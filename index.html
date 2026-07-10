@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Prazo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #e9ecef;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* ===== TELA INICIAL (LAUNCHER) ===== */
+        #tela-launcher {
+            text-align: center;
+        }
+
+        #tela-launcher h1 {
+            font-size: 1.8rem;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        #tela-launcher p {
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 1rem;
+        }
+
+        .btn-launch {
+            padding: 20px 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-launch:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 86, 179, 0.4);
+        }
+
+        .btn-launch:active {
+            transform: translateY(0);
+        }
+
+        /* ===== CALCULADORA ===== */
+        #tela-app {
+            display: none;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
+            padding: 30px;
+            width: 100%;
+            max-width: 420px;
+        }
+
+        #tela-app h2 {
+            font-size: 1.4rem;
+            color: #343a40;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .campo {
+            margin-bottom: 18px;
+        }
+
+        .campo label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 6px;
+        }
+
+        .campo input, .campo select {
+            width: 100%;
+            padding: 12px 14px;
+            font-size: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .campo input:focus, .campo select:focus {
+            border-color: #007bff;
+        }
+
+        .campo input[type="date"] {
+            color: #495057;
+        }
+
+        .row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .row .campo {
+            flex: 1;
+        }
+
+        .btn-calcular {
+            width: 100%;
+            padding: 14px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: white;
+            background-color: #28a745;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-calcular:hover {
+            background-color: #218838;
+            transform: translateY(-2px);
+        }
+
+        /* ===== RESULTADO ===== */
+        #resultado {
+            display: none;
+            margin-top: 22px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #007bff;
+        }
+
+        #resultado h3 {
+            font-size: 1rem;
+            color: #343a40;
+            margin-bottom: 10px;
+        }
+
+        #resultado .data-final {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 8px;
+        }
+
+        #resultado .info {
+            font-size: 0.85rem;
+            color: #6c757d;
+            line-height: 1.5;
+        }
+
+        #resultado .info strong {
+            color: #495057;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .badge-util {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-corridos {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        @media (max-width: 480px) {
+            #tela-app {
+                padding: 20px;
+                border-radius: 0;
+                min-height: 100vh;
+            }
+
+            .row {
+                flex-direction: column;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== TELA INICIAL ===== -->
+    <div id="tela-launcher">
+        <h1>Calculadora de Prazo</h1>
+        <p>Calcule datas futuras com base em dias uteis ou corridos</p>
+        <button class="btn-launch" onclick="iniciar()">Abrir Calculadora</button>
+    </div>
+
+    <!-- ===== APLICATIVO ===== -->
+    <div id="tela-app">
+        <h2>Calcular Prazo</h2>
+
+        <div class="campo">
+            <label for="dataInicial">Data Inicial</label>
+            <input type="date" id="dataInicial">
+        </div>
+
+        <div class="row">
+            <div class="campo">
+                <label for="quantidade">Quantidade</label>
+                <input type="number" id="quantidade" min="1" value="1" placeholder="Ex: 30">
+            </div>
+            <div class="campo">
+                <label for="tipoDias">Tipo de Dias</label>
+                <select id="tipoDias">
+                    <option value="uteis">Dias Uteis</option>
+                    <option value="corridos">Dias Corridos</option>
+                </select>
+            </div>
+        </div>
+
+        <button class="btn-calcular" onclick="calcular()">Calcular Data Final</button>
+
+        <div id="resultado">
+            <h3>Resultado</h3>
+            <div class="data-final" id="dataFinal"></div>
+            <div class="info" id="infoAdicional"></div>
+        </div>
+
+        <div class="footer">Calculadora de Prazo v1.0</div>
+    </div>
+
+    <script>
+        // ===== LAUNCHER =====
+        function iniciar() {
+            const largura = 480;
+            const altura = 750;
+            const left = Math.round((screen.width - largura) / 2);
+            const top = Math.round((screen.height - altura) / 2);
+            const feats = `width=${largura},height=${altura},top=${top},left=${left},resizable=yes,scrollbars=no,status=no,menubar=no,toolbar=no,location=no`;
+
+            // Abre a calculadora em popup
+            const win = window.open('', 'CalculadoraDePrazo', feats);
+
+            if (win && win.document && win.document.body.innerHTML === '') {
+                // Escreve o app no popup
+                win.document.write(document.documentElement.outerHTML);
+                win.document.close();
+                // Esconde launcher e mostra app no popup
+                win.onload = function() {
+                    const launcher = win.document.getElementById('tela-launcher');
+                    const app = win.document.getElementById('tela-app');
+                    if (launcher) launcher.style.display = 'none';
+                    if (app) app.style.display = 'block';
+                    // Preenche data de hoje
+                    const hoje = new Date().toISOString().split('T')[0];
+                    const dataInput = win.document.getElementById('dataInicial');
+                    if (dataInput) dataInput.value = hoje;
+                };
+            }
+
+            // Fecha a janela do launcher
+            window.close();
+        }
+
+        // ===== MOSTRA APP DIRETO SE ESTIVER NO POPUP =====
+        if (window.opener) {
+            document.getElementById('tela-launcher').style.display = 'none';
+            document.getElementById('tela-app').style.display = 'block';
+            // Preenche data de hoje
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataInicial').value = hoje;
+        }
+
+        // ===== CALCULADORA =====
+        function calcular() {
+            const dataInicial = document.getElementById('dataInicial').value;
+            const quantidade = parseInt(document.getElementById('quantidade').value);
+            const tipoDias = document.getElementById('tipoDias').value;
+
+            if (!dataInicial || isNaN(quantidade) || quantidade < 1) {
+                alert('Preencha todos os campos corretamente.');
+                return;
+            }
+
+            const data = new Date(dataInicial + 'T12:00:00');
+            let dataFinal;
+            let diasUsados = 0;
+
+            if (tipoDias === 'corridos') {
+                dataFinal = new Date(data);
+                dataFinal.setDate(dataFinal.getDate() + quantidade);
+                diasUsados = quantidade;
+            } else {
+                // Dias uteis
+                dataFinal = new Date(data);
+                let diasAdicionados = 0;
+                while (diasAdicionados < quantidade) {
+                    dataFinal.setDate(dataFinal.getDate() + 1);
+                    const diaSemana = dataFinal.getDay();
+                    if (diaSemana !== 0 && diaSemana !== 6) {
+                        diasAdicionados++;
+                    }
+                }
+                diasUsados = diasAdicionados;
+            }
+
+            // Formata data
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dataFormatada = dataFinal.toLocaleDateString('pt-BR', options);
+            const dataCurta = dataFinal.toLocaleDateString('pt-BR');
+
+            // Mostra resultado
+            const resultadoDiv = document.getElementById('resultado');
+            const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
+            const badgeText = tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS';
+
+            document.getElementById('dataFinal').innerHTML =
+                dataCurta + ' <span class="badge ' + badgeClass + '">' + badgeText + '</span>';
+            document.getElementById('infoAdicional').innerHTML =
+                '<strong>' + dataFormatada + '</strong><br>' +
+                'Adicionado <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' +
+                new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
+            resultadoDiv.style.display = 'block';
+        }
+    </script>
+
+</body>
+</html>
