@@ -404,7 +404,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
     </div>
-    <div class="footer">v3.1 - Dashboard Canvas</div>
+    <div class="footer">v3.2 - Timeline Proporcional</div>
 </div>
 
 </div>
@@ -424,7 +424,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <div class="timeline-marco" style="left:0%"><span class="timeline-marco-label">1a Vistoria</span></div>
         <div class="timeline-marco" style="left:33%"><span class="timeline-marco-label">2a Vistoria</span></div>
         <div class="timeline-marco" style="left:66%"><span class="timeline-marco-label">3a Vistoria</span></div>
-        <div class="timeline-marco-180" id="marco180" style="left:90%"><span class="timeline-marco-180-label">180 dias</span></div>
+        <div class="timeline-marco-180" id="marco180"><span class="timeline-marco-180-label">180 dias</span></div>
     </div>
 </div>
 
@@ -911,27 +911,38 @@ function atualizarTimeline() {
     const antigos = track.querySelectorAll('.timeline-evento');
     antigos.forEach(e => e.remove());
     
-    const datas = m.servicos.map(e => new Date(e.dataCriacao));
-    const datasB = m.servicos.filter(e => e.dataBaixa).map(e => new Date(e.dataBaixa));
+    const datas = m.servicos.map(e => new Date(e.dataCriacao + 'T12:00:00'));
+    const datasB = m.servicos.filter(e => e.dataBaixa).map(e => new Date(e.dataBaixa + 'T12:00:00'));
     const todas = [...datas, ...datasB];
     if (todas.length === 0) return;
     
-    const minData = new Date(Math.min(...todas));
-    const maxData = new Date(Math.max(...todas));
-    minData.setDate(minData.getDate() - 5);
-    maxData.setDate(maxData.getDate() + 65);
+    // Escala de proporcionalidade hibrida:
+    // - inicio = primeira criacao da matricula
+    // - dia180 = inicio + 180 dias (limite legal)
+    // - maxData = o mais distante entre: hoje+15, dia180+15 ou ultimo evento+15
+    // Assim o dia 180 sempre aparece, 'hoje' sempre aparece e a escala eh proporcional aos dias reais.
+    const dataInicio = new Date(Math.min(...datas));
+    const dia180 = new Date(dataInicio); dia180.setDate(dia180.getDate() + 180);
+    const ultimoEvento = new Date(Math.max(...todas));
+    const hoje = new Date();
+    const minData = new Date(dataInicio); minData.setDate(minData.getDate() - 5);
+    let maxData = new Date(Math.max(hoje.getTime(), dia180.getTime(), ultimoEvento.getTime()));
+    maxData.setDate(maxData.getDate() + 15);
     const range = maxData - minData;
+    const pct = (data) => Math.min(Math.max(((data - minData) / range) * 100, 0), 100);
     
     m.servicos.forEach(ev => {
-        const criDate = new Date(ev.dataCriacao);
-        const pctCriacao = ((criDate - minData) / range) * 100;
-        criarPontoTimeline(ev.codigo, 'criacao', pctCriacao, ev.dataCriacao);
-        if (ev.dataBaixa) { const baixaDate = new Date(ev.dataBaixa); const pctBaixa = ((baixaDate - minData) / range) * 100; criarPontoTimeline(ev.codigo, 'baixa', pctBaixa, ev.dataBaixa); }
+        const criDate = new Date(ev.dataCriacao + 'T12:00:00');
+        criarPontoTimeline(ev.codigo, 'criacao', pct(criDate), ev.dataCriacao);
+        if (ev.dataBaixa) { const baixaDate = new Date(ev.dataBaixa + 'T12:00:00'); criarPontoTimeline(ev.codigo, 'baixa', pct(baixaDate), ev.dataBaixa); }
     });
     
+    // Posiciona o marcador de 180 dias proporcionalmente
+    const marco180 = document.getElementById('marco180');
+    if (marco180) { marco180.style.left = pct(dia180) + '%'; }
+    
     const fill = document.getElementById('timelineFill');
-    const nowPct = ((new Date() - minData) / range) * 100;
-    fill.style.width = Math.min(Math.max(nowPct, 0), 100) + '%';
+    fill.style.width = pct(hoje) + '%';
     
     verificarSancoes();
     atualizarContador180();
@@ -1563,66 +1574,87 @@ function downloadArquivo(conteudo, nome, tipo) {
     URL.revokeObjectURL(url);
 }
 
-// ===== DADOS MOCK: 4 MATRICULAS REALISTAS - CICLOS COMPLETOS =====
+// ===== DADOS MOCK: 30 MATRICULAS VARIADAS E COERENTES COM O FLUXO VTO =====
 // Data de referencia: 13/07/2026 (hoje)
-// Todas as 4 matriculas estao DENTRO dos 180 dias
-// Fluxo logico: 1a vistoria → (opcional: 8409 analise) → 2a vistoria 8405 → 3a vistoria 8428
+// Distribuicao proposital para cobrir todos os estados do processo:
+//   - novas (sem servico)
+//   - 1a vistoria (em aberto / baixada OK / baixada em alerta / com servicos complementares)
+//   - 2a vistoria (em aberto / baixada / com 1a sancao ativa ou aplicada)
+//   - 3a vistoria (em aberto / baixada / com multa dobro ativa ou aplicada)
+//   - matriculas que ja estouraram os 180 dias
 function gerarMockData() {
-    const HOJE = '2026-07-13';
+    function s(codigo, criacao, baixa) {
+        return { codigo: codigo, dataCriacao: criacao, dataBaixa: baixa || null };
+    }
 
-    // Matricula 1: Fluxo normal dentro do prazo (1a → 2a vistoria, em aberto)
-    // Logica: Vistoria inicial em maio, baixou em junho. 2a vistoria criada recentemente, ainda em aberto.
-    // Dias desde 1a: 54 dias → 126 restantes → DENTRO DO PRAZO
-    const m1 = {
-        numero: '10045213',
-        servicos: [
-            { codigo: '8403', dataCriacao: '2026-05-20', dataBaixa: '2026-06-15' }, // 1a: 26 dias (OK)
-            { codigo: '8405', dataCriacao: '2026-06-18', dataBaixa: null }            // 2a: em aberto (recente)
-        ],
-        ativa: true
-    };
+    const mocks = [
+        // === 5 MATRICULAS NOVAS (sem servico) ===
+        { numero: '10045201', servicos: [], ativa: false },
+        { numero: '10045202', servicos: [], ativa: false },
+        { numero: '10045203', servicos: [], ativa: false },
+        { numero: '10045204', servicos: [], ativa: false },
+        { numero: '10045205', servicos: [], ativa: false },
 
-    // Matricula 2: Com analise complementar (8409) no fluxo
-    // Logica: 1a vistoria OK, orientacao tecnica para regularizar, aguardando 2a vistoria
-    // Dias desde 1a: 64 dias → 116 restantes → DENTRO DO PRAZO
-    const m2 = {
-        numero: '10045214',
-        servicos: [
-            { codigo: '8403', dataCriacao: '2026-05-10', dataBaixa: '2026-06-05' },  // 1a: 26 dias (OK)
-            { codigo: '8409', dataCriacao: '2026-06-08', dataBaixa: '2026-06-15' },  // Orient. tecnica: 7 dias
-            { codigo: '8405', dataCriacao: '2026-06-20', dataBaixa: null }             // 2a: em aberto
-        ],
-        ativa: false
-    };
+        // === 1a VISTORIA - 8 matriculas ===
+        // 10045206: 1a vistoria 8403 em aberto, recente (dentro do prazo)
+        { numero: '10045206', servicos: [s('8403','2026-07-03',null)], ativa: false },
+        // 10045207: 1a vistoria 8403 em aberto, critica (45 dias sem baixa)
+        { numero: '10045207', servicos: [s('8403','2026-05-29',null)], ativa: false },
+        // 10045208: 1a vistoria 8403 baixada OK (17 dias de execucao)
+        { numero: '10045208', servicos: [s('8403','2026-06-03','2026-06-20')], ativa: false },
+        // 10045209: 1a vistoria 8421 (sem AS) baixada OK (27 dias)
+        { numero: '10045209', servicos: [s('8421','2026-05-14','2026-06-10')], ativa: false },
+        // 10045210: 1a vistoria 8403 baixada em alerta (42 dias, acima dos 30)
+        { numero: '10045210', servicos: [s('8403','2026-05-04','2026-06-15')], ativa: false },
+        // 10045211: 1a vistoria 8403 + orientacao tecnica 8409
+        { numero: '10045211', servicos: [s('8403','2026-05-20','2026-06-10'), s('8409','2026-06-12','2026-06-18')], ativa: false },
+        // 10045212: solicitacao cliente 8400 + 1a vistoria 8403
+        { numero: '10045212', servicos: [s('8400','2026-06-01','2026-06-05'), s('8403','2026-06-08','2026-06-25')], ativa: false },
+        // 10045213: habite-se menor 8480 baixado
+        { numero: '10045213', servicos: [s('8480','2026-05-25','2026-06-15')], ativa: true },
 
-    // Matricula 3: 8405 com SANCAO 1a ATIVA (passou 60 dias desde baixa, mas ainda dentro dos 180)
-    // Logica: 1a vistoria em março OK. 2a vistoria baixou em abril. Hoje (13/07) ja passaram 84 dias desde
-    // a baixa do 8405 → SANCAO 1a deveria estar ATIVA (verde pulsante) ha 24 dias.
-    // Mas a matricula ainda tem 46 dias ate os 180 → ATENCAO
-    const m3 = {
-        numero: '10045215',
-        servicos: [
-            { codigo: '8403', dataCriacao: '2026-03-01', dataBaixa: '2026-03-25' },  // 1a: 24 dias (OK)
-            { codigo: '8405', dataCriacao: '2026-03-28', dataBaixa: '2026-04-20' }   // 2a: 23 dias (OK)
-            // SANCAO 1a: ativa a partir de 20/04 + 60 dias = 19/06/2026 → ATIVA desde 19/06
-        ],
-        ativa: false
-    };
+        // === 2a VISTORIA - 8 matriculas ===
+        // 10045214: 1a baixada, 2a em aberto recente
+        { numero: '10045214', servicos: [s('8403','2026-05-20','2026-06-15'), s('8405','2026-06-18',null)], ativa: false },
+        // 10045215: 1a + 8409 + 2a em aberto
+        { numero: '10045215', servicos: [s('8403','2026-05-10','2026-06-05'), s('8409','2026-06-08','2026-06-15'), s('8405','2026-06-20',null)], ativa: false },
+        // 10045216: 1a + 2a baixadas OK, dentro do prazo
+        { numero: '10045216', servicos: [s('8421','2026-04-14','2026-05-05'), s('8405','2026-05-08','2026-06-01')], ativa: false },
+        // 10045217: 1a + 2a em aberto, 1a baixada ha 80 dias
+        { numero: '10045217', servicos: [s('8403','2026-04-24','2026-05-15'), s('8405','2026-07-03',null)], ativa: false },
+        // 10045218: 1a + 2a baixadas, 1a SANCAO ATIVA (baixa do 8405 em 20/04, hoje 13/07 = 84 dias depois)
+        { numero: '10045218', servicos: [s('8403','2026-03-01','2026-03-25'), s('8405','2026-03-28','2026-04-20')], ativa: false },
+        // 10045219: 1a + 2a baixadas, 1a SANCAO APLICADA
+        { numero: '10045219', servicos: [s('8403','2026-03-05','2026-03-28'), s('8405','2026-04-01','2026-04-25'), s('1a_sancao','2026-06-20','2026-06-20')], ativa: false },
+        // 10045220: 2a em aberto, 1a baixada ha 120 dias, situacao critica
+        { numero: '10045220', servicos: [s('8403','2026-03-15','2026-04-05'), s('8405','2026-06-13',null)], ativa: false },
+        // 10045221: recuperacao tarifaria 8402 + 2a vistoria em aberto
+        { numero: '10045221', servicos: [s('8402','2026-04-01','2026-04-10'), s('8405','2026-06-20',null)], ativa: false },
 
-    // Matricula 4: 8405 com SANCAO 1a ATIVA (outra situacao, mais avancada no tempo)
-    // Logica: 1a vistoria em fevereiro. 2a baixou em abril. Hoje ja passaram 99 dias → sanção ativa há 39 dias.
-    // Dias desde 1a: 141 dias → 39 restantes → CRITICO mas ainda dentro dos 180
-    const m4 = {
-        numero: '10045216',
-        servicos: [
-            { codigo: '8421', dataCriacao: '2026-02-15', dataBaixa: '2026-03-10' },  // 1a: 23 dias (OK)
-            { codigo: '8405', dataCriacao: '2026-03-15', dataBaixa: '2026-04-08' }   // 2a: 24 dias (OK)
-            // SANCAO 1a: ativa a partir de 08/04 + 60 dias = 07/06/2026 → ATIVA desde 07/06
-        ],
-        ativa: false
-    };
+        // === 3a VISTORIA - 5 matriculas ===
+        // 10045222: 1a + 2a baixadas, 3a em aberto
+        { numero: '10045222', servicos: [s('8403','2026-03-01','2026-03-25'), s('8405','2026-03-28','2026-04-20'), s('8428','2026-06-23',null)], ativa: false },
+        // 10045223: 1a + 2a + 3a baixadas OK
+        { numero: '10045223', servicos: [s('8403','2026-04-01','2026-04-20'), s('8405','2026-04-23','2026-05-15'), s('8428','2026-05-18','2026-06-05')], ativa: false },
+        // 10045224: 3a baixada, MULTA DOBRO ATIVA (3a baixada em 10/05, hoje 13/07 = 64 dias depois)
+        { numero: '10045224', servicos: [s('8403','2026-02-13','2026-03-05'), s('8405','2026-03-08','2026-03-30'), s('8428','2026-04-02','2026-05-10')], ativa: false },
+        // 10045225: 3a baixada, MULTA DOBRO APLICADA
+        { numero: '10045225', servicos: [s('8403','2026-02-03','2026-02-25'), s('8405','2026-02-28','2026-03-20'), s('8428','2026-03-23','2026-04-30'), s('multa_dobro','2026-06-20','2026-06-20')], ativa: false },
+        // 10045226: 3a em aberto, critico perto dos 180 (170 dias desde 1a)
+        { numero: '10045226', servicos: [s('8403','2026-01-24','2026-02-15'), s('8405','2026-02-18','2026-03-10'), s('8428','2026-06-13',null)], ativa: false },
 
-    matriculas = [m1, m2, m3, m4];
+        // === MATRICULAS EXCEDIDAS (180 dias) - 4 matriculas ===
+        // 10045227: 1a baixada + 2a em aberto ha muito tempo (200 dias desde 1a)
+        { numero: '10045227', servicos: [s('8403','2025-12-25','2026-01-15'), s('8405','2026-01-18',null)], ativa: false },
+        // 10045228: 1a + 2a baixadas + 3a em aberto (191 dias desde 1a)
+        { numero: '10045228', servicos: [s('8421','2025-12-15','2026-01-05'), s('8405','2026-01-08','2026-01-30'), s('8428','2026-02-02',null)], ativa: false },
+        // 10045229: ciclo completo com sancoes aplicadas (224 dias desde 1a)
+        { numero: '10045229', servicos: [s('8403','2025-12-01','2025-12-20'), s('8405','2025-12-23','2026-01-15'), s('1a_sancao','2026-01-20','2026-01-20'), s('8428','2026-02-02','2026-03-10'), s('multa_dobro','2026-04-20','2026-04-20')], ativa: false },
+        // 10045230: habite-se grande 8470 + 2a em aberto (189 dias desde 1a)
+        { numero: '10045230', servicos: [s('8470','2026-01-04','2026-01-20'), s('8405','2026-03-15',null)], ativa: false }
+    ];
+
+    matriculas = mocks;
     matriculaAtiva = '10045213';
     document.getElementById('matriculaAtivaDisplay').textContent = '10045213';
     renderMatriculas();
