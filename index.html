@@ -159,6 +159,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .timeline-fase-2{background:rgba(245,124,0,.06)}
 .timeline-fase-3{background:rgba(194,24,88,.06)}
 .timeline-fase-excedido{background:rgba(220,53,69,.08);z-index:4}
+/* Barras de duracao (criacao -> baixa) */
+#timelineBarras{position:absolute;top:0;left:0;right:0;bottom:0;z-index:7}
+.timeline-barra{position:absolute;height:5px;border-radius:3px;opacity:.75;box-shadow:0 1px 2px rgba(0,0,0,.15);transition:opacity .2s}
+.timeline-barra:hover{opacity:1}
+.timeline-barra.aberto{background-image:repeating-linear-gradient(90deg,transparent,transparent 4px,rgba(255,255,255,.6) 4px,rgba(255,255,255,.6) 8px)}
 .timeline-marco{position:absolute;top:0;bottom:0;width:2px;z-index:5}
 .timeline-marco.fase-1{background:rgba(25,118,210,.35)}
 .timeline-marco.fase-2{background:rgba(245,124,0,.35)}
@@ -309,6 +314,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <div class="coluna-header">2a VISTORIA<div class="sub">60 dias - Multa</div></div>
                 <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8405')" data-cod="8405"><span class="codigo">8405</span> - 2a Vistoria<span class="desc">Irregularidade persistiu</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
+                </div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Complementares</div>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
                 </div>
                 <div class="servicos-grupo"><div class="servicos-grupo-title">Sancao</div>
                     <button class="servico-btn sancao-btn" onclick="registrarSancao('1a_sancao')" id="btnSancao1" data-cod="1a_sancao"><span class="codigo">&#9888;</span> 1a SANCAO<span class="desc">Multa - aguardando</span></button>
@@ -319,6 +332,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <div class="coluna-header">3a VISTORIA<div class="sub">60 dias - Multa DOBRO</div></div>
                 <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8428')" data-cod="8428"><span class="codigo">8428</span> - 3a Vistoria<span class="desc">Irregularidade persistente</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
+                </div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Complementares</div>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
                 </div>
                 <div class="servicos-grupo"><div class="servicos-grupo-title">Sancao</div>
                     <button class="servico-btn sancao-btn" onclick="registrarSancao('multa_dobro')" id="btnSancaoDobro" data-cod="multa_dobro"><span class="codigo">&#128308;</span> MULTA DOBRO<span class="desc">Reincidencia</span></button>
@@ -431,6 +452,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <div class="timeline-track" id="timelineTrack" style="display:none">
         <div class="timeline-ruler"></div>
         <div id="timelineFases"></div>
+        <div id="timelineBarras"></div>
         <div class="timeline-fill" id="timelineFill"></div>
         <div id="timelineMarcos"></div>
         <div class="timeline-marco-180" id="marco180"><span class="timeline-marco-180-label">180 dias</span></div>
@@ -703,13 +725,12 @@ function renderMatriculas() {
             }
         });
         
-        // Dias desde o primeiro servico ate hoje (para contar os 180)
+        // Dias desde o dia zero (baixa do primeiro servico) ate hoje (para contar os 180)
         let diasPassados180 = 0;
         let diasRestantes180 = 180;
         if (m.servicos.length > 0) {
-            const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
-            const primeiraData = new Date(Math.min(...datasCriacao));
-            diasPassados180 = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+            const diaZero = getDiaZero(m);
+            diasPassados180 = Math.round((new Date() - diaZero) / (1000*60*60*24));
             diasRestantes180 = Math.max(0, 180 - diasPassados180);
         }
         
@@ -899,6 +920,27 @@ function registrarSancao(tipo) {
 }
 
 // ===== TIMELINE =====
+function getDiaZero(m) {
+    // Dia 0 = baixa do primeiro servico registrado.
+    // Se nao tiver baixa, usa a criacao.
+    if (!m || m.servicos.length === 0) return null;
+    for (let i = 0; i < m.servicos.length; i++) {
+        if (m.servicos[i].dataBaixa) return new Date(m.servicos[i].dataBaixa + 'T12:00:00');
+    }
+    return new Date(m.servicos[0].dataCriacao + 'T12:00:00');
+}
+function getInicioFase2(m, diaZero) {
+    // Se houver 8405, a 2a fase comeca na data de criacao do primeiro 8405.
+    const s8405 = m.servicos.find(s => s.codigo === '8405');
+    if (s8405) return new Date(s8405.dataCriacao + 'T12:00:00');
+    const d = new Date(diaZero); d.setDate(d.getDate() + 60); return d;
+}
+function getInicioFase3(m, diaZero) {
+    // Se houver 8428, a 3a fase comeca na data de criacao do primeiro 8428.
+    const s8428 = m.servicos.find(s => s.codigo === '8428');
+    if (s8428) return new Date(s8428.dataCriacao + 'T12:00:00');
+    const d = new Date(diaZero); d.setDate(d.getDate() + 120); return d;
+}
 function atualizarTimeline() {
     const track = document.getElementById('timelineTrack');
     const empty = document.getElementById('timelineEmpty');
@@ -925,33 +967,38 @@ function atualizarTimeline() {
     const todas = [...datas, ...datasB];
     if (todas.length === 0) return;
     
-    // Escala de proporcionalidade hibrida:
-    // - inicio = primeira criacao da matricula
-    // - dia180 = inicio + 180 dias (limite legal)
+    // Escala de proporcionalidade:
+    // - diaZero = baixa do primeiro servico (inicio da contagem dos 180 dias)
+    // - inicioFase2 = data do primeiro 8405, ou diaZero + 60
+    // - inicioFase3 = data do primeiro 8428, ou diaZero + 120
+    // - dia180 = diaZero + 180
+    // - minData = data mais antiga (criacao anterior ao diaZero) - margem
     // - maxData = o mais distante entre: hoje+15, dia180+15 ou ultimo evento+15
-    // Assim o dia 180 sempre aparece, 'hoje' sempre aparece e a escala eh proporcional aos dias reais.
-    const dataInicio = new Date(Math.min(...datas));
-    const dia180 = new Date(dataInicio); dia180.setDate(dia180.getDate() + 180);
+    const diaZero = getDiaZero(m);
+    const inicioFase2 = getInicioFase2(m, diaZero);
+    const inicioFase3 = getInicioFase3(m, diaZero);
+    const dia180 = new Date(diaZero); dia180.setDate(dia180.getDate() + 180);
+    const dataMaisAntiga = new Date(Math.min(...todas));
     const ultimoEvento = new Date(Math.max(...todas));
     const hoje = new Date();
-    const minData = new Date(dataInicio); minData.setDate(minData.getDate() - 5);
+    const minData = new Date(Math.min(dataMaisAntiga.getTime(), diaZero.getTime())); minData.setDate(minData.getDate() - 5);
     let maxData = new Date(Math.max(hoje.getTime(), dia180.getTime(), ultimoEvento.getTime()));
     maxData.setDate(maxData.getDate() + 15);
     const range = maxData - minData;
     const pct = (data) => Math.min(Math.max(((data - minData) / range) * 100, 0), 100);
     
-    // Limpa faixas e marcos de fase antigos
+    // Limpa faixas, marcos e barras antigas
     const containerFases = document.getElementById('timelineFases');
     const containerMarcos = document.getElementById('timelineMarcos');
+    const containerBarras = document.getElementById('timelineBarras');
     if (containerFases) containerFases.innerHTML = '';
     if (containerMarcos) containerMarcos.innerHTML = '';
+    if (containerBarras) containerBarras.innerHTML = '';
     
-    // Calcula posicoes das fases (0, 60, 120, 180 dias desde o inicio)
-    const dia60 = new Date(dataInicio); dia60.setDate(dia60.getDate() + 60);
-    const dia120 = new Date(dataInicio); dia120.setDate(dia120.getDate() + 120);
-    const p0 = pct(minData);
-    const p60 = pct(dia60);
-    const p120 = pct(dia120);
+    // Calcula posicoes dos marcos
+    const pZero = pct(diaZero);
+    const pFase2 = pct(inicioFase2);
+    const pFase3 = pct(inicioFase3);
     const p180 = pct(dia180);
     const pHoje = pct(hoje);
     
@@ -965,12 +1012,12 @@ function atualizarTimeline() {
         if (label) { div.title = label; }
         containerFases.appendChild(div);
     }
-    criarFaixa(p0, p60, 'timeline-fase-1', '1a Vistoria (0-60 dias)');
-    criarFaixa(p60, p120, 'timeline-fase-2', '2a Vistoria (60-120 dias)');
-    criarFaixa(p120, p180, 'timeline-fase-3', '3a Vistoria (120-180 dias)');
+    criarFaixa(pZero, pFase2, 'timeline-fase-1', '1a Vistoria');
+    criarFaixa(pFase2, pFase3, 'timeline-fase-2', '2a Vistoria');
+    criarFaixa(pFase3, p180, 'timeline-fase-3', '3a Vistoria');
     if (hoje > dia180) { criarFaixa(p180, Math.max(pHoje, p180), 'timeline-fase-excedido', 'Periodo excedido (>180 dias)'); }
     
-    // Renderiza marcos divisórios de fase (linhas verticais de fora a fora)
+    // Renderiza marcos divisórios de fase
     function criarMarcoFase(pos, classe, label) {
         if (pos < 0 || pos > 100) return;
         const div = document.createElement('div');
@@ -982,22 +1029,46 @@ function atualizarTimeline() {
         div.appendChild(lbl);
         containerMarcos.appendChild(div);
     }
-    criarMarcoFase(p0, 'fase-1', '1a Vistoria');
-    criarMarcoFase(p60, 'fase-2', '2a Vistoria');
-    criarMarcoFase(p120, 'fase-3', '3a Vistoria');
+    criarMarcoFase(pZero, 'fase-1', 'Inicio');
+    criarMarcoFase(pFase2, 'fase-2', '2a Vistoria');
+    criarMarcoFase(pFase3, 'fase-3', '3a Vistoria');
     
-    m.servicos.forEach(ev => {
+    // Renderiza barras de duracao para cada servico
+    const coresCodigo = {
+        '8403': '#1976d2', '8421': '#1976d2', '8402': '#6c757d', '8400': '#6c757d',
+        '8409': '#6c757d', '8470': '#6c757d', '8480': '#6c757d',
+        '8405': '#f57c00', '8428': '#c2185b', '1a_sancao': '#28a745', 'multa_dobro': '#dc3545'
+    };
+    m.servicos.forEach((ev, idx) => {
         const criDate = new Date(ev.dataCriacao + 'T12:00:00');
-        criarPontoTimeline(ev.codigo, 'criacao', pct(criDate), ev.dataCriacao);
-        if (ev.dataBaixa) { const baixaDate = new Date(ev.dataBaixa + 'T12:00:00'); criarPontoTimeline(ev.codigo, 'baixa', pct(baixaDate), ev.dataBaixa); }
+        const fimDate = ev.dataBaixa ? new Date(ev.dataBaixa + 'T12:00:00') : hoje;
+        const pInicio = pct(criDate);
+        const pFim = pct(fimDate);
+        const cor = coresCodigo[ev.codigo] || '#6c757d';
+        
+        // Barra de duracao
+        if (containerBarras) {
+            const barra = document.createElement('div');
+            barra.className = 'timeline-barra' + (ev.dataBaixa ? '' : ' aberto');
+            barra.style.left = Math.min(pInicio, pFim) + '%';
+            barra.style.width = Math.abs(pFim - pInicio) + '%';
+            barra.style.backgroundColor = cor;
+            barra.style.top = (22 + (idx % 4) * 7) + '%';
+            barra.title = ev.codigo + ': criado ' + formatarDataCurta(ev.dataCriacao) + (ev.dataBaixa ? ', baixado ' + formatarDataCurta(ev.dataBaixa) : ', em aberto');
+            containerBarras.appendChild(barra);
+        }
+        
+        // Pontos de criacao e baixa
+        criarPontoTimeline(ev.codigo, 'criacao', pInicio, ev.dataCriacao);
+        if (ev.dataBaixa) { criarPontoTimeline(ev.codigo, 'baixa', pct(new Date(ev.dataBaixa + 'T12:00:00')), ev.dataBaixa); }
     });
     
     // Posiciona o marcador de 180 dias proporcionalmente
     const marco180 = document.getElementById('marco180');
-    if (marco180) { marco180.style.left = pct(dia180) + '%'; }
+    if (marco180) { marco180.style.left = p180 + '%'; }
     
     const fill = document.getElementById('timelineFill');
-    fill.style.width = pct(hoje) + '%';
+    fill.style.width = pHoje + '%';
     
     verificarSancoes();
     atualizarContador180();
@@ -1075,9 +1146,8 @@ function atualizarCardsResumo() {
     let excedidos = 0;
     matriculas.forEach(m => {
         if (m.servicos.length > 0) {
-            const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
-            const primeiraData = new Date(Math.min(...datasCriacao));
-            const diasPassados = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+            const diaZero = getDiaZero(m);
+            const diasPassados = Math.round((new Date() - diaZero) / (1000*60*60*24));
             if (diasPassados > 180) excedidos++;
         }
     });
@@ -1169,9 +1239,8 @@ function graficoStatus() {
     let ok = 0, alerta = 0, critico = 0, excedido = 0;
     matriculas.forEach(m => {
         if (m.servicos.length === 0) { ok++; return; }
-        const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
-        const primeiraData = new Date(Math.min(...datasCriacao));
-        const diasPassados = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+        const diaZero = getDiaZero(m);
+        const diasPassados = Math.round((new Date() - diaZero) / (1000*60*60*24));
         const restantes = 180 - diasPassados;
         if (restantes <= 0) excedido++;
         else if (restantes <= 30) critico++;
@@ -1408,9 +1477,8 @@ function atualizarContador180() {
     
     if (!m || m.servicos.length === 0) { contadorDiv.style.display = 'none'; alertaDiv.style.display = 'none'; return; }
     
-    const datasCriacao = m.servicos.map(e => new Date(e.dataCriacao + 'T12:00:00').getTime());
-    const primeiraData = new Date(Math.min(...datasCriacao));
-    const diasPassados = Math.round((new Date() - primeiraData) / (1000 * 60 * 60 * 24));
+    const diaZero = getDiaZero(m);
+    const diasPassados = Math.round((new Date() - diaZero) / (1000 * 60 * 60 * 24));
     const diasRestantes = 180 - diasPassados;
     
     if (diasRestantes > 0) {
