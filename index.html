@@ -1,353 +1,1638 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Prazo</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>VTO v3.2 — Prazos e Vistorias</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#e9ecef;min-height:100vh;padding:20px;padding-bottom:90px}
+.tabs-container{max-width:1200px;margin:0 auto}
+.tabs-nav{display:flex;gap:4px;margin-bottom:20px;background:#dee2e6;padding:6px;border-radius:12px;align-items:center}
+.tab-btn{flex:1;padding:14px 20px;font-size:1rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;background:transparent;color:#6c757d;transition:all .3s}
+.tab-btn:hover{background:rgba(255,255,255,.4);color:#495057}
+.tab-btn.active{background:#007bff;color:white;box-shadow:0 2px 8px rgba(0,123,255,.3)}
+.tab-content{display:none}.tab-content.active{display:block}
+.btn-ajuda,.btn-config{padding:10px 14px;font-size:.85rem;font-weight:700;color:#6c757d;background:white;border:2px solid #ced4da;border-radius:8px;cursor:pointer;transition:all .3s;font-family:inherit;white-space:nowrap}
+.btn-ajuda:hover,.btn-config:hover{background:#e9ecef;border-color:#adb5bd}
+.btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
+.versao-badge{margin-left:auto;padding:6px 12px;font-size:.72rem;font-weight:700;color:#adb5bd;background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;font-family:'Courier New',monospace;letter-spacing:1px;cursor:default;user-select:none}
+.btn-config.ativo{background:#495057;color:white;border-color:#343a40}
+.card{background:white;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:30px;margin-bottom:20px}
+.card h2{font-size:1.3rem;color:#343a40;margin-bottom:6px}
+.card p.subtitle{color:#6c757d;font-size:.9rem;margin-bottom:20px}
+.calc-wrap{max-width:480px;margin:0 auto}
+.campo{margin-bottom:18px}.campo label{display:block;font-size:.9rem;font-weight:600;color:#495057;margin-bottom:6px}
+.campo input,.campo select{width:100%;padding:12px 14px;font-size:1rem;border:2px solid #dee2e6;border-radius:8px;outline:none;transition:border-color .2s;font-family:inherit}
+.campo input:focus,.campo select:focus{border-color:#007bff}
+.row{display:flex;gap:12px}.row .campo{flex:1}
+.btn-calcular{width:100%;padding:14px;font-size:1.1rem;font-weight:700;color:white;background:#28a745;border:none;border-radius:10px;cursor:pointer;transition:all .3s;margin-top:10px}
+.btn-calcular:hover{background:#218838;transform:translateY(-2px)}
+#resultadoPrazo,#resultadoDilacao{display:none;margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #007bff}
+#resultadoPrazo h3,#resultadoDilacao h3{font-size:1rem;color:#343a40;margin-bottom:10px}
+.data-final{font-size:1.5rem;font-weight:700;color:#007bff;margin-bottom:8px}
+.info{font-size:.85rem;color:#6c757d;line-height:1.5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:8px}
+.badge-util{background:#d4edda;color:#155724}.badge-corridos{background:#fff3cd;color:#856404}
+.dica-box{background:#e7f3ff;border:1px solid #b8daff;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:.85rem;color:#004085;line-height:1.6}
+.dica-box strong{color:#002752}
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #e9ecef;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+/* ===== FLUXO DE VISTORIAS ===== */
+.fluxo-container{display:flex;gap:16px;flex-wrap:wrap}
+.coluna-vistoria{flex:1;min-width:300px;border-radius:14px;padding:20px;position:relative}
+.coluna-1{background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border:2px solid #64b5f6}
+.coluna-2{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:2px solid #ffb74d}
+.coluna-3{background:linear-gradient(135deg,#fce4ec 0%,#f8bbd0 100%);border:2px solid #f06292}
+.coluna-header{text-align:center;padding:12px;border-radius:10px;margin-bottom:16px;font-weight:700;font-size:1.1rem}
+.coluna-1 .coluna-header{background:#1976d2;color:white}
+.coluna-2 .coluna-header{background:#f57c00;color:white}
+.coluna-3 .coluna-header{background:#c2185b;color:white}
+.coluna-header .sub{font-size:.8rem;font-weight:400;opacity:.9;margin-top:4px}
+.servicos-grupo{margin-bottom:16px}
+.servicos-grupo-title{font-size:.8rem;font-weight:700;color:#495057;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px dashed rgba(0,0,0,.15)}
+.servico-btn{display:block;width:100%;padding:10px 14px;margin-bottom:6px;font-size:.85rem;font-weight:500;border:2px solid transparent;border-radius:8px;cursor:pointer;transition:all .25s;text-align:left;font-family:inherit}
+.coluna-1 .servico-btn{background:rgba(255,255,255,.7);color:#1565c0;border-color:#90caf9}
+.coluna-1 .servico-btn:hover{background:white;border-color:#1976d2;transform:translateX(4px)}
+.coluna-1 .servico-btn.selecionado{background:#1976d2;color:white;border-color:#0d47a1;box-shadow:0 2px 8px rgba(25,118,210,.3)}
+.coluna-2 .servico-btn{background:rgba(255,255,255,.7);color:#e65100;border-color:#ffcc80}
+.coluna-2 .servico-btn:hover{background:white;border-color:#f57c00;transform:translateX(4px)}
+.coluna-2 .servico-btn.selecionado{background:#f57c00;color:white;border-color:#e65100;box-shadow:0 2px 8px rgba(245,124,0,.3)}
+.coluna-3 .servico-btn{background:rgba(255,255,255,.7);color:#ad1457;border-color:#f48fb1}
+.coluna-3 .servico-btn:hover{background:white;border-color:#c2185b;transform:translateX(4px)}
+.coluna-3 .servico-btn.selecionado{background:#c2185b;color:white;border-color:#880e4f;box-shadow:0 2px 8px rgba(194,24,88,.3)}
+.servico-btn .codigo{font-weight:700;font-size:.95rem;display:inline-block;min-width:38px}
+.servico-btn .desc{font-size:.78rem;opacity:.85;display:block;margin-top:2px}
 
-        /* ===== TELA INICIAL (LAUNCHER) ===== */
-        #tela-launcher {
-            text-align: center;
-        }
+/* Cards de sancao */
+.sancao-btn{background:#e9ecef!important;color:#adb5bd!important;border-color:#dee2e6!important;cursor:not-allowed!important;opacity:.7}
+.sancao-btn.ativo{background:#28a745!important;color:white!important;border-color:#1e7e34!important;cursor:pointer!important;opacity:1;animation:sancaoPulse 2s infinite}
+.sancao-btn.ativo:hover{background:#218838!important;transform:translateX(4px)!important}
+.sancao-btn.aplicado{background:#17a2b8!important;color:white!important;border-color:#117a8b!important;cursor:default!important;opacity:1}
+@keyframes sancaoPulse{0%,100%{box-shadow:0 0 0 0 rgba(40,167,69,.4)}50%{box-shadow:0 0 0 8px rgba(40,167,69,0)}}
 
-        #tela-launcher h1 {
-            font-size: 1.8rem;
-            color: #343a40;
-            margin-bottom: 10px;
-        }
+.eventos-box{margin-top:12px;padding:12px;background:rgba(255,255,255,.6);border-radius:8px;border:1px dashed rgba(0,0,0,.15)}
+.eventos-box-title{font-size:.75rem;font-weight:700;color:#6c757d;text-transform:uppercase;margin-bottom:8px}
+.evento-chip{display:inline-block;padding:5px 10px;margin:3px;font-size:.78rem;border-radius:16px;cursor:pointer;border:1px solid #ced4da;background:white;color:#495057;transition:all .2s;font-family:inherit}
+.evento-chip:hover{background:#e9ecef}.evento-chip.selecionado{background:#495057;color:white;border-color:#343a40}
+.evento-chip.dilacao{border-color:#28a745;color:#155724}.evento-chip.dilacao.selecionado{background:#28a745;color:white}
+.evento-chip.recurso{border-color:#fd7e14;color:#856404}.evento-chip.recurso.selecionado{background:#fd7e14;color:white}
+.evento-chip.regular{border-color:#20c997;color:#0f5132}.evento-chip.regular.selecionado{background:#20c997;color:white}
 
-        #tela-launcher p {
-            color: #6c757d;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
+.seta-container{display:flex;align-items:flex-start;justify-content:center;padding-top:60px;min-width:40px}
+.seta{font-size:2rem;color:#adb5bd}
 
-        .btn-launch {
-            padding: 20px 50px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: white;
-            background-color: #007bff;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
-            transition: all 0.3s ease;
-        }
+/* ===== TABELA DE MATRICULAS ===== */
+.matricula-header{display:flex;gap:12px;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap}
+.matricula-header .campo{flex:1;min-width:200px;margin-bottom:0}
+.matricula-header input.matricula-input{font-size:1.2rem;font-weight:700;text-align:center;letter-spacing:4px}
+.btn-add{padding:12px 24px;font-size:1rem;font-weight:700;color:white;background:#007bff;border:none;border-radius:10px;cursor:pointer;transition:all .3s;font-family:inherit}
+.btn-add:hover{background:#0056b3;transform:translateY(-2px)}
 
-        .btn-launch:hover {
-            background-color: #0056b3;
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(0, 86, 179, 0.4);
-        }
+/* Card de matricula */
+.matricula-card{background:#f8f9fa;border:2px solid #dee2e6;border-radius:14px;padding:20px;margin-bottom:16px;transition:all .3s}
+.matricula-card:hover{border-color:#adb5bd;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+.matricula-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.matricula-numero{font-size:1.4rem;font-weight:800;color:#343a40;font-family:'Courier New',monospace;letter-spacing:2px}
+.matricula-status{display:flex;gap:8px;align-items:center}
+.matricula-badge{padding:4px 12px;border-radius:12px;font-size:.75rem;font-weight:700}
+.badge-ok{background:#d4edda;color:#155724}
+.badge-alerta{background:#fff3cd;color:#856404}
+.badge-critico{background:#f8d7da;color:#721c24}
+.badge-excedido{background:#dc3545;color:white}
 
-        .btn-launch:active {
-            transform: translateY(0);
-        }
+/* Mini timeline na matricula */
+.mini-timeline{position:relative;height:40px;margin:12px 0;background:#e9ecef;border-radius:8px;overflow:hidden}
+.mini-timeline-bar{position:absolute;top:0;left:0;height:100%;background:linear-gradient(90deg,#1976d2,#f57c00,#c2185b);border-radius:8px;transition:width .5s}
+.mini-timeline-pontos{position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;padding:0 10px;gap:8px}
+.mini-dot{width:10px;height:10px;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.2);flex-shrink:0}
+.mini-dot.criacao{background:#1976d2}.mini-dot.baixa{background:#28a745}.mini-dot.aberto{background:#adb5bd;border-style:dashed}
+.mini-dot-label{font-size:.65rem;color:#495057;font-weight:600;white-space:nowrap}
 
-        /* ===== CALCULADORA ===== */
-        #tela-app {
-            display: none;
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.12);
-            padding: 30px;
-            width: 100%;
-            max-width: 420px;
-        }
+/* Tabela mestre - estilo Excel */
+.tabela-master{width:100%;border-collapse:collapse;font-size:.82rem;border:1px solid #ced4da}
+.tabela-master thead th{background:#495057;color:white;padding:8px 10px;text-align:left;font-weight:600;font-size:.75rem;text-transform:uppercase;letter-spacing:.3px;border-right:1px solid #6c757d;position:sticky;top:0;z-index:10}
+.tabela-master thead th:last-child{border-right:none}
+.tabela-master tbody tr{border-bottom:1px solid #dee2e6;transition:background .15s}
+.tabela-master tbody tr:hover{background:#f0f4f8}
+.tabela-master tbody tr:nth-child(even){background:#fafbfc}
+.tabela-master tbody tr:nth-child(even):hover{background:#f0f4f8}
+.tabela-master td{padding:6px 10px;border-right:1px solid #e9ecef;color:#495057;vertical-align:top}
+.tabela-master td:last-child{border-right:none}
+.tabela-master .matricula-cell{min-width:130px;font-family:'Courier New',monospace;background:#f8f9fa}
+.tabela-master .cod-cell{font-weight:700;color:#1976d2;font-family:'Courier New',monospace;min-width:70px}
+.tabela-master .prazo-badge-mini{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.68rem;font-weight:700;white-space:nowrap}
+.tabela-master .ativa-tag{font-size:.65rem;background:#e9ecef;color:#495057;padding:1px 6px;border-radius:8px;font-weight:700;margin-left:4px;vertical-align:middle;border:1px solid #ced4da}
 
-        #tela-app h2 {
-            font-size: 1.4rem;
-            color: #343a40;
-            margin-bottom: 25px;
-            text-align: center;
-        }
+/* Botoes de acao na tabela - discretos */
+.btn-acao{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;font-size:.72rem;font-weight:500;border:1px solid #dee2e6;border-radius:6px;cursor:pointer;transition:all .2s;font-family:inherit;background:white;color:#6c757d}
+.btn-acao:hover{border-color:#adb5bd;color:#495057;background:#f8f9fa}
+.btn-acao.selecionar:hover{border-color:#90caf9;color:#1565c0;background:#e3f2fd}
+.btn-acao.remover:hover{border-color:#f5c6cb;color:#721c24;background:#f8d7da}
+.btn-acao svg,.btn-acao .icon{font-size:.8rem}
+.prazo-ok{background:#d4edda;color:#155724}.prazo-alerta{background:#fff3cd;color:#856404}.prazo-critico{background:#f8d7da;color:#721c24}
 
-        .campo {
-            margin-bottom: 18px;
-        }
+/* Contador resumo */
+.resumo-bar{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:20px;padding:16px;background:white;border-radius:12px;border:1px solid #dee2e6}
+.resumo-item{text-align:center;flex:1;min-width:100px}
+.resumo-item .num{font-size:1.8rem;font-weight:800;display:block}
+.resumo-item .rot{font-size:.7rem;color:#6c757d;text-transform:uppercase;letter-spacing:.5px}
+.resumo-item.total .num{color:#007bff}
+.resumo-item.ok .num{color:#28a745}
+.resumo-item.alerta .num{color:#fd7e14}
+.resumo-item.critico .num{color:#dc3545}
 
-        .campo label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #495057;
-            margin-bottom: 6px;
-        }
+/* Timeline inferior - compacta e elegante */
+.timeline-panel{position:fixed;bottom:0;left:0;right:0;background:white;border-top:2px solid #dee2e6;box-shadow:0 -2px 10px rgba(0,0,0,.08);padding:10px 24px 8px;z-index:100;max-height:110px;overflow-y:auto}
+.timeline-panel.has-content{border-top-color:#28a745}
+.timeline-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.timeline-header h4{font-size:.75rem;color:#6c757d;text-transform:uppercase;letter-spacing:.5px;margin:0}
+.timeline-toggle{font-size:.7rem;color:#007bff;cursor:pointer;background:none;border:none;font-family:inherit;font-weight:600}
+.timeline-track{display:flex;align-items:center;position:relative;padding:6px 0 8px;min-height:30px}
+.timeline-ruler{position:absolute;top:50%;left:0;right:0;height:2px;background:#e9ecef;border-radius:1px;transform:translateY(-50%)}
+.timeline-fill{position:absolute;top:50%;left:0;height:2px;background:linear-gradient(90deg,#1976d2,#f57c00,#c2185b);border-radius:1px;transform:translateY(-50%);transition:width .5s}
+.timeline-marco{position:absolute;top:15%;bottom:15%;width:1px;background:#ced4da;z-index:5}
+.timeline-marco-label{position:absolute;top:-14px;transform:translateX(-50%);font-size:.6rem;font-weight:600;color:#adb5bd;white-space:nowrap;text-transform:uppercase}
+/* Marcador de 180 dias */
+.timeline-marco-180{position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,#dc3545 3px,#dc3545 6px);z-index:6}
+.timeline-marco-180-label{position:absolute;top:-14px;transform:translateX(-50%);font-size:.6rem;font-weight:700;color:#dc3545;white-space:nowrap;background:#fff3cd;padding:1px 5px;border-radius:4px}
+.timeline-evento{position:absolute;top:50%;transform:translate(-50%,-50%);z-index:10;cursor:pointer}
+.timeline-dot{width:10px;height:10px;border-radius:50%;border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:all .3s}
+.timeline-dot.criacao{background:#1976d2}.timeline-dot.baixa{background:#28a745}.timeline-dot.aberto{background:#adb5bd;border-style:dashed}
+.timeline-evento-label{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:.6rem;font-weight:600;color:#495057;white-space:nowrap}
+.timeline-evento-data{position:absolute;bottom:-14px;left:50%;transform:translateX(-50%);font-size:.55rem;color:#adb5bd;white-space:nowrap}
+.timeline-empty{text-align:center;color:#adb5bd;font-size:.85rem;padding:8px 0}
 
-        .campo input, .campo select {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 1rem;
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.2s;
-            font-family: inherit;
-        }
+/* Contador 180 dias - compacto */
+.contador-180{display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px;margin-bottom:6px;background:#f8f9fa;border-radius:10px;border:1px solid #e9ecef}
+.contador-bloco{text-align:center}
+.contador-bloco .numero{font-size:1.4rem;font-weight:800;line-height:1;display:block}
+.contador-bloco .rotulo{font-size:.6rem;font-weight:600;color:#6c757d;text-transform:uppercase;letter-spacing:.5px;display:block}
+.contador-bloco.dias-restantes .numero{color:#28a745}
+.contador-bloco.dias-restantes.alerta .numero{color:#fd7e14}
+.contador-bloco.dias-restantes.critico .numero{color:#dc3545}
+.contador-bloco.dias-restantes.excedido .numero{color:#721c24}
+.contador-separador{font-size:1.2rem;font-weight:300;color:#ced4da}
+.contador-msg{font-size:.72rem;font-weight:600;padding:3px 10px;border-radius:6px;text-align:center}
+.contador-msg.ok{background:#d4edda;color:#155724}
+.contador-msg.alerta{background:#fff3cd;color:#856404}
+.contador-msg.critico{background:#f8d7da;color:#721c24}
+#alerta180{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%)!important;border-color:#ffb74d!important;padding:6px 16px}
+#alerta180 .numero{color:#dc3545!important}
 
-        .campo input:focus, .campo select:focus {
-            border-color: #007bff;
-        }
+/* Modal */
+.modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:700;justify-content:center;align-items:center}
+.modal-overlay.ativo{display:flex}
+.modal-box{background:white;border-radius:16px;padding:28px;max-width:400px;width:90%;box-shadow:0 10px 40px rgba(0,0,0,.2);animation:modalPop .3s ease}
+@keyframes modalPop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.modal-box h3{font-size:1.1rem;color:#343a40;margin-bottom:8px}
+.modal-box p.instrucao{font-size:.85rem;color:#6c757d;margin-bottom:18px;line-height:1.5}
+.modal-botoes{display:flex;gap:8px;margin-top:18px}
+.modal-btn{flex:1;padding:10px;font-size:.85rem;font-weight:600;border:none;border-radius:8px;cursor:pointer;font-family:inherit}
+.modal-btn.salvar{background:#007bff;color:white}.modal-btn.espaco{background:#6c757d;color:white}.modal-btn.cancelar{background:#e9ecef;color:#495057}
+.modal-ajuda-teclas{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;padding:10px 12px;background:#f8f9fa;border-radius:8px;border:1px solid #e9ecef}
+.modal-ajuda-teclas-title{width:100%;font-size:.7rem;font-weight:700;color:#adb5bd;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.tecla-hint{display:inline-flex;align-items:center;gap:5px;font-size:.78rem;color:#495057}
+.tecla-hint kbd{display:inline-block;padding:2px 8px;font-family:inherit;font-size:.75rem;font-weight:700;color:#495057;background:white;border:1px solid #ced4da;border-bottom:3px solid #adb5bd;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.campo-passo{position:absolute;top:-8px;right:0;font-size:.65rem;font-weight:700;color:#adb5bd;background:white;padding:1px 6px;border-radius:10px;border:1px solid #e9ecef}
 
-        .campo input[type="date"] {
-            color: #495057;
-        }
+/* Footer */
+.footer{text-align:center;margin-top:20px;font-size:.8rem;color:#adb5bd}
 
-        .row {
-            display: flex;
-            gap: 12px;
-        }
+/* ===== ESTATISTICAS ===== */
+.estat-container{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;max-width:1100px;margin-left:auto;margin-right:auto}
+.estat-card{background:white;border-radius:14px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid #e9ecef;max-width:520px;margin:0 auto}
+.estat-card h3{font-size:1rem;color:#343a40;margin-bottom:4px}
+.estat-card .sub{font-size:.78rem;color:#6c757d;margin-bottom:14px}
+.estat-canvas{width:100%;height:220px}
+.estat-resumo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;max-width:1100px;margin-left:auto;margin-right:auto}
+.estat-resumo-card{background:white;border-radius:12px;padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.06);border:1px solid #e9ecef;transition:transform .2s}
+.estat-resumo-card:hover{transform:translateY(-3px)}
+.estat-resumo-card .big{font-size:2rem;font-weight:800;display:block;line-height:1}
+.estat-resumo-card .lbl{font-size:.65rem;color:#6c757d;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;display:block}
+.estat-resumo-card .cor-azul{color:#1976d2}
+.estat-resumo-card .cor-laranja{color:#f57c00}
+.estat-resumo-card .cor-rosa{color:#c2185b}
+.estat-resumo-card .cor-verde{color:#28a745}
+.estat-resumo-card .cor-cinza{color:#6c757d}
 
-        .row .campo {
-            flex: 1;
-        }
-
-        .btn-calcular {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: white;
-            background-color: #28a745;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .btn-calcular:hover {
-            background-color: #218838;
-            transform: translateY(-2px);
-        }
-
-        /* ===== RESULTADO ===== */
-        #resultado {
-            display: none;
-            margin-top: 22px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            border-left: 4px solid #007bff;
-        }
-
-        #resultado h3 {
-            font-size: 1rem;
-            color: #343a40;
-            margin-bottom: 10px;
-        }
-
-        #resultado .data-final {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #007bff;
-            margin-bottom: 8px;
-        }
-
-        #resultado .info {
-            font-size: 0.85rem;
-            color: #6c757d;
-            line-height: 1.5;
-        }
-
-        #resultado .info strong {
-            color: #495057;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        .badge-util {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .badge-corridos {
-            background: #fff3cd;
-            color: #856404;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.8rem;
-            color: #adb5bd;
-        }
-
-        @media (max-width: 480px) {
-            #tela-app {
-                padding: 20px;
-                border-radius: 0;
-                min-height: 100vh;
-            }
-
-            .row {
-                flex-direction: column;
-                gap: 0;
-            }
-        }
-    </style>
+@media(max-width:768px){
+.estat-container{grid-template-columns:1fr}
+.estat-resumo-grid{grid-template-columns:1fr 1fr}
+.estat-canvas{height:180px}
+.fluxo-container{flex-direction:column}.seta-container{padding:10px 0;transform:rotate(90deg)}.data-input-box{flex-direction:column}.data-input-box .campo{min-width:100%}.calc-wrap{max-width:100%}.tabs-nav{flex-wrap:wrap}.timeline-panel{padding:10px 12px}.matricula-header{flex-direction:column}.matricula-header .campo{min-width:100%}
+}
+</style>
 </head>
 <body>
 
-    <!-- ===== TELA INICIAL ===== -->
-    <div id="tela-launcher">
-        <h1>Calculadora de Prazo</h1>
-        <p>Calcule datas futuras com base em dias uteis ou corridos</p>
-        <button class="btn-launch" onclick="iniciar()">Abrir Calculadora</button>
+<div class="tabs-container">
+
+<!-- NAVEGACAO -->
+<div class="tabs-nav">
+    <button class="tab-btn active" onclick="mostrarAba('prazo')">Calculadora de Prazo</button>
+    <button class="tab-btn" onclick="mostrarAba('dilacao')">Calculadora de Dilacao</button>
+    <button class="tab-btn" onclick="mostrarAba('fluxo')">Fluxo de Vistorias VTO</button>
+    <button class="tab-btn" onclick="mostrarAba('matriculas')">Matriculas</button>
+    <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
+    <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
+    <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
+    <span class="versao-badge" id="versaoBadge">v3.2</span>
+</div>
+
+<!-- ABA 1: CALCULADORA DE PRAZO -->
+<div id="aba-prazo" class="tab-content active">
+    <div class="card calc-wrap">
+        <h2>Calculadora de Prazo</h2>
+        <p class="subtitle">Calcule datas futuras com base em dias uteis ou corridos</p>
+        <div class="dica-box"><strong>Dica:</strong> Use para prazo de recurso de multa. Informe a data da fatura e some 30 dias.</div>
+        <div class="campo"><label for="dataInicialPrazo">Data Inicial</label><input type="date" id="dataInicialPrazo"></div>
+        <div class="row"><div class="campo"><label for="quantidadePrazo">Quantidade de Dias</label><input type="number" id="quantidadePrazo" min="1" value="30"></div><div class="campo"><label for="tipoDiasPrazo">Tipo de Dias</label><select id="tipoDiasPrazo"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
+        <button class="btn-calcular" onclick="calcularPrazo()">Calcular Data Final</button>
+        <div id="resultadoPrazo"><h3>Resultado</h3><div class="data-final" id="dataFinalPrazo"></div><div class="info" id="infoAdicionalPrazo"></div></div>
+        <div class="footer">v1.0</div>
+    </div>
+</div>
+
+<!-- ABA 2: CALCULADORA DE DILACAO -->
+<div id="aba-dilacao" class="tab-content">
+    <div class="card calc-wrap">
+        <h2>Calculadora de Dilacao</h2>
+        <p class="subtitle">Calcule prazos de dilacao (30, 60 ou 90 dias)</p>
+        <div class="dica-box"><strong>Dica:</strong> Cliente pode solicitar ate 90 dias corridos adicionais para regularizar.</div>
+        <div class="campo"><label for="dataInicialDilacao">Data Base</label><input type="date" id="dataInicialDilacao"></div>
+        <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
+        <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
+        <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
+        <div class="footer">v1.0</div>
+    </div>
+</div>
+
+<!-- ABA 3: FLUXO DE VISTORIAS -->
+<div id="aba-fluxo" class="tab-content">
+    <div class="card">
+        <h2>Fluxo de Vistorias VTO</h2>
+        <p class="subtitle">Clique em um codigo para registrar na matricula ativa. Use a aba "Matriculas" para gerenciar.</p>
+        <div class="dica-box"><strong>Como usar:</strong> Primeiro, va na aba "Matriculas" e selecione uma matricula. Depois volte aqui e clique nos codigos para registrar servicos nela.</div>
+        <div style="padding:12px;background:#e7f3ff;border-radius:8px;margin-bottom:16px;font-size:.9rem;color:#004085">
+            <strong>Matricula ativa:</strong> <span id="matriculaAtivaDisplay" style="font-family:'Courier New',monospace;font-weight:700;font-size:1.2rem">Nenhuma</span>
+            <button onclick="mostrarAba('matriculas')" style="margin-left:12px;padding:6px 14px;font-size:.8rem;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer">Ir para a tabela</button>
+        </div>
+    </div>
+    <div class="card">
+        <div class="fluxo-container">
+            <div class="coluna-vistoria coluna-1" id="coluna1">
+                <div class="coluna-header">1a VISTORIA<div class="sub">Programacao inicial</div></div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8403')" data-cod="8403"><span class="codigo">8403</span> - 1a Vistoria + AS<span class="desc">Primeira inspecao</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8421')" data-cod="8421"><span class="codigo">8421</span> - 1a Vistoria<span class="desc">Sem AS, direto SGC</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
+                    <button class="servico-btn" onclick="selecionarServico(1,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
+                </div>
+            </div>
+            <div class="seta-container"><div class="seta">&#10132;</div></div>
+            <div class="coluna-vistoria coluna-2" id="coluna2">
+                <div class="coluna-header">2a VISTORIA<div class="sub">60 dias - Multa</div></div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                    <button class="servico-btn" onclick="selecionarServico(2,'8405')" data-cod="8405"><span class="codigo">8405</span> - 2a Vistoria<span class="desc">Irregularidade persistiu</span></button>
+                </div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Sancao</div>
+                    <button class="servico-btn sancao-btn" onclick="registrarSancao('1a_sancao')" id="btnSancao1" data-cod="1a_sancao"><span class="codigo">&#9888;</span> 1a SANCAO<span class="desc">Multa - aguardando</span></button>
+                </div>
+            </div>
+            <div class="seta-container"><div class="seta">&#10132;</div></div>
+            <div class="coluna-vistoria coluna-3" id="coluna3">
+                <div class="coluna-header">3a VISTORIA<div class="sub">60 dias - Multa DOBRO</div></div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                    <button class="servico-btn" onclick="selecionarServico(3,'8428')" data-cod="8428"><span class="codigo">8428</span> - 3a Vistoria<span class="desc">Irregularidade persistente</span></button>
+                </div>
+                <div class="servicos-grupo"><div class="servicos-grupo-title">Sancao</div>
+                    <button class="servico-btn sancao-btn" onclick="registrarSancao('multa_dobro')" id="btnSancaoDobro" data-cod="multa_dobro"><span class="codigo">&#128308;</span> MULTA DOBRO<span class="desc">Reincidencia</span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">v3.0 - IT OPE 1580</div>
+</div>
+
+<!-- ABA 4: MATRICULAS -->
+<div id="aba-matriculas" class="tab-content">
+    <div class="card">
+        <h2>Registro de Matriculas</h2>
+        <p class="subtitle">Gerencie todas as matriculas em acompanhamento. Digite o numero (8 digitos) para adicionar.</p>
+        <!-- Barra de acoes: undo/redo + add + export -->
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+            <button onclick="undo()" id="btnUndo" title="Desfazer (Ctrl+Z)" style="padding:8px 12px;font-size:1rem;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;color:#6c757d;opacity:.4" disabled>&#8630;</button>
+            <button onclick="redo()" id="btnRedo" title="Refazer (Ctrl+Shift+Z)" style="padding:8px 12px;font-size:1rem;background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;cursor:pointer;color:#6c757d;opacity:.4" disabled>&#8631;</button>
+            <div style="width:1px;height:24px;background:#dee2e6;margin:0 4px"></div>
+            <div class="campo" style="flex:0 0 160px;margin-bottom:0">
+                <input type="text" id="novaMatricula" class="matricula-input" maxlength="8" placeholder="12345678" oninput="this.value=this.value.replace(/\D/g,'')" onkeydown="if(event.key==='Enter')adicionarMatricula()">
+            </div>
+            <button class="btn-add" onclick="adicionarMatricula()">+ Adicionar</button>
+            <div style="flex:1"></div>
+            <button class="btn-add" style="background:#6c757d;font-size:.85rem;padding:10px 16px" onclick="exportarCSV()">&#128190; Exportar CSV</button>
+            <button class="btn-add" style="background:#28a745;font-size:.85rem;padding:10px 16px" onclick="importarCSV()">&#128194; Importar CSV</button>
+            <button class="btn-add" style="background:#495057;font-size:.85rem;padding:10px 16px" onclick="exportarJSON()">&#128190; Salvar Arquivo</button>
+            <button class="btn-add" style="background:#6c757d;font-size:.85rem;padding:10px 16px" onclick="abrirArquivoJSON()">&#128194; Abrir Arquivo</button>
+        </div>
     </div>
 
-    <!-- ===== APLICATIVO ===== -->
-    <div id="tela-app">
-        <h2>Calcular Prazo</h2>
-
-        <div class="campo">
-            <label for="dataInicial">Data Inicial</label>
-            <input type="date" id="dataInicial">
-        </div>
-
-        <div class="row">
-            <div class="campo">
-                <label for="quantidade">Quantidade</label>
-                <input type="number" id="quantidade" min="1" value="1" placeholder="Ex: 30">
-            </div>
-            <div class="campo">
-                <label for="tipoDias">Tipo de Dias</label>
-                <select id="tipoDias">
-                    <option value="uteis">Dias Uteis</option>
-                    <option value="corridos">Dias Corridos</option>
-                </select>
-            </div>
-        </div>
-
-        <button class="btn-calcular" onclick="calcular()">Calcular Data Final</button>
-
-        <div id="resultado">
-            <h3>Resultado</h3>
-            <div class="data-final" id="dataFinal"></div>
-            <div class="info" id="infoAdicional"></div>
-        </div>
-
-        <div class="footer">Calculadora de Prazo v1.0</div>
+    <!-- Resumo -->
+    <div class="resumo-bar" id="resumoBar">
+        <div class="resumo-item total"><span class="num" id="resTotal">0</span><span class="rot">Total</span></div>
+        <div class="resumo-item ok"><span class="num" id="resOk">0</span><span class="rot">No prazo</span></div>
+        <div class="resumo-item alerta"><span class="num" id="resAlerta">0</span><span class="rot">Atencao</span></div>
+        <div class="resumo-item critico"><span class="num" id="resCritico">0</span><span class="rot">Critico</span></div>
     </div>
 
-    <script>
-        // ===== LAUNCHER =====
-        function iniciar() {
-            const largura = 480;
-            const altura = 750;
-            const left = Math.round((screen.width - largura) / 2);
-            const top = Math.round((screen.height - altura) / 2);
-            const feats = `width=${largura},height=${altura},top=${top},left=${left},resizable=yes,scrollbars=no,status=no,menubar=no,toolbar=no,location=no`;
+    <!-- Lista de matriculas -->
+    <div id="listaMatriculas"></div>
+</div>
 
-            // Abre a calculadora em popup
-            const win = window.open('', 'CalculadoraDePrazo', feats);
+<!-- ABA 5: ESTATISTICAS -->
+<div id="aba-estatisticas" class="tab-content">
+    <div class="card">
+        <h2>Estatisticas e Indicadores VTO</h2>
+        <p class="subtitle">Dashboard visual com indicadores do processo de vistorias.</p>
 
-            if (win && win.document && win.document.body.innerHTML === '') {
-                // Escreve o app no popup
-                win.document.write(document.documentElement.outerHTML);
-                win.document.close();
-                // Esconde launcher e mostra app no popup
-                win.onload = function() {
-                    const launcher = win.document.getElementById('tela-launcher');
-                    const app = win.document.getElementById('tela-app');
-                    if (launcher) launcher.style.display = 'none';
-                    if (app) app.style.display = 'block';
-                    // Preenche data de hoje
-                    const hoje = new Date().toISOString().split('T')[0];
-                    const dataInput = win.document.getElementById('dataInicial');
-                    if (dataInput) dataInput.value = hoje;
-                };
+        <!-- Cards resumo -->
+        <div class="estat-resumo-grid">
+            <div class="estat-resumo-card">
+                <span class="big cor-azul" id="estTotalMatriculas">0</span>
+                <span class="lbl">Total Matriculas</span>
+            </div>
+            <div class="estat-resumo-card">
+                <span class="big cor-verde" id="estMediaExecucao">0</span>
+                <span class="lbl">Media Dias Execucao</span>
+            </div>
+            <div class="estat-resumo-card">
+                <span class="big cor-laranja" id="estTaxaAberto">0%</span>
+                <span class="lbl">Taxa em Aberto</span>
+            </div>
+            <div class="estat-resumo-card">
+                <span class="big cor-rosa" id="estTaxaExcedido">0%</span>
+                <span class="lbl">% Excedido 180d</span>
+            </div>
+        </div>
+
+        <!-- Graficos -->
+        <div class="estat-container">
+            <div class="estat-card">
+                <h3>Distribuicao por Fase</h3>
+                <p class="sub">Quantidade de servicos em cada fase do processo</p>
+                <canvas id="grafFases" class="estat-canvas"></canvas>
+            </div>
+            <div class="estat-card">
+                <h3>Situacao das Matriculas</h3>
+                <p class="sub">Status geral considerando o prazo de 180 dias</p>
+                <canvas id="grafStatus" class="estat-canvas"></canvas>
+            </div>
+            <div class="estat-card">
+                <h3>Evolucao Mensal</h3>
+                <p class="sub">Criacao e baixa de servicos ao longo do tempo</p>
+                <canvas id="grafEvolucao" class="estat-canvas"></canvas>
+            </div>
+            <div class="estat-card">
+                <h3>Tempo Medio por Codigo</h3>
+                <p class="sub">Dias medios de execucao para cada tipo de servico</p>
+                <canvas id="grafTempoCodigo" class="estat-canvas"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="footer">v3.1 - Dashboard Canvas</div>
+</div>
+
+</div>
+
+<!-- TIMELINE INFERIOR -->
+<div class="timeline-panel" id="timelinePanel">
+    <div class="timeline-header"><h4>&#128197; Linha do Tempo</h4><button class="timeline-toggle" onclick="toggleTimeline()">&#9660; Recolher</button></div>
+    <div class="contador-180" id="contador180" style="display:none">
+        <div class="contador-bloco dias-restantes" id="contadorBlocoDias"><span class="numero" id="contadorNumero">180</span><span class="rotulo" id="contadorRotulo">dias restantes</span></div>
+        <div class="contador-separador">|</div>
+        <div class="contador-msg ok" id="contadorMsg">Dentro do prazo</div>
+    </div>
+    <div class="contador-180" id="alerta180" style="display:none"><div class="contador-bloco dias-restantes excedido"><span class="numero" id="alerta180Numero">0</span><span class="rotulo">dias excedidos</span></div><div class="contador-separador">|</div><div class="contador-msg critico" id="alerta180Msg">Limite excedido</div></div>
+    <div class="timeline-empty" id="timelineEmpty">Nenhuma matricula selecionada</div>
+    <div class="timeline-track" id="timelineTrack" style="display:none">
+        <div class="timeline-ruler"></div><div class="timeline-fill" id="timelineFill"></div>
+        <div class="timeline-marco" style="left:0%"><span class="timeline-marco-label">1a Vistoria</span></div>
+        <div class="timeline-marco" style="left:33%"><span class="timeline-marco-label">2a Vistoria</span></div>
+        <div class="timeline-marco" style="left:66%"><span class="timeline-marco-label">3a Vistoria</span></div>
+        <div class="timeline-marco-180" id="marco180" style="left:90%"><span class="timeline-marco-180-label">180 dias</span></div>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal-box">
+        <h3 id="modalTitulo">Data do Servico</h3>
+        <p class="instrucao" id="modalInstrucao">Digite as datas direto no teclado. Tab pula campo. Enter salva. Espaco = sem baixa.</p>
+        <div class="campo" style="position:relative"><span class="campo-passo">PASSO 1</span><label for="modalDataCriacao">Data de Criacao (SGC)</label><input type="date" id="modalDataCriacao" placeholder="DD/MM/AAAA"></div>
+        <div class="campo" style="position:relative"><span class="campo-passo">PASSO 2</span><label for="modalDataBaixa">Data da Baixa (vistoria)</label><input type="date" id="modalDataBaixa" placeholder="DD/MM/AAAA ou Espaco"></div>
+        <div class="modal-botoes"><button class="modal-btn salvar" onclick="salvarDatasModal()" id="btnSalvarModal">Salvar (Enter)</button><button class="modal-btn espaco" onclick="marcarEmAberto()" id="btnEspacoModal">Sem Baixa (Espaco)</button><button class="modal-btn cancelar" onclick="fecharModal()" id="btnCancelarModal">Cancelar (Esc)</button></div>
+        <div class="modal-ajuda-teclas"><div class="modal-ajuda-teclas-title">Atalhos do Teclado</div><div class="tecla-hint"><kbd>Tab</kbd> Proximo campo</div><div class="tecla-hint"><kbd>Enter</kbd> Salvar</div><div class="tecla-hint"><kbd>Espaco</kbd> Sem baixa</div><div class="tecla-hint"><kbd>Esc</kbd> Cancelar</div></div>
+    </div>
+</div>
+
+<script>
+// ===== DADOS =====
+let matriculas = [];
+let matriculaAtiva = null;
+let servicoPendente = null;
+
+// ===== UNDO / REDO =====
+let historico = [];
+let historicoIndex = -1;
+const HISTORICO_MAX = 50;
+
+function salvarHistorico() {
+    // Remove estados futuros se estiver no meio do historico
+    if (historicoIndex < historico.length - 1) {
+        historico = historico.slice(0, historicoIndex + 1);
+    }
+    // Salva estado atual (deep copy)
+    historico.push(JSON.stringify({ matriculas: matriculas, matriculaAtiva: matriculaAtiva }));
+    if (historico.length > HISTORICO_MAX) historico.shift();
+    else historicoIndex++;
+    atualizarBotoesUndoRedo();
+}
+
+function undo() {
+    if (historicoIndex <= 0) return;
+    historicoIndex--;
+    const estado = JSON.parse(historico[historicoIndex]);
+    matriculas = estado.matriculas;
+    matriculaAtiva = estado.matriculaAtiva;
+    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+    renderMatriculas();
+    atualizarTimeline();
+    atualizarBotoesUndoRedo();
+}
+
+function redo() {
+    if (historicoIndex >= historico.length - 1) return;
+    historicoIndex++;
+    const estado = JSON.parse(historico[historicoIndex]);
+    matriculas = estado.matriculas;
+    matriculaAtiva = estado.matriculaAtiva;
+    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+    renderMatriculas();
+    atualizarTimeline();
+    atualizarBotoesUndoRedo();
+}
+
+function atualizarBotoesUndoRedo() {
+    const btnUndo = document.getElementById('btnUndo');
+    const btnRedo = document.getElementById('btnRedo');
+    if (btnUndo) { btnUndo.disabled = historicoIndex <= 0; btnUndo.style.opacity = historicoIndex <= 0 ? '.4' : '1'; }
+    if (btnRedo) { btnRedo.disabled = historicoIndex >= historico.length - 1; btnRedo.style.opacity = historicoIndex >= historico.length - 1 ? '.4' : '1'; }
+}
+
+// Ctrl+Z / Ctrl+Shift+Z
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.key === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+});
+
+// ===== CONFIGURACAO DE PRAZOS POR CODIGO =====
+const CODIGOS_SERVICO = ['8403','8421','8402','8400','8409','8470','8480','8405','8428'];
+let prazosPorCodigo = {};
+// Inicializa com 30 dias padrao
+CODIGOS_SERVICO.forEach(c => prazosPorCodigo[c] = 30);
+
+function getPrazoCodigo(codigo) {
+    return prazosPorCodigo[codigo] || 30;
+}
+
+function salvarPrazoCodigo(codigo, dias) {
+    const d = parseInt(dias);
+    if (d >= 1 && d <= 999) { prazosPorCodigo[codigo] = d; }
+}
+
+// ===== SISTEMA DE ABAS =====
+function mostrarAba(aba) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('aba-' + aba).classList.add('active');
+    event.target.classList.add('active');
+    if (aba === 'estatisticas') { setTimeout(renderGraficos, 50); }
+}
+
+// ===== CONFIGURACAO =====
+let configAberta = false;
+function toggleConfig() {
+    const btn = document.querySelector('.btn-config');
+    configAberta = !configAberta;
+    btn.classList.toggle('ativo', configAberta);
+    if (configAberta) { abrirModalConfig(); }
+    else { fecharModalConfig(); }
+}
+function abrirModalConfig() {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (!window._modalOriginal) { window._modalOriginal = box.innerHTML; }
+
+    // Constroi tabela de prazos por codigo
+    let prazosHtml = '<div style="margin:12px 0;max-height:200px;overflow-y:auto;border:1px solid #e9ecef;border-radius:8px;padding:10px">';
+    prazosHtml += '<table style="width:100%;font-size:.8rem;border-collapse:collapse">';
+    prazosHtml += '<thead><tr style="border-bottom:1px solid #dee2e6"><th style="text-align:left;padding:4px;color:#6c757d;font-weight:600">Codigo</th><th style="text-align:left;padding:4px;color:#6c757d;font-weight:600">Servico</th><th style="text-align:center;padding:4px;color:#6c757d;font-weight:600">Prazo (dias)</th></tr></thead><tbody>';
+
+    const nomes = { '8403':'1a Vistoria + AS', '8421':'1a Vistoria', '8402':'Rec. Tarifaria', '8400':'Solic. Cliente', '8409':'Orient. Tecnica', '8470':'Habite-se +600', '8480':'Habite-se -600', '8405':'2a Vistoria', '8428':'3a Vistoria' };
+    const cores = { '8403':'#1976d2','8421':'#1976d2','8402':'#1976d2','8400':'#1976d2','8409':'#1976d2','8470':'#1976d2','8480':'#1976d2','8405':'#f57c00','8428':'#c2185b' };
+
+    CODIGOS_SERVICO.forEach(cod => {
+        const prazoAtual = getPrazoCodigo(cod);
+        prazosHtml += '<tr style="border-bottom:1px solid #f0f0f0">';
+        prazosHtml += '<td style="padding:4px;font-family:monospace;font-weight:700;color:' + (cores[cod] || '#495057') + '">' + cod + '</td>';
+        prazosHtml += '<td style="padding:4px;color:#495057;font-size:.75rem">' + (nomes[cod] || '') + '</td>';
+        prazosHtml += '<td style="padding:4px;text-align:center"><input type="number" id="prazo_' + cod + '" value="' + prazoAtual + '" min="1" max="999" style="width:50px;padding:4px 6px;font-size:.8rem;border:1px solid #dee2e6;border-radius:4px;text-align:center;font-family:inherit" onchange="salvarPrazoCodigo(\'' + cod + '\', this.value)"></td>';
+        prazosHtml += '</tr>';
+    });
+    prazosHtml += '</tbody></table></div>';
+
+    box.innerHTML = '<h3>&#9881; Configuracoes</h3><p class="instrucao">Defina o prazo em dias para cada codigo de servico. Padrao: 30 dias.</p><div style="font-size:.8rem;color:#495057;margin-bottom:8px"><strong>Prazos por Codigo:</strong></div>' + prazosHtml + '<div style="border-top:1px solid #e9ecef;margin:12px 0;padding-top:12px"><button onclick="if(confirm(\'Restaurar 30 dias para TODOS os codigos?\')){CODIGOS_SERVICO.forEach(c=>salvarPrazoCodigo(c,30));abrirModalConfig();}" style="padding:6px 12px;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;margin-right:8px">&#8634; Restaurar Padrao</button><button onclick="resetarFluxo()" style="padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600">&#128465; Limpar Todos os Dados</button></div><div class="modal-botoes"><button class="modal-btn salvar" onclick="salvarConfigEFechar()">Salvar e Fechar</button><button class="modal-btn cancelar" onclick="fecharModalConfig()">Cancelar (Esc)</button></div><div class="modal-ajuda-teclas"><div class="modal-ajuda-teclas-title">Dica</div><div class="tecla-hint">Altere o prazo e clique "Salvar e Fechar" para atualizar estatisticas e status.</div></div>';
+    overlay.classList.add('ativo');
+}
+function salvarConfigEFechar() {
+    renderMatriculas();
+    atualizarTimeline();
+    const abaEstat = document.getElementById('aba-estatisticas');
+    if (abaEstat && abaEstat.classList.contains('active')) { renderGraficos(); }
+    fecharModalConfig();
+}
+function fecharModalConfig() {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (window._modalOriginal) { box.innerHTML = window._modalOriginal; }
+    overlay.classList.remove('ativo');
+    configAberta = false;
+    document.querySelector('.btn-config').classList.remove('ativo');
+}
+
+// ===== AJUDA =====
+let ajudaAberta = false;
+function toggleAjuda() {
+    const btn = document.getElementById('btnAjuda');
+    ajudaAberta = !ajudaAberta;
+    btn.classList.toggle('ativo', ajudaAberta);
+    if (ajudaAberta) { abrirModalAjuda(); }
+    else { fecharModalAjuda(); }
+}
+function abrirModalAjuda() {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (!window._modalOriginal) { window._modalOriginal = box.innerHTML; }
+    box.innerHTML = '<h3>&#10067; Ajuda Rápida</h3><div style="font-size:.82rem;color:#495057;line-height:1.6;max-height:300px;overflow-y:auto"><p><strong>Como adicionar uma matricula:</strong> Vá na aba "Matriculas", digite 8 números e clique em "+ Adicionar"</p><p><strong>Como registrar um serviço:</strong> Selecione uma matricula, vá em "Fluxo de Vistorias" e clique no código desejado</p><p><strong>Modal de datas:</strong> Tab navega, Enter salva, Espaço = sem baixa, Esc cancela</p><p><strong>Desfazer:</strong> Ctrl+Z desfaz, Ctrl+Shift+Z refaz</p><p><strong>Transferir dados:</strong> Use "Salvar Arquivo" para exportar JSON e "Abrir Arquivo" para importar em outro PC</p><p><strong>Importar do Excel:</strong> Exporte como CSV do Excel e use "Importar CSV"</p><p><strong>180 dias:</strong> O contador na timeline mostra quantos dias faltam desde a 1ª vistoria. Excedendo vira vermelho.</p></div><div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>';
+    overlay.classList.add('ativo');
+}
+function fecharModalAjuda() {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (window._modalOriginal) { box.innerHTML = window._modalOriginal; }
+    overlay.classList.remove('ativo');
+    ajudaAberta = false;
+    document.getElementById('btnAjuda').classList.remove('ativo');
+}
+
+// Preenche data de hoje
+const hoje = new Date().toISOString().split('T')[0];
+document.getElementById('dataInicialPrazo').value = hoje;
+document.getElementById('dataInicialDilacao').value = hoje;
+
+// ===== ABA 1: PRAZO =====
+function calcularPrazo() {
+    const dataInicial = document.getElementById('dataInicialPrazo').value;
+    const quantidade = parseInt(document.getElementById('quantidadePrazo').value);
+    const tipoDias = document.getElementById('tipoDiasPrazo').value;
+    if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
+    const data = new Date(dataInicial + 'T12:00:00');
+    let dataFinal, diasUsados = 0;
+    if (tipoDias === 'corridos') { dataFinal = new Date(data); dataFinal.setDate(dataFinal.getDate() + quantidade); diasUsados = quantidade; }
+    else { dataFinal = new Date(data); let d = 0; while (d < quantidade) { dataFinal.setDate(dataFinal.getDate() + 1); if (dataFinal.getDay() !== 0 && dataFinal.getDay() !== 6) d++; } diasUsados = d; }
+    const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
+    const badgeText = tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS';
+    document.getElementById('dataFinalPrazo').innerHTML = dataFinal.toLocaleDateString('pt-BR') + ' <span class="badge ' + badgeClass + '">' + badgeText + '</span>';
+    document.getElementById('infoAdicionalPrazo').innerHTML = '<strong>' + dataFinal.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '</strong><br>Adicionado <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' + new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
+    document.getElementById('resultadoPrazo').style.display = 'block';
+}
+
+// ===== ABA 2: DILACAO =====
+function calcularDilacao() {
+    const dataInicial = document.getElementById('dataInicialDilacao').value;
+    const quantidade = parseInt(document.getElementById('quantidadeDilacao').value);
+    const tipoDias = document.getElementById('tipoDiasDilacao').value;
+    if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
+    const data = new Date(dataInicial + 'T12:00:00');
+    let dataFinal, diasUsados = 0;
+    if (tipoDias === 'corridos') { dataFinal = new Date(data); dataFinal.setDate(dataFinal.getDate() + quantidade); diasUsados = quantidade; }
+    else { dataFinal = new Date(data); let d = 0; while (d < quantidade) { dataFinal.setDate(dataFinal.getDate() + 1); if (dataFinal.getDay() !== 0 && dataFinal.getDay() !== 6) d++; } diasUsados = d; }
+    const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
+    document.getElementById('dataFinalDilacao').innerHTML = dataFinal.toLocaleDateString('pt-BR') + ' <span class="badge ' + badgeClass + '">' + (tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS') + '</span>';
+    document.getElementById('infoAdicionalDilacao').innerHTML = '<strong>' + dataFinal.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '</strong><br>Dilacao de <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' + new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
+    document.getElementById('resultadoDilacao').style.display = 'block';
+}
+
+// ===== ABA 4: MATRICULAS =====
+function adicionarMatricula() {
+    const input = document.getElementById('novaMatricula');
+    const numero = input.value.trim();
+    if (!/^\d{8}$/.test(numero)) { alert('Digite exatamente 8 numeros.'); return; }
+    if (matriculas.find(m => m.numero === numero)) { alert('Matricula ja existe.'); return; }
+    salvarHistorico();
+    matriculas.push({ numero: numero, servicos: [], ativa: false });
+    input.value = '';
+    renderMatriculas();
+}
+
+function removerMatricula(numero) {
+    if (!confirm('Remover matricula ' + numero + '?')) return;
+    salvarHistorico();
+    matriculas = matriculas.filter(m => m.numero !== numero);
+    if (matriculaAtiva === numero) { matriculaAtiva = null; }
+    renderMatriculas();
+}
+
+function selecionarMatricula(numero) {
+    matriculaAtiva = numero;
+    matriculas.forEach(m => m.ativa = (m.numero === numero));
+    document.getElementById('matriculaAtivaDisplay').textContent = numero;
+    renderMatriculas();
+    atualizarTimeline();
+}
+
+function getMatriculaAtiva() {
+    return matriculas.find(m => m.numero === matriculaAtiva);
+}
+
+function renderMatriculas() {
+    const container = document.getElementById('listaMatriculas');
+    const resumo = { total: matriculas.length, ok: 0, alerta: 0, critico: 0 };
+    
+    if (matriculas.length === 0) {
+        container.innerHTML = '<div class="card" style="text-align:center;color:#adb5bd;padding:40px">Nenhuma matricula cadastrada. Adicione uma acima.</div>';
+        atualizarResumo(resumo);
+        return;
+    }
+    
+    // Calcula dados agregados por matricula
+    const dadosMatriculas = matriculas.map(m => {
+        const statusGeral = calcularStatusMatricula(m);
+        if (statusGeral.tipo === 'ok') resumo.ok++;
+        else if (statusGeral.tipo === 'alerta') resumo.alerta++;
+        else resumo.critico++;
+        
+        // Total dias de execucao (soma de todos os servicos baixados)
+        let totalDiasExecucao = 0;
+        m.servicos.forEach(s => {
+            if (s.dataCriacao && s.dataBaixa) {
+                totalDiasExecucao += Math.round((new Date(s.dataBaixa) - new Date(s.dataCriacao)) / (1000*60*60*24));
             }
-
-            // Fecha a janela do launcher
-            window.close();
+        });
+        
+        // Dias desde o primeiro servico ate hoje (para contar os 180)
+        let diasPassados180 = 0;
+        let diasRestantes180 = 180;
+        if (m.servicos.length > 0) {
+            const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
+            const primeiraData = new Date(Math.min(...datasCriacao));
+            diasPassados180 = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+            diasRestantes180 = Math.max(0, 180 - diasPassados180);
         }
-
-        // ===== MOSTRA APP DIRETO SE ESTIVER NO POPUP =====
-        if (window.opener) {
-            document.getElementById('tela-launcher').style.display = 'none';
-            document.getElementById('tela-app').style.display = 'block';
-            // Preenche data de hoje
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('dataInicial').value = hoje;
+        
+        // Texto situacao geral melhorado
+        let situacaoTexto = statusGeral.texto;
+        let situacaoClasse = statusGeral.tipo;
+        if (diasRestantes180 > 0) {
+            if (diasRestantes180 <= 30) { situacaoTexto = diasRestantes180 + ' dias restantes'; situacaoClasse = 'critico'; }
+            else if (diasRestantes180 <= 60) { situacaoTexto = diasRestantes180 + ' dias restantes'; situacaoClasse = 'alerta'; }
+            else { situacaoTexto = diasRestantes180 + ' dias restantes'; }
+        } else {
+            const excedido = diasPassados180 - 180;
+            situacaoTexto = 'Passou ' + excedido + ' dias do prazo';
+            situacaoClasse = 'critico';
         }
+        
+        return { ...m, statusGeral, totalDiasExecucao, diasRestantes180, diasPassados180, situacaoTexto, situacaoClasse, isAtiva: m.numero === matriculaAtiva };
+    });
+    
+    // Tabela mestre
+    let html = '<div class="card" style="overflow-x:auto;padding:16px">';
+    html += '<table class="tabela-master">';
+    html += '<thead><tr>';
+    html += '<th>Matricula</th>';
+    html += '<th>Acoes</th>';
+    html += '<th>Servico</th>';
+    html += '<th>Criacao</th>';
+    html += '<th>Baixa</th>';
+    html += '<th>Dias Exec.</th>';
+    html += '<th>Status</th>';
+    html += '<th>Total Dias</th>';
+    html += '<th>Dias Rest. (180)</th>';
+    html += '<th>Situacao</th>';
+    html += '</tr></thead><tbody>';
+    
+    dadosMatriculas.forEach(dm => {
+        const rowCount = dm.servicos.length || 1;
+        
+        if (dm.servicos.length === 0) {
+            html += '<tr style="background:' + (dm.isAtiva ? '#f0f7ff' : 'white') + '">';
+            html += '<td class="matricula-cell"><strong style="font-size:1.05rem;cursor:pointer;color:#1976d2;text-decoration:underline" onclick="selecionarMatricula(\'' + dm.numero + '\')" title="Clique para ver na timeline">' + dm.numero + '</strong>' + (dm.isAtiva ? ' <span class="ativa-tag">ativa</span>' : '') + '</td>';
+            html += '<td><button class="btn-acao selecionar" onclick="selecionarMatricula(\'' + dm.numero + '\')">&#9679; selecionar</button><br><button class="btn-acao remover" onclick="removerMatricula(\'' + dm.numero + '\')" style="margin-top:4px">&#10005; remover</button></td>';
+            html += '<td colspan="7" style="color:#adb5bd;text-align:center;font-size:.85rem">Nenhum servico. Clique no numero da matricula para ver na timeline.</td>';
+            html += '<td><span class="matricula-badge badge-ok">Nova</span></td>';
+            html += '</tr>';
+        } else {
+            dm.servicos.forEach((s, idx) => {
+                const st = s.dataBaixa ? calcularStatusExecucao(s.codigo, s.dataCriacao, s.dataBaixa) : null;
+                const execDias = st ? st.dias : '-';
+                const execBadge = st ? '<span class="prazo-badge-mini ' + st.classe + '">' + st.texto + '</span>' : '<span class="prazo-badge-mini prazo-alerta">Em aberto</span>';
+                
+                html += '<tr style="background:' + (dm.isAtiva ? '#f0f7ff' : 'white') + '">';
+                
+                if (idx === 0) {
+                    html += '<td class="matricula-cell" rowspan="' + rowCount + '"><strong style="font-size:1.05rem;cursor:pointer;color:#1976d2;text-decoration:underline" onclick="selecionarMatricula(\'' + dm.numero + '\')" title="Clique para ver na timeline">' + dm.numero + '</strong>' + (dm.isAtiva ? ' <span class="ativa-tag">ativa</span>' : '') + '</td>';
+                    html += '<td rowspan="' + rowCount + '"><button class="btn-acao selecionar" onclick="selecionarMatricula(\'' + dm.numero + '\')">&#9679; selecionar</button><br><button class="btn-acao remover" onclick="removerMatricula(\'' + dm.numero + '\')" style="margin-top:4px">&#10005; remover</button></td>';
+                }
+                
+                html += '<td class="cod-cell">' + s.codigo + '</td>';
+                html += '<td>' + formatarDataCurta(s.dataCriacao) + '</td>';
+                html += '<td>' + (s.dataBaixa ? formatarDataCurta(s.dataBaixa) : '<em style="color:#adb5bd">--</em>') + '</td>';
+                html += '<td style="text-align:center">' + execDias + '</td>';
+                html += '<td>' + execBadge + '</td>';
+                
+                if (idx === 0) {
+                    html += '<td rowspan="' + rowCount + '" style="text-align:center;font-weight:700;color:' + (dm.totalDiasExecucao > 90 ? '#dc3545' : '#495057') + '">' + dm.totalDiasExecucao + '</td>';
+                    html += '<td rowspan="' + rowCount + '" style="text-align:center;font-weight:700;color:' + (dm.diasRestantes180 < 30 ? '#dc3545' : dm.diasRestantes180 < 60 ? '#fd7e14' : '#28a745') + '">' + (dm.diasRestantes180 > 0 ? dm.diasRestantes180 : '<span style="color:#dc3545">' + (dm.diasPassados180 - 180) + '</span>') + '</td>';
+                    html += '<td rowspan="' + rowCount + '"><span class="matricula-badge badge-' + dm.situacaoClasse + '">' + dm.situacaoTexto + '</span></td>';
+                }
+                
+                html += '</tr>';
+            });
+        }
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+    atualizarResumo(resumo);
+    // Sincroniza graficos se aba estatistica estiver visivel
+    const abaEstat = document.getElementById('aba-estatisticas');
+    if (abaEstat && abaEstat.classList.contains('active')) { renderGraficos(); }
+}
 
-        // ===== CALCULADORA =====
-        function calcular() {
-            const dataInicial = document.getElementById('dataInicial').value;
-            const quantidade = parseInt(document.getElementById('quantidade').value);
-            const tipoDias = document.getElementById('tipoDias').value;
+function calcularStatusMatricula(m) {
+    if (m.servicos.length === 0) return { tipo: 'ok', texto: 'Nova' };
+    const s = m.servicos[m.servicos.length - 1];
+    if (!s.dataBaixa) return { tipo: 'alerta', texto: 'Em aberto' };
+    const st = calcularStatusExecucao(s.codigo, s.dataCriacao, s.dataBaixa);
+    if (!st) return { tipo: 'ok', texto: 'OK' };
+    return { tipo: st.status === 'depois' ? 'critico' : st.status === 'antes' ? 'ok' : 'ok', texto: st.texto };
+}
 
-            if (!dataInicial || isNaN(quantidade) || quantidade < 1) {
-                alert('Preencha todos os campos corretamente.');
-                return;
+function atualizarResumo(r) {
+    document.getElementById('resTotal').textContent = r.total;
+    document.getElementById('resOk').textContent = r.ok;
+    document.getElementById('resAlerta').textContent = r.alerta;
+    document.getElementById('resCritico').textContent = r.critico;
+}
+
+// ===== FLUXO: SELECIONAR SERVICO =====
+function selecionarServico(coluna, codigo) {
+    if (!matriculaAtiva) { alert('Selecione uma matricula primeiro na aba "Matriculas".'); mostrarAba('matriculas'); return; }
+    const m = getMatriculaAtiva();
+    servicoPendente = { coluna: coluna, codigo: codigo, matricula: matriculaAtiva };
+    abrirModal(codigo);
+}
+
+function toggleEvento(coluna, evento) {
+    if (!matriculaAtiva) return;
+}
+
+function resetarFluxo() {
+    if (!confirm('Limpar TODOS os dados? Isso nao pode ser desfeito.')) return;
+    salvarHistorico();
+    matriculas.forEach(m => { m.servicos = []; m.ativa = false; });
+    matriculaAtiva = null;
+    document.getElementById('matriculaAtivaDisplay').textContent = 'Nenhuma';
+    renderMatriculas();
+    atualizarTimeline();
+}
+
+// ===== MODAL =====
+function abrirModal(codigo) {
+    document.getElementById('modalTitulo').textContent = 'Servico ' + codigo;
+    document.getElementById('modalInstrucao').textContent = 'Digite as datas direto no teclado. Tab pula campo. Enter salva. Espaco = sem baixa.';
+    document.getElementById('modalDataCriacao').value = '';
+    document.getElementById('modalDataBaixa').value = '';
+    document.getElementById('modalOverlay').classList.add('ativo');
+    setTimeout(() => document.getElementById('modalDataCriacao').focus(), 100);
+}
+function fecharModal() { document.getElementById('modalOverlay').classList.remove('ativo'); servicoPendente = null; }
+function salvarDatasModal() {
+    const dataCriacao = document.getElementById('modalDataCriacao').value;
+    const dataBaixa = document.getElementById('modalDataBaixa').value;
+    if (!dataCriacao) { alert('Informe a data de criacao.'); return; }
+    salvarHistorico();
+    const m = matriculas.find(x => x.numero === servicoPendente.matricula);
+    if (m) { m.servicos.push({ codigo: servicoPendente.codigo, dataCriacao: dataCriacao, dataBaixa: dataBaixa || null }); }
+    fecharModal();
+    renderMatriculas();
+    atualizarTimeline();
+    verificarSancoes();
+}
+function marcarEmAberto() {
+    const dataCriacao = document.getElementById('modalDataCriacao').value;
+    if (!dataCriacao) { alert('Informe a data de criacao.'); return; }
+    salvarHistorico();
+    const m = matriculas.find(x => x.numero === servicoPendente.matricula);
+    if (m) { m.servicos.push({ codigo: servicoPendente.codigo, dataCriacao: dataCriacao, dataBaixa: null }); }
+    fecharModal();
+    renderMatriculas();
+    atualizarTimeline();
+    verificarSancoes();
+}
+
+// ===== SANCAO =====
+function verificarSancoes() {
+    const m = getMatriculaAtiva();
+    if (!m) { document.querySelectorAll('.sancao-btn').forEach(b => { b.className = 'servico-btn sancao-btn'; }); return; }
+    
+    const ev8405 = m.servicos.find(e => e.codigo === '8405' && e.dataBaixa);
+    const btn1 = document.getElementById('btnSancao1');
+    const s1 = m.servicos.find(e => e.codigo === '1a_sancao');
+    if (s1) { btn1.className = 'servico-btn sancao-btn aplicado'; btn1.querySelector('.desc').textContent = 'Aplicada em ' + formatarDataCurta(s1.dataCriacao); }
+    else if (ev8405) { const limite = new Date(ev8405.dataBaixa); limite.setDate(limite.getDate() + 60); if (new Date() >= limite) { btn1.className = 'servico-btn sancao-btn ativo'; btn1.querySelector('.desc').textContent = 'Periodo iniciado! Clique para registrar'; } else { btn1.className = 'servico-btn sancao-btn'; btn1.querySelector('.desc').textContent = 'Aguardando ' + Math.ceil((limite - new Date()) / (1000 * 60 * 60 * 24)) + ' dias'; } }
+    else { btn1.className = 'servico-btn sancao-btn'; btn1.querySelector('.desc').textContent = 'Multa - aguardando'; }
+    
+    const ev8428 = m.servicos.find(e => e.codigo === '8428' && e.dataBaixa);
+    const btnD = document.getElementById('btnSancaoDobro');
+    const sd = m.servicos.find(e => e.codigo === 'multa_dobro');
+    if (sd) { btnD.className = 'servico-btn sancao-btn aplicado'; btnD.querySelector('.desc').textContent = 'Aplicada em ' + formatarDataCurta(sd.dataCriacao); }
+    else if (ev8428) { const limite = new Date(ev8428.dataBaixa); limite.setDate(limite.getDate() + 60); if (new Date() >= limite) { btnD.className = 'servico-btn sancao-btn ativo'; btnD.querySelector('.desc').textContent = 'Periodo iniciado! Clique para registrar'; } else { btnD.className = 'servico-btn sancao-btn'; btnD.querySelector('.desc').textContent = 'Aguardando ' + Math.ceil((limite - new Date()) / (1000 * 60 * 60 * 24)) + ' dias'; } }
+    else { btnD.className = 'servico-btn sancao-btn'; btnD.querySelector('.desc').textContent = 'Reincidencia'; }
+}
+function registrarSancao(tipo) {
+    const btn = tipo === '1a_sancao' ? document.getElementById('btnSancao1') : document.getElementById('btnSancaoDobro');
+    if (!btn.classList.contains('ativo')) return;
+    if (!matriculaAtiva) { alert('Selecione uma matricula primeiro.'); return; }
+    const data = prompt('Data que a ' + (tipo === '1a_sancao' ? '1a SANCAO' : 'MULTA EM DOBRO') + ' foi aplicada (AAAA-MM-DD):');
+    if (!data || !/^\d{4}-\d{2}-\d{2}$/.test(data)) { alert('Formato invalido.'); return; }
+    salvarHistorico();
+    const m = getMatriculaAtiva();
+    if (m) { m.servicos.push({ codigo: tipo, dataCriacao: data, dataBaixa: data }); }
+    verificarSancoes();
+    renderMatriculas();
+    atualizarTimeline();
+}
+
+// ===== TIMELINE =====
+function atualizarTimeline() {
+    const track = document.getElementById('timelineTrack');
+    const empty = document.getElementById('timelineEmpty');
+    const panel = document.getElementById('timelinePanel');
+    const m = getMatriculaAtiva();
+    
+    if (!m || m.servicos.length === 0) {
+        track.style.display = 'none'; empty.style.display = 'block';
+        empty.textContent = m ? 'Matricula ' + m.numero + ' - nenhum servico' : 'Nenhuma matricula selecionada';
+        panel.classList.remove('has-content');
+        document.getElementById('contador180').style.display = 'none';
+        document.getElementById('alerta180').style.display = 'none';
+        return;
+    }
+    
+    track.style.display = 'flex'; empty.style.display = 'none';
+    panel.classList.add('has-content');
+    
+    const antigos = track.querySelectorAll('.timeline-evento');
+    antigos.forEach(e => e.remove());
+    
+    const datas = m.servicos.map(e => new Date(e.dataCriacao));
+    const datasB = m.servicos.filter(e => e.dataBaixa).map(e => new Date(e.dataBaixa));
+    const todas = [...datas, ...datasB];
+    if (todas.length === 0) return;
+    
+    const minData = new Date(Math.min(...todas));
+    const maxData = new Date(Math.max(...todas));
+    minData.setDate(minData.getDate() - 5);
+    maxData.setDate(maxData.getDate() + 65);
+    const range = maxData - minData;
+    
+    m.servicos.forEach(ev => {
+        const criDate = new Date(ev.dataCriacao);
+        const pctCriacao = ((criDate - minData) / range) * 100;
+        criarPontoTimeline(ev.codigo, 'criacao', pctCriacao, ev.dataCriacao);
+        if (ev.dataBaixa) { const baixaDate = new Date(ev.dataBaixa); const pctBaixa = ((baixaDate - minData) / range) * 100; criarPontoTimeline(ev.codigo, 'baixa', pctBaixa, ev.dataBaixa); }
+    });
+    
+    const fill = document.getElementById('timelineFill');
+    const nowPct = ((new Date() - minData) / range) * 100;
+    fill.style.width = Math.min(Math.max(nowPct, 0), 100) + '%';
+    
+    verificarSancoes();
+    atualizarContador180();
+}
+function criarPontoTimeline(codigo, tipo, pct, data) {
+    const track = document.getElementById('timelineTrack');
+    const evento = document.createElement('div');
+    evento.className = 'timeline-evento';
+    evento.style.left = pct + '%';
+    const dot = document.createElement('div');
+    dot.className = 'timeline-dot ' + tipo;
+    const label = document.createElement('div');
+    label.className = 'timeline-evento-label';
+    label.textContent = codigo;
+    const dataLabel = document.createElement('div');
+    dataLabel.className = 'timeline-evento-data';
+    dataLabel.textContent = formatarDataCurta(data);
+    evento.appendChild(label);
+    evento.appendChild(dot);
+    evento.appendChild(dataLabel);
+    evento.title = codigo + ' - ' + (tipo === 'criacao' ? 'Criado' : 'Baixado') + ' ' + formatarDataCurta(data);
+    track.appendChild(evento);
+}
+function toggleTimeline() {
+    const track = document.getElementById('timelineTrack');
+    const empty = document.getElementById('timelineEmpty');
+    const contador = document.getElementById('contador180');
+    const alerta = document.getElementById('alerta180');
+    if (track.style.display === 'none') {
+        const m = getMatriculaAtiva();
+        if (m && m.servicos.length > 0) { track.style.display = 'flex'; empty.style.display = 'none'; atualizarContador180(); }
+        event.target.innerHTML = '&#9660; Recolher';
+    } else {
+        track.style.display = 'none'; empty.style.display = 'none'; contador.style.display = 'none'; alerta.style.display = 'none';
+        event.target.innerHTML = '&#9650; Expandir';
+    }
+}
+
+// ===== GRAFICOS CANVAS =====
+function renderGraficos() {
+    atualizarCardsResumo();
+    graficoFases();
+    graficoStatus();
+    graficoEvolucao();
+    graficoTempoPorCodigo();
+}
+
+function atualizarCardsResumo() {
+    // Total matriculas
+    document.getElementById('estTotalMatriculas').textContent = matriculas.length;
+
+    // Media dias execucao
+    let totalDias = 0, totalComBaixa = 0;
+    matriculas.forEach(m => {
+        m.servicos.forEach(s => {
+            if (s.dataCriacao && s.dataBaixa) {
+                totalDias += Math.round((new Date(s.dataBaixa) - new Date(s.dataCriacao)) / (1000*60*60*24));
+                totalComBaixa++;
             }
+        });
+    });
+    document.getElementById('estMediaExecucao').textContent = totalComBaixa > 0 ? Math.round(totalDias / totalComBaixa) : 0;
 
-            const data = new Date(dataInicial + 'T12:00:00');
-            let dataFinal;
-            let diasUsados = 0;
+    // Taxa em aberto
+    let totalServicos = 0, emAberto = 0;
+    matriculas.forEach(m => {
+        m.servicos.forEach(s => {
+            totalServicos++;
+            if (!s.dataBaixa) emAberto++;
+        });
+    });
+    document.getElementById('estTaxaAberto').textContent = totalServicos > 0 ? Math.round((emAberto / totalServicos) * 100) + '%' : '0%';
 
-            if (tipoDias === 'corridos') {
-                dataFinal = new Date(data);
-                dataFinal.setDate(dataFinal.getDate() + quantidade);
-                diasUsados = quantidade;
-            } else {
-                // Dias uteis
-                dataFinal = new Date(data);
-                let diasAdicionados = 0;
-                while (diasAdicionados < quantidade) {
-                    dataFinal.setDate(dataFinal.getDate() + 1);
-                    const diaSemana = dataFinal.getDay();
-                    if (diaSemana !== 0 && diaSemana !== 6) {
-                        diasAdicionados++;
+    // % Excedido 180 dias
+    let excedidos = 0;
+    matriculas.forEach(m => {
+        if (m.servicos.length > 0) {
+            const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
+            const primeiraData = new Date(Math.min(...datasCriacao));
+            const diasPassados = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+            if (diasPassados > 180) excedidos++;
+        }
+    });
+    document.getElementById('estTaxaExcedido').textContent = matriculas.length > 0 ? Math.round((excedidos / matriculas.length) * 100) + '%' : '0%';
+}
+
+function graficoFases() {
+    const canvas = document.getElementById('grafFases');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = rect.height;
+
+    // Conta servicos por fase
+    const fases = { '1a Vistoria': 0, '2a Vistoria': 0, '3a Vistoria': 0 };
+    const cod1a = ['8403','8421','8402','8400','8409','8470','8480'];
+    const cod2a = ['8405'];
+    const cod3a = ['8428'];
+    matriculas.forEach(m => {
+        m.servicos.forEach(s => {
+            if (cod1a.includes(s.codigo)) fases['1a Vistoria']++;
+            else if (cod2a.includes(s.codigo)) fases['2a Vistoria']++;
+            else if (cod3a.includes(s.codigo)) fases['3a Vistoria']++;
+        });
+    });
+
+    const valores = Object.values(fases);
+    const maxVal = Math.max(...valores, 1);
+    const nomes = Object.keys(fases);
+    const cores = ['#1976d2','#f57c00','#c2185b'];
+    const barW = Math.min(60, (w - 80) / nomes.length - 20);
+    const startX = (w - (nomes.length * (barW + 20) - 20)) / 2;
+    const baseY = h - 40;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Eixo Y
+    ctx.strokeStyle = '#e9ecef';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 5; i++) {
+        const y = baseY - (i / 5) * (baseY - 30);
+        ctx.beginPath(); ctx.moveTo(40, y); ctx.lineTo(w - 20, y); ctx.stroke();
+        ctx.fillStyle = '#adb5bd'; ctx.font = '10px sans-serif';
+        ctx.textAlign = 'right'; ctx.fillText(Math.round((maxVal / 5) * i), 35, y + 3);
+    }
+
+    // Barras
+    nomes.forEach((nome, i) => {
+        const val = valores[i];
+        const barH = (val / maxVal) * (baseY - 30);
+        const x = startX + i * (barW + 20);
+        const y = baseY - barH;
+
+        // Gradiente
+        const grad = ctx.createLinearGradient(0, y, 0, baseY);
+        grad.addColorStop(0, cores[i]);
+        grad.addColorStop(1, cores[i] + '88');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(x, y, barW, barH, [6, 6, 0, 0]);
+        ctx.fill();
+
+        // Valor no topo
+        ctx.fillStyle = '#343a40'; ctx.font = 'bold 12px sans-serif';
+        ctx.textAlign = 'center'; ctx.fillText(val, x + barW/2, y - 6);
+
+        // Label
+        ctx.fillStyle = '#495057'; ctx.font = '10px sans-serif';
+        ctx.fillText(nome, x + barW/2, baseY + 14);
+    });
+}
+
+function graficoStatus() {
+    const canvas = document.getElementById('grafStatus');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = rect.height;
+
+    // Calcula status de cada matricula
+    let ok = 0, alerta = 0, critico = 0, excedido = 0;
+    matriculas.forEach(m => {
+        if (m.servicos.length === 0) { ok++; return; }
+        const datasCriacao = m.servicos.map(s => new Date(s.dataCriacao + 'T12:00:00').getTime());
+        const primeiraData = new Date(Math.min(...datasCriacao));
+        const diasPassados = Math.round((new Date() - primeiraData) / (1000*60*60*24));
+        const restantes = 180 - diasPassados;
+        if (restantes <= 0) excedido++;
+        else if (restantes <= 30) critico++;
+        else if (restantes <= 60) alerta++;
+        else ok++;
+    });
+
+    const dados = [
+        { label: 'No prazo', val: ok, cor: '#28a745' },
+        { label: 'Atencao', val: alerta, cor: '#fd7e14' },
+        { label: 'Critico', val: critico, cor: '#dc3545' },
+        { label: 'Excedido', val: excedido, cor: '#721c24' }
+    ];
+    const total = ok + alerta + critico + excedido;
+
+    ctx.clearRect(0, 0, w, h);
+    if (total === 0) { ctx.fillStyle = '#adb5bd'; ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.fillText('Sem dados', w/2, h/2); return; }
+
+    const cx = w * 0.35, cy = h / 2, r = Math.min(cx, cy) - 20, ri = r * 0.55;
+    let ang = -Math.PI / 2;
+
+    dados.forEach(d => {
+        if (d.val === 0) return;
+        const slice = (d.val / total) * Math.PI * 2;
+        // Segmento
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, ang, ang + slice);
+        ctx.arc(cx, cy, ri, ang + slice, ang, true);
+        ctx.closePath();
+        ctx.fillStyle = d.cor; ctx.fill();
+        // Borda
+        ctx.strokeStyle = 'white'; ctx.lineWidth = 2; ctx.stroke();
+        ang += slice;
+    });
+
+    // Centro
+    ctx.fillStyle = '#343a40'; ctx.font = 'bold 16px sans-serif';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(total, cx, cy - 6);
+    ctx.fillStyle = '#6c757d'; ctx.font = '10px sans-serif';
+    ctx.fillText('matriculas', cx, cy + 8);
+
+    // Legenda
+    let ly = cy - (dados.length * 14) / 2;
+    const lx = w * 0.65;
+    dados.forEach(d => {
+        ctx.fillStyle = d.cor;
+        ctx.beginPath(); ctx.arc(lx, ly, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#495057'; ctx.font = '11px sans-serif';
+        ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+        ctx.fillText(d.label + ' (' + d.val + ')', lx + 14, ly);
+        ly += 22;
+    });
+}
+
+function graficoEvolucao() {
+    const canvas = document.getElementById('grafEvolucao');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = rect.height;
+
+    // Agrupa por mes
+    const criacoes = {}, baixas = {};
+    const mesesOrdem = [];
+    for (let i = 0; i < 12; i++) {
+        const d = new Date(); d.setMonth(d.getMonth() - 11 + i);
+        const chave = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0');
+        mesesOrdem.push(chave);
+        criacoes[chave] = 0; baixas[chave] = 0;
+    }
+
+    matriculas.forEach(m => {
+        m.servicos.forEach(s => {
+            if (s.dataCriacao) { const c = s.dataCriacao.substring(0,7); if (criacoes[c] !== undefined) criacoes[c]++; }
+            if (s.dataBaixa) { const b = s.dataBaixa.substring(0,7); if (baixas[b] !== undefined) baixas[b]++; }
+        });
+    });
+
+    const maxVal = Math.max(...Object.values(criacoes), ...Object.values(baixas), 1);
+    const padL = 40, padR = 20, padT = 20, padB = 35;
+    const chartW = w - padL - padR, chartH = h - padT - padB;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Grid
+    ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const y = padT + (i / 4) * chartH;
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(w - padR, y); ctx.stroke();
+    }
+
+    // Linhas
+    const stepX = chartW / (mesesOrdem.length - 1 || 1);
+    const ptsCri = mesesOrdem.map((m, i) => ({ x: padL + i * stepX, y: padT + chartH - (criacoes[m] / maxVal) * chartH }));
+    const ptsBaix = mesesOrdem.map((m, i) => ({ x: padL + i * stepX, y: padT + chartH - (baixas[m] / maxVal) * chartH }));
+
+    // Area criacoes
+    ctx.beginPath(); ctx.moveTo(ptsCri[0].x, ptsCri[0].y);
+    ptsCri.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(ptsCri[ptsCri.length-1].x, padT + chartH); ctx.lineTo(ptsCri[0].x, padT + chartH); ctx.closePath();
+    ctx.fillStyle = 'rgba(25,118,210,0.1)'; ctx.fill();
+
+    // Linha criacoes
+    ctx.beginPath(); ctx.moveTo(ptsCri[0].x, ptsCri[0].y);
+    ptsCri.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#1976d2'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // Area baixas
+    ctx.beginPath(); ctx.moveTo(ptsBaix[0].x, ptsBaix[0].y);
+    ptsBaix.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(ptsBaix[ptsBaix.length-1].x, padT + chartH); ctx.lineTo(ptsBaix[0].x, padT + chartH); ctx.closePath();
+    ctx.fillStyle = 'rgba(40,167,69,0.1)'; ctx.fill();
+
+    // Linha baixas
+    ctx.beginPath(); ctx.moveTo(ptsBaix[0].x, ptsBaix[0].y);
+    ptsBaix.forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#28a745'; ctx.lineWidth = 2.5; ctx.stroke();
+
+    // Pontos
+    ptsCri.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fillStyle = '#1976d2'; ctx.fill(); ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5; ctx.stroke(); });
+    ptsBaix.forEach(p => { ctx.beginPath(); ctx.arc(p.x, p.y, 4, 0, Math.PI*2); ctx.fillStyle = '#28a745'; ctx.fill(); ctx.strokeStyle = 'white'; ctx.lineWidth = 1.5; ctx.stroke(); });
+
+    // Labels X
+    ctx.fillStyle = '#adb5bd'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    mesesOrdem.forEach((m, i) => {
+        const parts = m.split('-');
+        ctx.fillText(parts[1] + '/' + parts[0].substring(2), padL + i * stepX, padT + chartH + 16);
+    });
+
+    // Eixo Y
+    ctx.fillStyle = '#adb5bd'; ctx.font = '9px sans-serif'; ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+        ctx.fillText(Math.round((maxVal / 4) * (4 - i)), padL - 6, padT + (i / 4) * chartH + 3);
+    }
+
+    // Legenda
+    ctx.font = '10px sans-serif'; ctx.textAlign = 'left';
+    ctx.fillStyle = '#1976d2'; ctx.beginPath(); ctx.arc(w - 100, 10, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#495057'; ctx.fillText('Criacoes', w - 92, 13);
+    ctx.fillStyle = '#28a745'; ctx.beginPath(); ctx.arc(w - 40, 10, 4, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#495057'; ctx.fillText('Baixas', w - 32, 13);
+}
+
+function graficoTempoPorCodigo() {
+    const canvas = document.getElementById('grafTempoCodigo');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    const w = rect.width, h = rect.height;
+
+    // Calcula tempo medio por codigo
+    const tempos = {};
+    const contagem = {};
+    matriculas.forEach(m => {
+        m.servicos.forEach(s => {
+            if (s.dataCriacao && s.dataBaixa) {
+                const dias = Math.round((new Date(s.dataBaixa) - new Date(s.dataCriacao)) / (1000*60*60*24));
+                if (!tempos[s.codigo]) { tempos[s.codigo] = 0; contagem[s.codigo] = 0; }
+                tempos[s.codigo] += dias; contagem[s.codigo]++;
+            }
+        });
+    });
+
+    const codigos = Object.keys(tempos).sort();
+    const medias = codigos.map(c => Math.round(tempos[c] / contagem[c]));
+    if (codigos.length === 0) {
+        ctx.clearRect(0, 0, w, h); ctx.fillStyle = '#adb5bd'; ctx.font = '12px sans-serif';
+        ctx.textAlign = 'center'; ctx.fillText('Sem dados de execucao', w/2, h/2); return;
+    }
+    const maxVal = Math.max(...medias, 1);
+
+    const barH = Math.min(22, (h - 50) / codigos.length - 8);
+    const startY = 25;
+    const maxBarW = w - 100;
+
+    ctx.clearRect(0, 0, w, h);
+
+    // Grid vertical
+    ctx.strokeStyle = '#f0f0f0'; ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+        const x = 70 + (i / 4) * maxBarW;
+        ctx.beginPath(); ctx.moveTo(x, 15); ctx.lineTo(x, h - 15); ctx.stroke();
+    }
+
+    const coresMap = { '8400':'#6c757d','8402':'#6c757d','8403':'#1976d2','8405':'#f57c00','8409':'#1976d2','8421':'#1976d2','8428':'#c2185b','8470':'#1976d2','8480':'#1976d2' };
+
+    codigos.forEach((cod, i) => {
+        const media = medias[i];
+        const barW = (media / maxVal) * maxBarW;
+        const y = startY + i * (barH + 10);
+        const cor = coresMap[cod] || '#495057';
+
+        // Barra
+        const grad = ctx.createLinearGradient(70, 0, 70 + barW, 0);
+        grad.addColorStop(0, cor); grad.addColorStop(1, cor + 'aa');
+        ctx.fillStyle = grad;
+        ctx.beginPath(); ctx.roundRect(70, y, barW, barH, [0, 4, 4, 0]); ctx.fill();
+
+        // Codigo
+        ctx.fillStyle = '#495057'; ctx.font = 'bold 10px monospace'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle';
+        ctx.fillText(cod, 64, y + barH/2);
+
+        // Valor
+        ctx.fillStyle = '#343a40'; ctx.font = 'bold 10px sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText(media + ' dias', 74 + barW, y + barH/2);
+    });
+
+    // Eixo X labels
+    ctx.fillStyle = '#adb5bd'; ctx.font = '9px sans-serif'; ctx.textAlign = 'center';
+    for (let i = 0; i <= 4; i++) {
+        ctx.fillText(Math.round((maxVal / 4) * i), 70 + (i / 4) * maxBarW, h - 5);
+    }
+}
+
+// ===== CONTADOR 180 =====
+function atualizarContador180() {
+    const contadorDiv = document.getElementById('contador180');
+    const alertaDiv = document.getElementById('alerta180');
+    const blocoDias = document.getElementById('contadorBlocoDias');
+    const numero = document.getElementById('contadorNumero');
+    const rotulo = document.getElementById('contadorRotulo');
+    const msg = document.getElementById('contadorMsg');
+    const panel = document.getElementById('timelinePanel');
+    const m = getMatriculaAtiva();
+    
+    if (!m || m.servicos.length === 0) { contadorDiv.style.display = 'none'; alertaDiv.style.display = 'none'; return; }
+    
+    const datasCriacao = m.servicos.map(e => new Date(e.dataCriacao + 'T12:00:00').getTime());
+    const primeiraData = new Date(Math.min(...datasCriacao));
+    const diasPassados = Math.round((new Date() - primeiraData) / (1000 * 60 * 60 * 24));
+    const diasRestantes = 180 - diasPassados;
+    
+    if (diasRestantes > 0) {
+        contadorDiv.style.display = 'flex'; alertaDiv.style.display = 'none';
+        numero.textContent = diasRestantes;
+        rotulo.textContent = diasRestantes === 1 ? 'dia restante' : 'dias restantes';
+        blocoDias.classList.remove('alerta', 'critico', 'excedido');
+        msg.classList.remove('ok', 'alerta', 'critico');
+        panel.style.background = 'white';
+        
+        if (diasPassados <= 120) { blocoDias.classList.add('dias-restantes'); msg.classList.add('ok'); msg.textContent = diasRestantes <= 30 ? 'Fase final - atencao' : 'Dentro do prazo'; }
+        else if (diasPassados <= 150) { blocoDias.classList.add('alerta'); msg.classList.add('alerta'); msg.textContent = 'Atenao - prazo se aproxima'; }
+        else { blocoDias.classList.add('critico'); msg.classList.add('critico'); msg.textContent = 'Critico - proximo do limite'; }
+    } else {
+        contadorDiv.style.display = 'none'; alertaDiv.style.display = 'flex';
+        document.getElementById('alerta180Numero').textContent = Math.abs(diasRestantes);
+        document.getElementById('alerta180Msg').textContent = 'Matricula passou ' + Math.abs(diasRestantes) + ' dias do prazo';
+        panel.style.background = 'linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%)';
+    }
+}
+
+// ===== UTILS =====
+function calcularStatusExecucao(codigo, dataCriacao, dataBaixa) {
+    if (!dataCriacao || !dataBaixa) return null;
+    const prazo = getPrazoCodigo(codigo);
+    const cri = new Date(dataCriacao + 'T12:00:00');
+    const baixa = new Date(dataBaixa + 'T12:00:00');
+    const diffDias = Math.round((baixa - cri) / (1000 * 60 * 60 * 24));
+    if (diffDias < prazo) { const falta = prazo - diffDias; return { dias: diffDias, status: 'antes', classe: 'prazo-ok', texto: falta === 0 ? 'no prazo' : falta + ' dias antes', prazo: prazo }; }
+    else if (diffDias === prazo) return { dias: diffDias, status: 'dentro', classe: 'prazo-ok', texto: 'dentro do prazo', prazo: prazo };
+    else return { dias: diffDias, status: 'depois', classe: 'prazo-critico', texto: (diffDias - prazo) + ' dias depois', prazo: prazo };
+}
+function formatarDataCurta(dataStr) {
+    if (!dataStr) return '--';
+    const d = new Date(dataStr + 'T12:00:00');
+    return d.toLocaleDateString('pt-BR');
+}
+
+// ===== TECLADO MODAL =====
+document.addEventListener('keydown', function(e) {
+    const overlay = document.getElementById('modalOverlay');
+    if (!overlay.classList.contains('ativo')) return;
+    // Se modal de config ou ajuda esta aberto, Esc fecha eles
+    if (configAberta && e.key === 'Escape') { e.preventDefault(); fecharModalConfig(); return; }
+    if (ajudaAberta && e.key === 'Escape') { e.preventDefault(); fecharModalAjuda(); return; }
+    const inputCriacao = document.getElementById('modalDataCriacao');
+    const inputBaixa = document.getElementById('modalDataBaixa');
+    const ativo = document.activeElement;
+    if (e.key === 'Escape') { e.preventDefault(); fecharModal(); return; }
+    if (e.key === ' ' && ativo === inputBaixa && !inputBaixa.value) { e.preventDefault(); marcarEmAberto(); return; }
+    if (e.key === 'Enter' && (ativo === inputCriacao || ativo === inputBaixa)) { e.preventDefault(); if (ativo === inputCriacao && inputCriacao.value) { inputBaixa.focus(); } else if (ativo === inputBaixa) { salvarDatasModal(); } return; }
+});
+document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+
+// ===== EXPORTAR CSV =====
+function exportarCSV() {
+    if (matriculas.length === 0) { alert('Nenhuma matricula para exportar.'); return; }
+    let csv = 'Matricula;Servico;Data_Criacao;Data_Baixa;Dias_Execucao;Status_Execucao;Situacao_Geral\n';
+    matriculas.forEach(m => {
+        const statusGeral = calcularStatusMatricula(m);
+        if (m.servicos.length === 0) {
+            csv += m.numero + ';;;;;;' + statusGeral.texto + '\n';
+        } else {
+            m.servicos.forEach(s => {
+                const st = s.dataBaixa ? calcularStatusExecucao(s.codigo, s.dataCriacao, s.dataBaixa) : null;
+                csv += m.numero + ';';
+                csv += s.codigo + ';';
+                csv += (s.dataCriacao || '') + ';';
+                csv += (s.dataBaixa || '') + ';';
+                csv += (st ? st.dias : '') + ';';
+                csv += (st ? st.texto : 'Em aberto') + ';';
+                csv += statusGeral.texto + '\n';
+            });
+        }
+    });
+    downloadArquivo(csv, 'matriculas_vto.csv', 'text/csv;charset=utf-8;');
+}
+
+// ===== SALVAR ARQUIVO JSON =====
+function exportarJSON() {
+    if (matriculas.length === 0) { alert('Nenhuma matricula para salvar.'); return; }
+    const dados = {
+        versao: '1.1',
+        data_exportacao: new Date().toISOString(),
+        total_matriculas: matriculas.length,
+        prazos_por_codigo: prazosPorCodigo,
+        matriculas: matriculas
+    };
+    const json = JSON.stringify(dados, null, 2);
+    downloadArquivo(json, 'matriculas_vto.json', 'application/json');
+    alert('Arquivo salvo! Para abrir em outro PC: clique em "Abrir Arquivo" e selecione o .json');
+}
+
+// ===== IMPORTAR CSV =====
+function importarCSV() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.csv';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const linhas = event.target.result.split(/\r?\n/).filter(l => l.trim());
+                if (linhas.length < 2) { alert('CSV vazio ou invalido.'); return; }
+                
+                // Detecta delimitador (; ou ,)
+                const primeira = linhas[0];
+                const delimitador = primeira.indexOf(';') > -1 ? ';' : ',';
+                const cabecalho = primeira.split(delimitador).map(c => c.trim().toLowerCase().replace(/[^a-z0-9]/g, '_'));
+                
+                // Mapeamento de colunas flexivel
+                const idxMatricula = cabecalho.findIndex(c => c.includes('matricula'));
+                const idxServico = cabecalho.findIndex(c => c.includes('servico'));
+                const idxCriacao = cabecalho.findIndex(c => c.includes('criacao') || c.includes('data_cri'));
+                const idxBaixa = cabecalho.findIndex(c => c.includes('baixa') || c.includes('data_baix'));
+                
+                if (idxMatricula === -1) { alert('Coluna "Matricula" nao encontrada no CSV. Verifique o cabecalho.'); return; }
+                
+                salvarHistorico();
+                let importadas = 0;
+                
+                for (let i = 1; i < linhas.length; i++) {
+                    const cols = linhas[i].split(delimitador).map(c => c.trim());
+                    const numero = cols[idxMatricula];
+                    if (!numero || !/^\d{8}$/.test(numero)) continue;
+                    
+                    // Encontra ou cria matricula
+                    let m = matriculas.find(x => x.numero === numero);
+                    if (!m) {
+                        m = { numero: numero, servicos: [], ativa: false };
+                        matriculas.push(m);
+                        importadas++;
+                    }
+                    
+                    // Adiciona servico se existir
+                    if (idxServico !== -1 && cols[idxServico]) {
+                        const codigo = cols[idxServico];
+                        const dataCriacao = idxCriacao !== -1 ? converterDataCSV(cols[idxCriacao]) : null;
+                        const dataBaixa = idxBaixa !== -1 ? converterDataCSV(cols[idxBaixa]) : null;
+                        
+                        // So adiciona se nao existir servico identico
+                        const existe = m.servicos.find(s => s.codigo === codigo && s.dataCriacao === dataCriacao);
+                        if (!existe) {
+                            m.servicos.push({ codigo: codigo, dataCriacao: dataCriacao, dataBaixa: dataBaixa });
+                        }
                     }
                 }
-                diasUsados = diasAdicionados;
-            }
+                
+                renderMatriculas();
+                atualizarTimeline();
+                alert(importadas + ' matricula(s) importada(s) com sucesso! Total: ' + matriculas.length);
+            } catch (err) { alert('Erro ao importar CSV: ' + err.message); }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
 
-            // Formata data
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const dataFormatada = dataFinal.toLocaleDateString('pt-BR', options);
-            const dataCurta = dataFinal.toLocaleDateString('pt-BR');
+function converterDataCSV(dataStr) {
+    if (!dataStr) return null;
+    // Tenta formatos: DD/MM/AAAA, AAAA-MM-DD, DD-MM-AAAA
+    const m1 = dataStr.match(/(\d{2})[\/\-](\d{2})[\/\-](\d{4})/);
+    if (m1) return m1[3] + '-' + m1[2] + '-' + m1[1];
+    const m2 = dataStr.match(/(\d{4})[\/\-](\d{2})[\/\-](\d{2})/);
+    if (m2) return m2[1] + '-' + m2[2] + '-' + m2[3];
+    return null;
+}
 
-            // Mostra resultado
-            const resultadoDiv = document.getElementById('resultado');
-            const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
-            const badgeText = tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS';
+// ===== ABRIR ARQUIVO JSON =====
+function abrirArquivoJSON() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            try {
+                const dados = JSON.parse(event.target.result);
+                if (dados.matriculas && Array.isArray(dados.matriculas)) {
+                    salvarHistorico();
+                    matriculas = dados.matriculas;
+                    // Restaura prazos configurados se existirem
+                    if (dados.prazos_por_codigo && typeof dados.prazos_por_codigo === 'object') {
+                        Object.keys(dados.prazos_por_codigo).forEach(c => {
+                            prazosPorCodigo[c] = dados.prazos_por_codigo[c];
+                        });
+                    }
+                    matriculaAtiva = matriculas.length > 0 ? matriculas[0].numero : null;
+                    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+                    renderMatriculas();
+                    atualizarTimeline();
+                    alert(matriculas.length + ' matricula(s) carregada(s) com sucesso!');
+                } else {
+                    alert('Arquivo invalido.');
+                }
+            } catch (err) { alert('Erro ao ler arquivo: ' + err.message); }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
 
-            document.getElementById('dataFinal').innerHTML =
-                dataCurta + ' <span class="badge ' + badgeClass + '">' + badgeText + '</span>';
-            document.getElementById('infoAdicional').innerHTML =
-                '<strong>' + dataFormatada + '</strong><br>' +
-                'Adicionado <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' +
-                new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
-            resultadoDiv.style.display = 'block';
-        }
-    </script>
+function downloadArquivo(conteudo, nome, tipo) {
+    const blob = new Blob([conteudo], { type: tipo });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nome;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// ===== DADOS MOCK: 4 MATRICULAS REALISTAS - CICLOS COMPLETOS =====
+// Data de referencia: 13/07/2026 (hoje)
+// Todas as 4 matriculas estao DENTRO dos 180 dias
+// Fluxo logico: 1a vistoria → (opcional: 8409 analise) → 2a vistoria 8405 → 3a vistoria 8428
+function gerarMockData() {
+    const HOJE = '2026-07-13';
+
+    // Matricula 1: Fluxo normal dentro do prazo (1a → 2a vistoria, em aberto)
+    // Logica: Vistoria inicial em maio, baixou em junho. 2a vistoria criada recentemente, ainda em aberto.
+    // Dias desde 1a: 54 dias → 126 restantes → DENTRO DO PRAZO
+    const m1 = {
+        numero: '10045213',
+        servicos: [
+            { codigo: '8403', dataCriacao: '2026-05-20', dataBaixa: '2026-06-15' }, // 1a: 26 dias (OK)
+            { codigo: '8405', dataCriacao: '2026-06-18', dataBaixa: null }            // 2a: em aberto (recente)
+        ],
+        ativa: true
+    };
+
+    // Matricula 2: Com analise complementar (8409) no fluxo
+    // Logica: 1a vistoria OK, orientacao tecnica para regularizar, aguardando 2a vistoria
+    // Dias desde 1a: 64 dias → 116 restantes → DENTRO DO PRAZO
+    const m2 = {
+        numero: '10045214',
+        servicos: [
+            { codigo: '8403', dataCriacao: '2026-05-10', dataBaixa: '2026-06-05' },  // 1a: 26 dias (OK)
+            { codigo: '8409', dataCriacao: '2026-06-08', dataBaixa: '2026-06-15' },  // Orient. tecnica: 7 dias
+            { codigo: '8405', dataCriacao: '2026-06-20', dataBaixa: null }             // 2a: em aberto
+        ],
+        ativa: false
+    };
+
+    // Matricula 3: 8405 com SANCAO 1a ATIVA (passou 60 dias desde baixa, mas ainda dentro dos 180)
+    // Logica: 1a vistoria em março OK. 2a vistoria baixou em abril. Hoje (13/07) ja passaram 84 dias desde
+    // a baixa do 8405 → SANCAO 1a deveria estar ATIVA (verde pulsante) ha 24 dias.
+    // Mas a matricula ainda tem 46 dias ate os 180 → ATENCAO
+    const m3 = {
+        numero: '10045215',
+        servicos: [
+            { codigo: '8403', dataCriacao: '2026-03-01', dataBaixa: '2026-03-25' },  // 1a: 24 dias (OK)
+            { codigo: '8405', dataCriacao: '2026-03-28', dataBaixa: '2026-04-20' }   // 2a: 23 dias (OK)
+            // SANCAO 1a: ativa a partir de 20/04 + 60 dias = 19/06/2026 → ATIVA desde 19/06
+        ],
+        ativa: false
+    };
+
+    // Matricula 4: 8405 com SANCAO 1a ATIVA (outra situacao, mais avancada no tempo)
+    // Logica: 1a vistoria em fevereiro. 2a baixou em abril. Hoje ja passaram 99 dias → sanção ativa há 39 dias.
+    // Dias desde 1a: 141 dias → 39 restantes → CRITICO mas ainda dentro dos 180
+    const m4 = {
+        numero: '10045216',
+        servicos: [
+            { codigo: '8421', dataCriacao: '2026-02-15', dataBaixa: '2026-03-10' },  // 1a: 23 dias (OK)
+            { codigo: '8405', dataCriacao: '2026-03-15', dataBaixa: '2026-04-08' }   // 2a: 24 dias (OK)
+            // SANCAO 1a: ativa a partir de 08/04 + 60 dias = 07/06/2026 → ATIVA desde 07/06
+        ],
+        ativa: false
+    };
+
+    matriculas = [m1, m2, m3, m4];
+    matriculaAtiva = '10045213';
+    document.getElementById('matriculaAtivaDisplay').textContent = '10045213';
+    renderMatriculas();
+    atualizarTimeline();
+    salvarHistorico();
+}
+
+// Inicializa
+gerarMockData();
+</script>
 
 </body>
 </html>
