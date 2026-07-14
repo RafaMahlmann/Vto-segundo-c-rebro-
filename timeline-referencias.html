@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Referencias de Timeline</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:0;background:#f3f5f7;color:#212529}
+    main{max-width:1100px;margin:0 auto;padding:28px}
+    h1{font-size:24px;margin:0 0 8px}
+    p{color:#5f6872;line-height:1.5;margin:0 0 22px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+    .card{background:white;border:1px solid #dfe4ea;border-radius:8px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+    .card h2{font-size:16px;margin:0 0 10px}
+    .shot{display:block;width:100%;max-height:360px;object-fit:contain;background:#f8f9fa;border:1px solid #edf0f2;border-radius:6px}
+    a{display:inline-block;margin-top:10px;color:#0d6efd;font-size:13px;text-decoration:none}
+    a:hover{text-decoration:underline}
+    .nota{margin-top:22px;padding:14px;background:#fff8e1;border:1px solid #ffe08a;border-radius:8px;color:#5d4b00}
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Referencias visuais para evoluir a linha do tempo VTO</h1>
+    <p>Estas imagens sao referencias externas. A melhor direcao para o app VTO e uma versao compacta da logica Gantt/Timeline, mas implementada em HTML, CSS e JavaScript vanilla dentro do index.html.</p>
+
+    <section class="grid">
+      <article class="card">
+        <h2>1. Frappe Gantt</h2>
+        <img class="shot" src="https://github.com/frappe/gantt/raw/master/.github/hero-image.png" alt="Exemplo visual Frappe Gantt">
+        <a href="https://github.com/frappe/gantt" target="_blank" rel="noopener">Abrir repositorio</a>
+      </article>
+
+      <article class="card">
+        <h2>2. Vis Timeline</h2>
+        <img class="shot" src="https://raw.githubusercontent.com/visjs/vis-timeline/master/docs/img/timeline.png" alt="Exemplo visual Vis Timeline">
+        <a href="https://github.com/visjs/vis-timeline" target="_blank" rel="noopener">Abrir repositorio</a>
+      </article>
+
+      <article class="card">
+        <h2>3. React Calendar Timeline</h2>
+        <img class="shot" src="https://github.com/namespace-ee/react-calendar-timeline/raw/main/demo.gif" alt="Exemplo visual React Calendar Timeline">
+        <a href="https://github.com/namespace-ee/react-calendar-timeline" target="_blank" rel="noopener">Abrir repositorio</a>
+      </article>
+
+      <article class="card">
+        <h2>4. D3 Brush Timeline</h2>
+        <img class="shot" src="https://i.sstatic.net/SWiWG.jpg" alt="Exemplo visual D3 brush timeline">
+        <a href="https://stackoverflow.com/questions/67035992/d3-v6-brush-chart" target="_blank" rel="noopener">Abrir exemplo</a>
+      </article>
+
+      <article class="card">
+        <h2>5. Scheduler horizontal</h2>
+        <img class="shot" src="https://code.daypilot.org/media/9961/react-scheduler-horizontal-timeline-open-source.png" alt="Exemplo visual scheduler horizontal">
+        <a href="https://code.daypilot.org/79813/react-scheduler-with-horizontal-timeline-open-source" target="_blank" rel="noopener">Abrir exemplo</a>
+      </article>
+    </section>
+
+    <div class="nota">
+      Para o VTO, eu recomendo copiar a clareza do Frappe Gantt e a escala real do Vis Timeline: regua fixa 0, 60, 120 e 180 dias, com eventos posicionados proporcionalmente e indicador de hoje.
+    </div>
+  </main>
+</body>
+</html>

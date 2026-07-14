@@ -204,6 +204,37 @@ Nao ha pendencias obrigatorias. O aplicativo esta funcional e completo. As itens
 
 ---
 
+## PARTE 5: PLANO DIRETOR - CARTEIRA VTO E COLABORACAO OFFLINE
+
+**Periodo:** 2026-07-14
+
+### Problema Identificado
+- A timeline individual explica bem uma matricula, mas nao responde sozinha quais matriculas da carteira inteira exigem acao primeiro.
+- O processo real precisa acompanhar matriculas ao longo de semanas/meses, reclassificando risco conforme o tempo passa.
+- O app e local e monobloco; portanto, nao pode oferecer edicao simultanea real como Google Planilhas.
+- Mesmo sem servidor, dois usuarios podem trabalhar em arquivos separados e consolidar depois por mesclagem.
+
+### Direcao Arquitetural
+- Tratar o conjunto de matriculas como uma **Carteira VTO** em acompanhamento continuo.
+- Manter dois modos de visualizacao:
+  - Individual: timeline detalhada da matricula selecionada.
+  - Coletivo: radar/fila de risco para varias matriculas.
+- Evoluir a tabela para filtros, ordenacao e paginacao antes de suportar grande volume.
+- Criar futuramente uma rotina "Mesclar Arquivo" para somar arquivos JSON de usuarios diferentes, atualizar registros iguais e apontar conflitos.
+
+### Documento Criado
+- `docs/06-plano-diretor-carteira-vto.md`
+
+### Proximas Entregas Recomendadas
+- [ ] Criar filtros e ordenacao por risco na aba Matriculas.
+- [ ] Criar paginacao para evitar travamento com grandes carteiras.
+- [ ] Criar calculo de prioridade operacional.
+- [ ] Criar aba Radar VTO / Carteira VTO.
+- [ ] Evoluir JSON com metadados de autor, arquivo e atualizacao.
+- [ ] Criar importacao com mesclagem inteligente e tela de conflitos.
+
+---
+
 ## COMO CONTINUAR EM UMA NOVA SESSAO
 
 Se um novo agente/IA precisar continuar este projeto:

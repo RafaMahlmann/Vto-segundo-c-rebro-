@@ -222,6 +222,11 @@ Os seguintes documentos foram extraidos de PDFs da Sanepar e transformados em MD
 - Competencias, fluxo de processo, procedimentos de vistoria, preenchimento do AS
 - Relacionamento cruzado com IA OPE 21169, IA OPE 169 e documentos de categoria
 
+### 06-plano-diretor-carteira-vto.md
+- Plano diretor de evolucao do aplicativo para carteira de matriculas em acompanhamento
+- Define dois modos de visualizacao: individual (timeline 0-180) e coletivo (radar/fila de risco)
+- Estabelece diretrizes de paginacao, filtros, priorizacao operacional e mesclagem de arquivos JSON sem servidor
+
 ---
 
 ## GLOSSARIO DE SIGLAS DO DOMINIO
@@ -257,6 +262,8 @@ Os seguintes documentos foram extraidos de PDFs da Sanepar e transformados em MD
 6. **Sistema de sanacao simbolica:** Codigos `1a_sancao` e `multa_dobro` nao sao codigos Sanepar oficiais; sao flags internas do app
 7. **Prazo padrao de 30 dias:** `calcularStatusExecucao()` usa 30 dias como referencia para status OK/Alerta/Critico por servico
 8. **Contador de 180 dias:** Calculado a partir da PRIMEIRA data de criacao da matricula ate a data atual
+9. **Evolucao para carteira VTO:** O app deve evoluir para acompanhar grandes conjuntos de matriculas, reclassificando riscos diariamente com base na data atual, sem depender de servidor.
+10. **Colaboracao offline:** Como nao ha backend em nuvem, trabalho em equipe deve ser resolvido por exportacao/importacao e mesclagem inteligente de arquivos JSON.
 
 ---
 
