@@ -153,7 +153,16 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .timeline-track{display:flex;align-items:center;position:relative;padding:6px 0 8px;min-height:30px}
 .timeline-ruler{position:absolute;top:50%;left:0;right:0;height:2px;background:#e9ecef;border-radius:1px;transform:translateY(-50%)}
 .timeline-fill{position:absolute;top:50%;left:0;height:2px;background:linear-gradient(90deg,#1976d2,#f57c00,#c2185b);border-radius:1px;transform:translateY(-50%);transition:width .5s}
-.timeline-marco{position:absolute;top:15%;bottom:15%;width:1px;background:#ced4da;z-index:5}
+/* Faixas de fase na timeline */
+.timeline-fase{position:absolute;top:0;bottom:0;z-index:1;border-right:1px dashed rgba(0,0,0,.1)}
+.timeline-fase-1{background:rgba(25,118,210,.06)}
+.timeline-fase-2{background:rgba(245,124,0,.06)}
+.timeline-fase-3{background:rgba(194,24,88,.06)}
+.timeline-fase-excedido{background:rgba(220,53,69,.08);z-index:4}
+.timeline-marco{position:absolute;top:0;bottom:0;width:2px;z-index:5}
+.timeline-marco.fase-1{background:rgba(25,118,210,.35)}
+.timeline-marco.fase-2{background:rgba(245,124,0,.35)}
+.timeline-marco.fase-3{background:rgba(194,24,88,.35)}
 .timeline-marco-label{position:absolute;top:-14px;transform:translateX(-50%);font-size:.6rem;font-weight:600;color:#adb5bd;white-space:nowrap;text-transform:uppercase}
 /* Marcador de 180 dias */
 .timeline-marco-180{position:absolute;top:0;bottom:0;width:2px;background:repeating-linear-gradient(to bottom,transparent 0,transparent 3px,#dc3545 3px,#dc3545 6px);z-index:6}
@@ -420,10 +429,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <div class="contador-180" id="alerta180" style="display:none"><div class="contador-bloco dias-restantes excedido"><span class="numero" id="alerta180Numero">0</span><span class="rotulo">dias excedidos</span></div><div class="contador-separador">|</div><div class="contador-msg critico" id="alerta180Msg">Limite excedido</div></div>
     <div class="timeline-empty" id="timelineEmpty">Nenhuma matricula selecionada</div>
     <div class="timeline-track" id="timelineTrack" style="display:none">
-        <div class="timeline-ruler"></div><div class="timeline-fill" id="timelineFill"></div>
-        <div class="timeline-marco" style="left:0%"><span class="timeline-marco-label">1a Vistoria</span></div>
-        <div class="timeline-marco" style="left:33%"><span class="timeline-marco-label">2a Vistoria</span></div>
-        <div class="timeline-marco" style="left:66%"><span class="timeline-marco-label">3a Vistoria</span></div>
+        <div class="timeline-ruler"></div>
+        <div id="timelineFases"></div>
+        <div class="timeline-fill" id="timelineFill"></div>
+        <div id="timelineMarcos"></div>
         <div class="timeline-marco-180" id="marco180"><span class="timeline-marco-180-label">180 dias</span></div>
     </div>
 </div>
@@ -930,6 +939,52 @@ function atualizarTimeline() {
     maxData.setDate(maxData.getDate() + 15);
     const range = maxData - minData;
     const pct = (data) => Math.min(Math.max(((data - minData) / range) * 100, 0), 100);
+    
+    // Limpa faixas e marcos de fase antigos
+    const containerFases = document.getElementById('timelineFases');
+    const containerMarcos = document.getElementById('timelineMarcos');
+    if (containerFases) containerFases.innerHTML = '';
+    if (containerMarcos) containerMarcos.innerHTML = '';
+    
+    // Calcula posicoes das fases (0, 60, 120, 180 dias desde o inicio)
+    const dia60 = new Date(dataInicio); dia60.setDate(dia60.getDate() + 60);
+    const dia120 = new Date(dataInicio); dia120.setDate(dia120.getDate() + 120);
+    const p0 = pct(minData);
+    const p60 = pct(dia60);
+    const p120 = pct(dia120);
+    const p180 = pct(dia180);
+    const pHoje = pct(hoje);
+    
+    // Renderiza faixas de fase
+    function criarFaixa(inicio, fim, classe, label) {
+        if (fim <= inicio) return;
+        const div = document.createElement('div');
+        div.className = 'timeline-fase ' + classe;
+        div.style.left = inicio + '%';
+        div.style.width = (fim - inicio) + '%';
+        if (label) { div.title = label; }
+        containerFases.appendChild(div);
+    }
+    criarFaixa(p0, p60, 'timeline-fase-1', '1a Vistoria (0-60 dias)');
+    criarFaixa(p60, p120, 'timeline-fase-2', '2a Vistoria (60-120 dias)');
+    criarFaixa(p120, p180, 'timeline-fase-3', '3a Vistoria (120-180 dias)');
+    if (hoje > dia180) { criarFaixa(p180, Math.max(pHoje, p180), 'timeline-fase-excedido', 'Periodo excedido (>180 dias)'); }
+    
+    // Renderiza marcos divisórios de fase (linhas verticais de fora a fora)
+    function criarMarcoFase(pos, classe, label) {
+        if (pos < 0 || pos > 100) return;
+        const div = document.createElement('div');
+        div.className = 'timeline-marco ' + classe;
+        div.style.left = pos + '%';
+        const lbl = document.createElement('span');
+        lbl.className = 'timeline-marco-label';
+        lbl.textContent = label;
+        div.appendChild(lbl);
+        containerMarcos.appendChild(div);
+    }
+    criarMarcoFase(p0, 'fase-1', '1a Vistoria');
+    criarMarcoFase(p60, 'fase-2', '2a Vistoria');
+    criarMarcoFase(p120, 'fase-3', '3a Vistoria');
     
     m.servicos.forEach(ev => {
         const criDate = new Date(ev.dataCriacao + 'T12:00:00');
