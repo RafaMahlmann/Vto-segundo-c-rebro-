@@ -66,6 +66,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .servico-btn .codigo{font-weight:700;font-size:.95rem;display:inline-block;min-width:38px}
 .servico-btn .desc{font-size:.78rem;opacity:.85;display:block;margin-top:2px}
 
+/* Roleta de servicos (prototipo) */
+.roleta-grupo{border-radius:10px;transition:outline-color .15s}
+.roleta-nav{display:flex;align-items:center;gap:8px;margin-bottom:6px;user-select:none}
+.roleta-seta{width:24px;height:24px;flex-shrink:0;border:none;border-radius:6px;background:rgba(255,255,255,.7);color:#495057;cursor:pointer;font-size:.65rem;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.roleta-seta:hover{background:white;transform:scale(1.1)}
+.roleta-seta:active{transform:scale(.92)}
+.roleta-dots{display:flex;gap:5px;flex:1;justify-content:center}
+.roleta-dot{width:7px;height:7px;border-radius:50%;background:rgba(0,0,0,.15);transition:transform .15s,background .15s}
+.roleta-dot.ativo{transform:scale(1.35)}
+.roleta-dot.preenchido{background:#28a745}
+.roleta-grupo .servico-btn{transition:transform .15s}
+.roleta-grupo.roleta-armada{outline:2px solid;outline-offset:4px}
+.roleta-grupo.roleta-armada .servico-btn{transform:scale(.98)}
+.coluna-1 .roleta-grupo.roleta-armada{outline-color:#1976d2}
+.coluna-2 .roleta-grupo.roleta-armada{outline-color:#f57c00}
+.coluna-3 .roleta-grupo.roleta-armada{outline-color:#c2185b}
+.coluna-1 .roleta-dot.ativo{background:#1976d2}
+.coluna-2 .roleta-dot.ativo{background:#f57c00}
+.coluna-3 .roleta-dot.ativo{background:#c2185b}
+
 /* Cards de sancao */
 .sancao-btn{background:#e9ecef!important;color:#adb5bd!important;border-color:#dee2e6!important;cursor:not-allowed!important;opacity:.7}
 .sancao-btn.ativo{background:#28a745!important;color:white!important;border-color:#1e7e34!important;cursor:pointer!important;opacity:1;animation:sancaoPulse 2s infinite}
@@ -305,12 +325,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <div class="fluxo-container">
             <div class="coluna-vistoria coluna-1" id="coluna1">
                 <div class="coluna-header">1a VISTORIA<div class="sub">Programacao inicial</div></div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(1,'8403')" data-cod="8403"><span class="codigo">8403</span> - 1a Vistoria + AS<span class="desc">Primeira inspecao</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8421')" data-cod="8421"><span class="codigo">8421</span> - 1a Vistoria<span class="desc">Sem AS, direto SGC</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8563')" data-cod="8563"><span class="codigo">8563</span> - 1a Vistoria Obras<span class="desc">Novas ligacoes</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Intermediarios</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Intermediarios</div>
                     <button class="servico-btn" onclick="selecionarServico(1,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8407')" data-cod="8407"><span class="codigo">8407</span> - Topografia<span class="desc">Condicoes tecnicas</span></button>
@@ -318,7 +338,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                     <button class="servico-btn" onclick="selecionarServico(1,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Habite-se</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Habite-se</div>
                     <button class="servico-btn" onclick="selecionarServico(1,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
@@ -327,12 +347,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <div class="seta-container"><div class="seta">&#10132;</div></div>
             <div class="coluna-vistoria coluna-2" id="coluna2">
                 <div class="coluna-header">2a VISTORIA<div class="sub">60 dias - Multa</div></div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8405')" data-cod="8405"><span class="codigo">8405</span> - 2a Vistoria<span class="desc">Irregularidade persistiu</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8416')" data-cod="8416"><span class="codigo">8416</span> - 2a Vistoria Convenio<span class="desc">Parceria Prefeitura</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8574')" data-cod="8574"><span class="codigo">8574</span> - 2a Vistoria Obras<span class="desc">Novas ligacoes</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Intermediarios</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Intermediarios</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8403')" data-cod="8403"><span class="codigo">8403</span> - 1a Vistoria + AS<span class="desc">Nova inspecao</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
@@ -342,12 +362,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                     <button class="servico-btn" onclick="selecionarServico(2,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Dilacao</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Dilacao</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8432')" data-cod="8432"><span class="codigo">8432</span> - Dilacao 30 dias<span class="desc">Prazo adicional</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8433')" data-cod="8433"><span class="codigo">8433</span> - Dilacao 60 dias<span class="desc">Prazo adicional</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8434')" data-cod="8434"><span class="codigo">8434</span> - Dilacao 90 dias<span class="desc">Prazo adicional</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Habite-se</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Habite-se</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
@@ -359,11 +379,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <div class="seta-container"><div class="seta">&#10132;</div></div>
             <div class="coluna-vistoria coluna-3" id="coluna3">
                 <div class="coluna-header">3a VISTORIA<div class="sub">60 dias - Multa DOBRO</div></div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Servicos</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8428')" data-cod="8428"><span class="codigo">8428</span> - 3a Vistoria<span class="desc">Irregularidade persistente</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8417')" data-cod="8417"><span class="codigo">8417</span> - Autuacao Municipal<span class="desc">Terceira em convenio</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Intermediarios</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Intermediarios</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8403')" data-cod="8403"><span class="codigo">8403</span> - 1a Vistoria + AS<span class="desc">Nova inspecao</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
@@ -373,12 +393,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                     <button class="servico-btn" onclick="selecionarServico(3,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Dilacao</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Dilacao</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8432')" data-cod="8432"><span class="codigo">8432</span> - Dilacao 30 dias<span class="desc">Prazo adicional</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8433')" data-cod="8433"><span class="codigo">8433</span> - Dilacao 60 dias<span class="desc">Prazo adicional</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8434')" data-cod="8434"><span class="codigo">8434</span> - Dilacao 90 dias<span class="desc">Prazo adicional</span></button>
                 </div>
-                <div class="servicos-grupo"><div class="servicos-grupo-title">Habite-se</div>
+                <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Habite-se</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8470')" data-cod="8470"><span class="codigo">8470</span> - Habite-se +600<span class="desc">Edificacao grande</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
@@ -653,6 +673,7 @@ function mostrarAba(aba) {
     document.getElementById('aba-' + aba).classList.add('active');
     event.target.classList.add('active');
     if (aba === 'estatisticas') { setTimeout(renderGraficos, 50); }
+    if (aba === 'fluxo') { atualizarTodasRoletas(); }
 }
 
 // ===== CONFIGURACAO =====
@@ -792,6 +813,7 @@ function selecionarMatricula(numero) {
     document.getElementById('matriculaAtivaDisplay').textContent = numero;
     renderMatriculas();
     atualizarTimeline();
+    atualizarTodasRoletas();
 }
 
 function getMatriculaAtiva() {
@@ -941,6 +963,72 @@ function toggleEvento(coluna, evento) {
     if (!matriculaAtiva) return;
 }
 
+// ===== ROLETA DE SERVICOS (prototipo - grupo "Servicos" da 1a Vistoria) =====
+let _roletaInstances = [];
+function initRoletas() {
+    document.querySelectorAll('.roleta-grupo').forEach(setupRoletaGrupo);
+}
+function atualizarTodasRoletas() {
+    _roletaInstances.forEach(r => r.refresh());
+}
+function setupRoletaGrupo(grupoEl) {
+    const btns = Array.from(grupoEl.querySelectorAll('.servico-btn'));
+    if (btns.length < 2) return;
+    let idx = 0;
+
+    const nav = document.createElement('div');
+    nav.className = 'roleta-nav';
+    nav.innerHTML = '<button type="button" class="roleta-seta roleta-cima" aria-label="Servico anterior">&#9650;</button>'
+                   + '<div class="roleta-dots"></div>'
+                   + '<button type="button" class="roleta-seta roleta-baixo" aria-label="Proximo servico">&#9660;</button>';
+    grupoEl.insertBefore(nav, btns[0]);
+    const dotsWrap = nav.querySelector('.roleta-dots');
+    btns.forEach(() => {
+        const dot = document.createElement('span');
+        dot.className = 'roleta-dot';
+        dotsWrap.appendChild(dot);
+    });
+    const dots = Array.from(dotsWrap.querySelectorAll('.roleta-dot'));
+
+    function armar() { grupoEl.classList.add('roleta-armada'); }
+    function desarmar() { grupoEl.classList.remove('roleta-armada'); }
+    function mover(dir) {
+        idx = (idx + dir + btns.length) % btns.length;
+        armar();
+        refresh();
+    }
+    function refresh() {
+        btns.forEach((b, i) => { b.style.display = i === idx ? '' : 'none'; });
+        const m = typeof getMatriculaAtiva === 'function' ? getMatriculaAtiva() : null;
+        dots.forEach((d, i) => {
+            d.classList.toggle('ativo', i === idx);
+            const cod = btns[i].getAttribute('data-cod');
+            d.classList.toggle('preenchido', !!(m && m.servicos.some(s => s.codigo === cod)));
+        });
+    }
+
+    nav.querySelector('.roleta-cima').addEventListener('click', e => { e.stopPropagation(); mover(-1); });
+    nav.querySelector('.roleta-baixo').addEventListener('click', e => { e.stopPropagation(); mover(1); });
+    grupoEl.addEventListener('wheel', e => {
+        e.preventDefault();
+        mover(e.deltaY > 0 ? 1 : -1);
+    }, { passive: false });
+    grupoEl.addEventListener('click', function (e) {
+        if (!e.target.closest('.servico-btn')) return;
+        if (!grupoEl.classList.contains('roleta-armada')) {
+            e.stopPropagation();
+            armar();
+        } else {
+            desarmar();
+        }
+    }, true);
+    document.addEventListener('click', e => { if (!grupoEl.contains(e.target)) desarmar(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') desarmar(); });
+
+    refresh();
+    _roletaInstances.push({ refresh });
+}
+
 function resetarFluxo() {
     if (!confirm('Limpar TODOS os dados? Isso nao pode ser desfeito.')) return;
     salvarHistorico();
@@ -972,6 +1060,7 @@ function salvarDatasModal() {
     renderMatriculas();
     atualizarTimeline();
     verificarSancoes();
+    atualizarTodasRoletas();
 }
 function marcarEmAberto() {
     const dataCriacao = document.getElementById('modalDataCriacao').value;
@@ -983,6 +1072,7 @@ function marcarEmAberto() {
     renderMatriculas();
     atualizarTimeline();
     verificarSancoes();
+    atualizarTodasRoletas();
 }
 
 // ===== SANCAO =====
@@ -1893,6 +1983,8 @@ function gerarMockData() {
 
 // Inicializa
 gerarMockData();
+initRoletas();
+atualizarTodasRoletas();
 </script>
 
 </body>
