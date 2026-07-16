@@ -41,8 +41,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .dica-box strong{color:#002752}
 
 /* ===== FLUXO DE VISTORIAS ===== */
-.fluxo-container{display:flex;gap:16px;flex-wrap:wrap}
-.coluna-vistoria{flex:1;min-width:300px;border-radius:14px;padding:20px;position:relative}
+.fluxo-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}
+.fluxo-toolbar-botoes{display:flex;gap:8px;align-items:center}
+.btn-fluxo-visor{padding:8px 14px;font-size:.85rem;font-weight:600;border:2px solid #ced4da;border-radius:8px;background:white;color:#495057;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-fluxo-visor:hover{background:#e9ecef}
+.btn-fluxo-visor.ativo{background:#007bff;color:white;border-color:#007bff}
+.btn-zoom{width:34px;height:34px;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700}
+.fluxo-zoom-wrap{transform-origin:top center;transition:transform .2s ease}
+.fluxo-container{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;align-items:flex-start}
+.coluna-vistoria{flex:1 1 320px;max-width:380px;min-width:280px;border-radius:14px;padding:20px;position:relative;transition:transform .2s,box-shadow .2s}
+.fluxo-container.modo-carrossel{flex-wrap:nowrap;overflow:hidden;justify-content:center;gap:0}
+.fluxo-container.modo-carrossel .coluna-vistoria{flex:0 0 auto;width:100%;max-width:380px;min-width:280px;display:none;margin:0 auto}
+.fluxo-container.modo-carrossel .coluna-vistoria.ativo{display:block}
+.fluxo-carrossel-nav{display:flex;justify-content:center;gap:12px;margin-top:12px}
+.fluxo-carrossel-nav button{padding:8px 16px;font-size:.85rem;font-weight:600;border:none;border-radius:8px;background:#6c757d;color:white;cursor:pointer;transition:background .2s}
+.fluxo-carrossel-nav button:hover{background:#5a6268}
+.fluxo-carrossel-nav button:disabled{opacity:.5;cursor:not-allowed}
+.coluna-matricula-ativa{text-align:center;margin-bottom:12px;padding:8px 12px;background:rgba(255,255,255,.7);border-radius:8px;font-size:.9rem;color:#495057;font-weight:600}
+.coluna-matricula-ativa span{font-family:'Courier New',monospace;font-weight:700;font-size:1.1rem;color:#343a40}
+.matricula-input-card{width:100%;max-width:160px;margin-top:4px;padding:8px 10px;font-family:'Courier New',monospace;font-size:1.1rem;font-weight:700;text-align:center;letter-spacing:2px;border:2px solid #ced4da;border-radius:8px;background:white;color:#343a40;outline:none;transition:border-color .2s,box-shadow .2s}
+.matricula-input-card:focus{border-color:#007bff;box-shadow:0 0 0 3px rgba(0,123,255,.15)}
+.matricula-input-card:invalid{border-color:#dc3545}
+.coluna-1 .matricula-input-card{border-color:#90caf9}
+.coluna-1 .matricula-input-card:focus{border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,.15)}
 .coluna-1{background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border:2px solid #64b5f6}
 .coluna-2{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:2px solid #ffb74d}
 .coluna-3{background:linear-gradient(135deg,#fce4ec 0%,#f8bbd0 100%);border:2px solid #f06292}
@@ -262,7 +283,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .estat-container{grid-template-columns:1fr}
 .estat-resumo-grid{grid-template-columns:1fr 1fr}
 .estat-canvas{height:180px}
-.fluxo-container{flex-direction:column}.seta-container{padding:10px 0;transform:rotate(90deg)}.data-input-box{flex-direction:column}.data-input-box .campo{min-width:100%}.calc-wrap{max-width:100%}.tabs-nav{flex-wrap:wrap}.timeline-panel{padding:10px 12px}.matricula-header{flex-direction:column}.matricula-header .campo{min-width:100%}
+.fluxo-container{flex-direction:column;align-items:stretch}.coluna-vistoria{max-width:100%;width:100%;margin:0 auto}.fluxo-container.modo-carrossel{flex-direction:row}.seta-container{padding:10px 0;transform:rotate(90deg)}.data-input-box{flex-direction:column}.data-input-box .campo{min-width:100%}.calc-wrap{max-width:100%}.tabs-nav{flex-wrap:wrap}.timeline-panel{padding:10px 12px}.matricula-header{flex-direction:column}.matricula-header .campo{min-width:100%}
 }
 </style>
 </head>
@@ -316,15 +337,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <h2>Fluxo de Vistorias VTO</h2>
         <p class="subtitle">Clique em um codigo para registrar na matricula ativa. Use a aba "Matriculas" para gerenciar.</p>
         <div class="dica-box"><strong>Como usar:</strong> Primeiro, va na aba "Matriculas" e selecione uma matricula. Depois volte aqui e clique nos codigos para registrar servicos nela.</div>
-        <div style="padding:12px;background:#e7f3ff;border-radius:8px;margin-bottom:16px;font-size:.9rem;color:#004085">
-            <strong>Matricula ativa:</strong> <span id="matriculaAtivaDisplay" style="font-family:'Courier New',monospace;font-weight:700;font-size:1.2rem">Nenhuma</span>
-            <button onclick="mostrarAba('matriculas')" style="margin-left:12px;padding:6px 14px;font-size:.8rem;background:#007bff;color:white;border:none;border-radius:6px;cursor:pointer">Ir para a tabela</button>
-        </div>
     </div>
     <div class="card">
-        <div class="fluxo-container">
+        <div class="fluxo-toolbar">
+            <div class="fluxo-toolbar-botoes">
+                <button id="btnModoGrade" class="btn-fluxo-visor ativo" onclick="alternarModoFluxo('grade')" title="Exibir todos os cards lado a lado">&#9783; Modo Grade</button>
+                <button id="btnModoCarrossel" class="btn-fluxo-visor" onclick="alternarModoFluxo('carrossel')" title="Exibir um card por vez">&#9974; 1 card</button>
+            </div>
+            <div class="fluxo-toolbar-botoes">
+                <button class="btn-fluxo-visor btn-zoom" onclick="aplicarZoom(-0.1)" title="Diminuir zoom">&#8722;</button>
+                <button class="btn-fluxo-visor btn-zoom" onclick="aplicarZoom(0.1)" title="Aumentar zoom">&#43;</button>
+                <button class="btn-fluxo-visor" onclick="resetarZoomFluxo()" title="Zoom padrão" style="font-size:.75rem;padding:8px 10px">100%</button>
+                <span id="zoomNivelDisplay" style="font-size:.8rem;color:#6c757d;min-width:46px;text-align:center">100%</span>
+            </div>
+        </div>
+        <div class="fluxo-zoom-wrap" id="fluxoZoomWrap">
+        <div class="fluxo-container" id="fluxoContainer">
             <div class="coluna-vistoria coluna-1" id="coluna1">
                 <div class="coluna-header">1a VISTORIA<div class="sub">Programacao inicial</div></div>
+                <div class="coluna-matricula-ativa">Matrícula ativa:<br><input type="text" id="matriculaInputCard1" class="matricula-input-card" maxlength="8" placeholder="12345678" oninput="atualizarMatriculaPeloCard(this.value)"></div>
                 <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(1,'8403')" data-cod="8403"><span class="codigo">8403</span> - 1a Vistoria + AS<span class="desc">Primeira inspecao</span></button>
                     <button class="servico-btn" onclick="selecionarServico(1,'8421')" data-cod="8421"><span class="codigo">8421</span> - 1a Vistoria<span class="desc">Sem AS, direto SGC</span></button>
@@ -347,6 +378,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <div class="seta-container"><div class="seta">&#10132;</div></div>
             <div class="coluna-vistoria coluna-2" id="coluna2">
                 <div class="coluna-header">2a VISTORIA<div class="sub">60 dias - Multa</div></div>
+                <div class="coluna-matricula-ativa">Matrícula ativa:<br><span class="matriculaAtivaCard">Nenhuma</span></div>
                 <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(2,'8405')" data-cod="8405"><span class="codigo">8405</span> - 2a Vistoria<span class="desc">Irregularidade persistiu</span></button>
                     <button class="servico-btn" onclick="selecionarServico(2,'8416')" data-cod="8416"><span class="codigo">8416</span> - 2a Vistoria Convenio<span class="desc">Parceria Prefeitura</span></button>
@@ -379,6 +411,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <div class="seta-container"><div class="seta">&#10132;</div></div>
             <div class="coluna-vistoria coluna-3" id="coluna3">
                 <div class="coluna-header">3a VISTORIA<div class="sub">60 dias - Multa DOBRO</div></div>
+                <div class="coluna-matricula-ativa">Matrícula ativa:<br><span class="matriculaAtivaCard">Nenhuma</span></div>
                 <div class="servicos-grupo roleta-grupo"><div class="servicos-grupo-title">Servicos</div>
                     <button class="servico-btn" onclick="selecionarServico(3,'8428')" data-cod="8428"><span class="codigo">8428</span> - 3a Vistoria<span class="desc">Irregularidade persistente</span></button>
                     <button class="servico-btn" onclick="selecionarServico(3,'8417')" data-cod="8417"><span class="codigo">8417</span> - Autuacao Municipal<span class="desc">Terceira em convenio</span></button>
@@ -407,6 +440,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                     <button class="servico-btn sancao-btn" onclick="registrarSancao('multa_dobro')" id="btnSancaoDobro" data-cod="multa_dobro"><span class="codigo">&#128308;</span> MULTA DOBRO<span class="desc">Reincidencia</span></button>
                 </div>
             </div>
+        </div>
+        </div>
+        <div class="fluxo-carrossel-nav" id="fluxoCarrosselNav" style="display:none">
+            <button onclick="mudarCardFluxo(-1)" id="btnCarrosselAnterior">&#10094; Anterior</button>
+            <span id="fluxoCarrosselIndicador" style="font-size:.85rem;color:#6c757d;padding:8px 0">1 / 3</span>
+            <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo &#10095;</button>
         </div>
     </div>
     <div class="footer">v3.0 - IT OPE 1580</div>
@@ -592,7 +631,7 @@ function undo() {
     const estado = JSON.parse(historico[historicoIndex]);
     matriculas = estado.matriculas;
     matriculaAtiva = estado.matriculaAtiva;
-    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+    atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
     atualizarBotoesUndoRedo();
@@ -604,7 +643,7 @@ function redo() {
     const estado = JSON.parse(historico[historicoIndex]);
     matriculas = estado.matriculas;
     matriculaAtiva = estado.matriculaAtiva;
-    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+    atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
     atualizarBotoesUndoRedo();
@@ -799,6 +838,25 @@ function adicionarMatricula() {
     renderMatriculas();
 }
 
+function adicionarOuSelecionarMatricula(numero) {
+    if (!/^\d{8}$/.test(numero)) return;
+    if (matriculas.find(m => m.numero === numero)) {
+        selecionarMatricula(numero);
+    } else {
+        salvarHistorico();
+        matriculas.push({ numero: numero, servicos: [], ativa: false });
+        selecionarMatricula(numero);
+        renderMatriculas();
+    }
+}
+
+function atualizarMatriculaPeloCard(valor) {
+    const numero = valor.replace(/\D/g, '').slice(0, 8);
+    const input = document.getElementById('matriculaInputCard1');
+    if (input && input.value !== numero) { input.value = numero; }
+    if (numero.length === 8) { adicionarOuSelecionarMatricula(numero); }
+}
+
 function removerMatricula(numero) {
     if (!confirm('Remover matricula ' + numero + '?')) return;
     salvarHistorico();
@@ -810,7 +868,7 @@ function removerMatricula(numero) {
 function selecionarMatricula(numero) {
     matriculaAtiva = numero;
     matriculas.forEach(m => m.ativa = (m.numero === numero));
-    document.getElementById('matriculaAtivaDisplay').textContent = numero;
+    atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
     atualizarTodasRoletas();
@@ -1029,12 +1087,66 @@ function setupRoletaGrupo(grupoEl) {
     _roletaInstances.push({ refresh });
 }
 
+// ===== CONTROLE DE VISUALIZACAO DO FLUXO =====
+let fluxoModo = 'grade'; // 'grade' ou 'carrossel'
+let fluxoCardAtivo = 0;
+let fluxoZoom = 1;
+const FLUXO_ZOOM_MIN = 0.6;
+const FLUXO_ZOOM_MAX = 1.6;
+
+function alternarModoFluxo(modo) {
+    fluxoModo = modo;
+    fluxoCardAtivo = 0;
+    document.getElementById('btnModoGrade').classList.toggle('ativo', modo === 'grade');
+    document.getElementById('btnModoCarrossel').classList.toggle('ativo', modo === 'carrossel');
+    const container = document.getElementById('fluxoContainer');
+    const nav = document.getElementById('fluxoCarrosselNav');
+    container.classList.toggle('modo-carrossel', modo === 'carrossel');
+    nav.style.display = modo === 'carrossel' ? 'flex' : 'none';
+    atualizarVisaoFluxo();
+}
+
+function mudarCardFluxo(dir) {
+    const colunas = document.querySelectorAll('#fluxoContainer .coluna-vistoria');
+    fluxoCardAtivo = (fluxoCardAtivo + dir + colunas.length) % colunas.length;
+    atualizarVisaoFluxo();
+}
+
+function atualizarVisaoFluxo() {
+    const colunas = document.querySelectorAll('#fluxoContainer .coluna-vistoria');
+    colunas.forEach((c, i) => { c.classList.toggle('ativo', i === fluxoCardAtivo); });
+    document.getElementById('fluxoCarrosselIndicador').textContent = (fluxoCardAtivo + 1) + ' / ' + colunas.length;
+    document.getElementById('btnCarrosselAnterior').disabled = colunas.length <= 1;
+    document.getElementById('btnCarrosselProximo').disabled = colunas.length <= 1;
+}
+
+function aplicarZoom(delta) {
+    fluxoZoom = Math.max(FLUXO_ZOOM_MIN, Math.min(FLUXO_ZOOM_MAX, fluxoZoom + delta));
+    const wrap = document.getElementById('fluxoZoomWrap');
+    if (wrap) { wrap.style.transform = 'scale(' + fluxoZoom + ')'; }
+    document.getElementById('zoomNivelDisplay').textContent = Math.round(fluxoZoom * 100) + '%';
+}
+
+function resetarZoomFluxo() {
+    fluxoZoom = 1;
+    const wrap = document.getElementById('fluxoZoomWrap');
+    if (wrap) { wrap.style.transform = 'scale(1)'; }
+    document.getElementById('zoomNivelDisplay').textContent = '100%';
+}
+
+function atualizarMatriculaAtivaNosCards() {
+    const texto = matriculaAtiva || 'Nenhuma';
+    document.querySelectorAll('.matriculaAtivaCard').forEach(el => { el.textContent = texto; });
+    const input = document.getElementById('matriculaInputCard1');
+    if (input && document.activeElement !== input) { input.value = matriculaAtiva || ''; }
+}
+
 function resetarFluxo() {
     if (!confirm('Limpar TODOS os dados? Isso nao pode ser desfeito.')) return;
     salvarHistorico();
     matriculas.forEach(m => { m.servicos = []; m.ativa = false; });
     matriculaAtiva = null;
-    document.getElementById('matriculaAtivaDisplay').textContent = 'Nenhuma';
+    atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
 }
@@ -1867,7 +1979,7 @@ function abrirArquivoJSON() {
                         });
                     }
                     matriculaAtiva = matriculas.length > 0 ? matriculas[0].numero : null;
-                    document.getElementById('matriculaAtivaDisplay').textContent = matriculaAtiva || 'Nenhuma';
+                    atualizarMatriculaAtivaNosCards();
                     renderMatriculas();
                     atualizarTimeline();
                     alert(matriculas.length + ' matricula(s) carregada(s) com sucesso!');
@@ -1975,7 +2087,7 @@ function gerarMockData() {
 
     matriculas = mocks;
     matriculaAtiva = '10045213';
-    document.getElementById('matriculaAtivaDisplay').textContent = '10045213';
+    atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
     salvarHistorico();
@@ -1985,6 +2097,7 @@ function gerarMockData() {
 gerarMockData();
 initRoletas();
 atualizarTodasRoletas();
+alternarModoFluxo('grade');
 </script>
 
 </body>
