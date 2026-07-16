@@ -64,6 +64,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .matricula-input-card:invalid{border-color:#dc3545}
 .coluna-1 .matricula-input-card{border-color:#90caf9}
 .coluna-1 .matricula-input-card:focus{border-color:#1976d2;box-shadow:0 0 0 3px rgba(25,118,210,.15)}
+.coluna-vistoria.card-foco{box-shadow:0 0 0 4px rgba(0,123,255,.4);transform:scale(1.01);z-index:2}
+.fluxo-enviar-wrap{display:flex;justify-content:center;margin-top:20px}
+.btn-enviar{padding:12px 32px;font-size:1rem;font-weight:700;color:white;background:#28a745;border:none;border-radius:10px;cursor:pointer;transition:all .2s;font-family:inherit;box-shadow:0 4px 12px rgba(40,167,69,.25)}
+.btn-enviar:hover{background:#218838;transform:translateY(-2px);box-shadow:0 6px 16px rgba(40,167,69,.35)}
+.btn-enviar:disabled{background:#adb5bd;cursor:not-allowed;transform:none;box-shadow:none}
 .coluna-1{background:linear-gradient(135deg,#e3f2fd 0%,#bbdefb 100%);border:2px solid #64b5f6}
 .coluna-2{background:linear-gradient(135deg,#fff3e0 0%,#ffe0b2 100%);border:2px solid #ffb74d}
 .coluna-3{background:linear-gradient(135deg,#fce4ec 0%,#f8bbd0 100%);border:2px solid #f06292}
@@ -441,6 +446,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 </div>
             </div>
         </div>
+        </div>
+        <div class="fluxo-enviar-wrap">
+            <button class="btn-enviar" id="btnEnviarFluxo" onclick="enviarFluxoParaMatriculas()">&#10148; Enviar</button>
         </div>
         <div class="fluxo-carrossel-nav" id="fluxoCarrosselNav" style="display:none">
             <button onclick="mudarCardFluxo(-1)" id="btnCarrosselAnterior">&#10094; Anterior</button>
@@ -1114,11 +1122,55 @@ function mudarCardFluxo(dir) {
 
 function atualizarVisaoFluxo() {
     const colunas = document.querySelectorAll('#fluxoContainer .coluna-vistoria');
-    colunas.forEach((c, i) => { c.classList.toggle('ativo', i === fluxoCardAtivo); });
+    colunas.forEach((c, i) => {
+        c.classList.toggle('ativo', i === fluxoCardAtivo);
+        c.classList.toggle('card-foco', i === fluxoCardAtivo);
+    });
     document.getElementById('fluxoCarrosselIndicador').textContent = (fluxoCardAtivo + 1) + ' / ' + colunas.length;
     document.getElementById('btnCarrosselAnterior').disabled = colunas.length <= 1;
     document.getElementById('btnCarrosselProximo').disabled = colunas.length <= 1;
+    const ativa = colunas[fluxoCardAtivo];
+    if (ativa) { ativa.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' }); }
 }
+
+function ativarAba(aba) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('aba-' + aba).classList.add('active');
+    const btn = document.querySelector('.tab-btn[onclick*="mostrarAba(\'' + aba + '\')"]');
+    if (btn) btn.classList.add('active');
+    if (aba === 'estatisticas') { setTimeout(renderGraficos, 50); }
+    if (aba === 'fluxo') { atualizarTodasRoletas(); }
+}
+
+function enviarFluxoParaMatriculas() {
+    const input = document.getElementById('matriculaInputCard1');
+    let numero = '';
+    if (input) { numero = input.value.replace(/\D/g, '').slice(0, 8); }
+    if (!/^\d{8}$/.test(numero)) {
+        alert('Preencha uma matricula valida com 8 numeros no 1o card antes de enviar.');
+        if (input) input.focus();
+        return;
+    }
+    adicionarOuSelecionarMatricula(numero);
+    const m = getMatriculaAtiva();
+    const qtdServicos = m ? m.servicos.length : 0;
+    if (confirm('Matricula ' + numero + ' enviada. ' + (qtdServicos > 0 ? qtdServicos + ' servico(s) registrado(s).' : 'Nenhum servico registrado ainda.') + '\n\nDeseja ir para a aba Matriculas?')) {
+        ativarAba('matriculas');
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key !== 'Tab') return;
+    const abaFluxo = document.getElementById('aba-fluxo');
+    if (!abaFluxo || !abaFluxo.classList.contains('active')) return;
+    const inputMatricula = document.getElementById('matriculaInputCard1');
+    if (document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA' || document.activeElement.isContentEditable)) {
+        if (document.activeElement !== inputMatricula) return;
+    }
+    e.preventDefault();
+    mudarCardFluxo(1);
+});
 
 function aplicarZoom(delta) {
     fluxoZoom = Math.max(FLUXO_ZOOM_MIN, Math.min(FLUXO_ZOOM_MAX, fluxoZoom + delta));
