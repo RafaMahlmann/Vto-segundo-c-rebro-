@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v3.4 — Prazos e Vistorias</title>
+<title>VTO v3.5 — Prazos e Vistorias</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#e9ecef;min-height:100vh;padding:20px;padding-bottom:90px}
@@ -267,6 +267,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 /* Footer */
 .footer{text-align:center;margin-top:20px;font-size:.8rem;color:#adb5bd}
 
+/* ===== CAMPO DATA COM ICONE CALENDARIO ===== */
+.campo-data{position:relative}
+.campo-data input[type="date"]{padding-right:40px}
+.campo-data input[type="date"]::-webkit-calendar-picker-indicator{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;cursor:pointer;opacity:1}
+.campo-data .cal-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:1.2rem;pointer-events:none;color:#6c757d}
+
 /* ===== CALCULADORA SANCAO ===== */
 .form-text-muted{display:block;margin-top:.5rem;font-size:.8rem;color:#6c757d;font-style:italic}
 .status-ok{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}
@@ -324,7 +330,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <span class="versao-badge" id="versaoBadge">v3.4</span>
+    <span class="versao-badge" id="versaoBadge">v3.5</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -346,7 +352,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.4</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.5</div>
     </div>
 </div>
 
@@ -360,7 +366,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
         <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
         <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
-        <div class="footer">v3.4</div>
+        <div class="footer">v3.5</div>
     </div>
 </div>
 
@@ -601,7 +607,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
     </div>
-    <div class="footer">v3.4 - Timeline Proporcional</div>
+    <div class="footer">v3.5 - Timeline Proporcional</div>
 </div>
 
 </div>
@@ -749,6 +755,10 @@ function mostrarAba(aba) {
     event.target.classList.add('active');
     if (aba === 'estatisticas') { setTimeout(renderGraficos, 50); }
     if (aba === 'fluxo') { atualizarTodasRoletas(); }
+    // Auto-foco no primeiro campo da aba
+    if (aba === 'prazo') { setTimeout(() => { const el = document.getElementById('dataSancao'); if (el) el.focus(); }, 100); }
+    if (aba === 'dilacao') { setTimeout(() => { const el = document.getElementById('dataInicialDilacao'); if (el) el.focus(); }, 100); }
+    if (aba === 'fluxo') { setTimeout(() => { const el = document.getElementById('matriculaInputCard1'); if (el) el.focus(); }, 100); }
 }
 
 // ===== CONFIGURACAO =====
@@ -2215,7 +2225,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '3.4';
+const VERSAO_LOCAL = '3.5';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 
 (function verificarNovaVersao() {
