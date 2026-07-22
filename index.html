@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v3.5 — Prazos e Vistorias</title>
+<title>VTO v3.6 — Prazos e Vistorias</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#e9ecef;min-height:100vh;padding:20px;padding-bottom:90px}
@@ -267,11 +267,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 /* Footer */
 .footer{text-align:center;margin-top:20px;font-size:.8rem;color:#adb5bd}
 
-/* ===== CAMPO DATA COM ICONE CALENDARIO ===== */
-.campo-data{position:relative}
-.campo-data input[type="date"]{padding-right:40px}
-.campo-data input[type="date"]::-webkit-calendar-picker-indicator{position:absolute;right:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;cursor:pointer;opacity:1}
-.campo-data .cal-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:1.2rem;pointer-events:none;color:#6c757d}
+/* ===== CAMPO DATA COM DIGITACAO + ICONE CALENDARIO ===== */
+.data-input-wrap{display:flex;align-items:stretch;gap:0}
+.data-input-wrap input[type="text"]{flex:1;padding:12px 14px;font-size:1rem;border:2px solid #dee2e6;border-right:none;border-radius:8px 0 0 8px;outline:none;transition:border-color .2s;font-family:inherit;background:white;width:auto}
+.data-input-wrap input[type="text"]:focus{border-color:#007bff}
+.data-input-wrap .btn-calendario{width:44px;min-width:44px;border:2px solid #dee2e6;border-left:none;background:#f8f9fa;border-radius:0 8px 8px 0;cursor:pointer;font-size:1.3rem;display:flex;align-items:center;justify-content:center;color:#495057;transition:all .2s;padding:0;line-height:1}
+.data-input-wrap .btn-calendario:hover{background:#e9ecef;color:#007bff}
+.data-input-wrap:focus-within .btn-calendario{border-color:#007bff}
 
 /* ===== CALCULADORA SANCAO ===== */
 .form-text-muted{display:block;margin-top:.5rem;font-size:.8rem;color:#6c757d;font-style:italic}
@@ -330,7 +332,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <span class="versao-badge" id="versaoBadge">v3.5</span>
+    <span class="versao-badge" id="versaoBadge">v3.6</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -341,9 +343,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <p class="subtitle" style="font-size:.9rem;color:#555;font-weight:400;margin-top:4px">(Sanção de Esgoto)</p>
         </div>
         <div class="dica-box"><strong>Dica:</strong> A data limite é calculada somando 30 dias corridos a partir da data de faturamento da sanção.</div>
-        <div class="campo"><label for="dataSancao">1. Data de Lançamento da Sanção:</label><input type="date" id="dataSancao" required></div>
-        <div class="campo"><label for="dataFaturamento">2. Data de Faturamento da Sanção:</label><input type="date" id="dataFaturamento" required><small class="form-text-muted">Procurar, na tela 4, a próxima data de fatura após a data do lançamento de sanção.</small></div>
-        <div class="campo"><label for="dataSolicitacao">3. Data da Solicitação de Vistoria (após regularização):</label><input type="date" id="dataSolicitacao" required></div>
+        <div class="campo"><label for="dataSancao">1. Data de Lançamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataSancao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSancao')" title="Abrir calendario">📅</button></div></div>
+        <div class="campo"><label for="dataFaturamento">2. Data de Faturamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataFaturamento" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataFaturamento')" title="Abrir calendario">📅</button></div><small class="form-text-muted">Procurar, na tela 4, a próxima data de fatura após a data do lançamento de sanção.</small></div>
+        <div class="campo"><label for="dataSolicitacao">3. Data da Solicitação de Vistoria (após regularização):</label><div class="data-input-wrap"><input type="text" id="dataSolicitacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSolicitacao')" title="Abrir calendario">📅</button></div></div>
         <button class="btn-calcular" onclick="calcularPrazoSancao()">Analisar Prazo</button>
         <div id="resultadoPrazoSancao" style="display:none;margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #007bff">
             <h3>Resultado da Análise:</h3>
@@ -352,7 +354,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.5</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.6</div>
     </div>
 </div>
 
@@ -362,11 +364,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <h2>Calculadora de Dilacao</h2>
         <p class="subtitle">Calcule prazos de dilacao (30, 60 ou 90 dias)</p>
         <div class="dica-box"><strong>Dica:</strong> Cliente pode solicitar ate 90 dias corridos adicionais para regularizar.</div>
-        <div class="campo"><label for="dataInicialDilacao">Data Base</label><input type="date" id="dataInicialDilacao"></div>
+        <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario">📅</button></div></div>
         <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
         <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
         <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
-        <div class="footer">v3.5</div>
+        <div class="footer">v3.6</div>
     </div>
 </div>
 
@@ -607,7 +609,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
     </div>
-    <div class="footer">v3.5 - Timeline Proporcional</div>
+    <div class="footer">v3.6 - Timeline Proporcional</div>
 </div>
 
 </div>
@@ -835,17 +837,88 @@ function fecharModalAjuda() {
 }
 
 // Preenche data de hoje
-const hoje = new Date().toISOString().split('T')[0];
-document.getElementById('dataInicialDilacao').value = hoje;
+function dataHojeBr() { const d = new Date(); return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear(); }
+document.getElementById('dataInicialDilacao').value = dataHojeBr();
+
+// ===== CALENDARIO VIA INPUT OCULTO =====
+function abrirCalendario(inputId) {
+    const inputTexto = document.getElementById(inputId);
+    if (!inputTexto) return;
+    // Cria input date oculto
+    const fakeDate = document.createElement('input');
+    fakeDate.type = 'date';
+    fakeDate.style.position = 'fixed';
+    fakeDate.style.left = '-9999px';
+    fakeDate.style.top = '-9999px';
+    fakeDate.style.width = '0';
+    fakeDate.style.height = '0';
+    fakeDate.style.opacity = '0';
+    fakeDate.style.pointerEvents = 'none';
+    document.body.appendChild(fakeDate);
+    // Se ja tem data no campo, preenche no date
+    const val = inputTexto.value;
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(val)) {
+        const [d, m, a] = val.split('/');
+        fakeDate.value = a + '-' + m + '-' + d;
+    }
+    fakeDate.showPicker ? fakeDate.showPicker() : fakeDate.focus();
+    fakeDate.addEventListener('change', function() {
+        if (fakeDate.value) {
+            const parts = fakeDate.value.split('-');
+            inputTexto.value = parts[2] + '/' + parts[1] + '/' + parts[0];
+        }
+        document.body.removeChild(fakeDate);
+    });
+    fakeDate.addEventListener('blur', function() {
+        setTimeout(() => { if (document.body.contains(fakeDate)) document.body.removeChild(fakeDate); }, 200);
+    });
+    // Firefox/fallback
+    setTimeout(() => { if (document.body.contains(fakeDate)) fakeDate.focus(); }, 50);
+}
+
+// ===== MASCARA DD/MM/AAAA =====
+function aplicarMascaraData(input) {
+    input.addEventListener('input', function(e) {
+        let val = this.value.replace(/\D/g, '');
+        if (val.length > 8) val = val.slice(0, 8);
+        if (val.length >= 5) {
+            this.value = val.slice(0,2) + '/' + val.slice(2,4) + '/' + val.slice(4);
+        } else if (val.length >= 3) {
+            this.value = val.slice(0,2) + '/' + val.slice(2);
+        } else {
+            this.value = val;
+        }
+    });
+}
+
+// Aplica mascara em todos os campos de data
+['dataSancao','dataFaturamento','dataSolicitacao','dataInicialDilacao'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) aplicarMascaraData(el);
+});
+
+// ===== CONVERSAO TEXTO DD/MM/AAAA -> AAAA-MM-DD =====
+function textoParaISODate(str) {
+    if (!str || !/^\d{2}\/\d{2}\/\d{4}$/.test(str)) return null;
+    var parts = str.split('/');
+    return parts[2] + '-' + parts[1] + '-' + parts[0];
+}
 
 // ===== ABA 1: CALCULADORA DE PRAZO (SANCAO DE ESGOTO) =====
 function calcularPrazoSancao() {
-    const dataSancaoStr = document.getElementById('dataSancao').value;
-    const dataFaturamentoStr = document.getElementById('dataFaturamento').value;
-    const dataSolicitacaoStr = document.getElementById('dataSolicitacao').value;
+    const dataSancaoTxt = document.getElementById('dataSancao').value;
+    const dataFaturamentoTxt = document.getElementById('dataFaturamento').value;
+    const dataSolicitacaoTxt = document.getElementById('dataSolicitacao').value;
 
-    if (!dataSancaoStr || !dataFaturamentoStr || !dataSolicitacaoStr) {
+    const dataFaturamentoStr = textoParaISODate(dataFaturamentoTxt);
+    const dataSolicitacaoStr = textoParaISODate(dataSolicitacaoTxt);
+
+    if (!dataSancaoTxt || !dataFaturamentoTxt || !dataSolicitacaoTxt) {
         window.alert("Por favor, preencha todos os tres campos de data.");
+        return;
+    }
+    if (!/^\d{2}\/\d{2}\/\d{4}$/.test(dataFaturamentoTxt) || !/^\d{2}\/\d{2}\/\d{4}$/.test(dataSolicitacaoTxt)) {
+        window.alert("Formato de data invalido. Use DD/MM/AAAA.");
         return;
     }
 
@@ -858,13 +931,8 @@ function calcularPrazoSancao() {
         return `${dia}/${mes}/${ano}`;
     }
 
-    function parseDateAsUTC(dateString) {
-        const parts = dateString.split('-').map(Number);
-        return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
-    }
-
-    const dataFaturamento = parseDateAsUTC(dataFaturamentoStr);
-    const dataSolicitacao = parseDateAsUTC(dataSolicitacaoStr);
+    const dataFaturamento = new Date(dataFaturamentoStr + 'T00:00:00');
+    const dataSolicitacao = new Date(dataSolicitacaoStr + 'T00:00:00');
     const prazoEmDias = 30;
 
     const dataLimite = new Date(dataFaturamento.getTime());
@@ -899,7 +967,8 @@ function calcularPrazoSancao() {
 
 // ===== ABA 2: DILACAO =====
 function calcularDilacao() {
-    const dataInicial = document.getElementById('dataInicialDilacao').value;
+    const dataInicialTxt = document.getElementById('dataInicialDilacao').value;
+    const dataInicial = textoParaISODate(dataInicialTxt);
     const quantidade = parseInt(document.getElementById('quantidadeDilacao').value);
     const tipoDias = document.getElementById('tipoDiasDilacao').value;
     if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
@@ -2225,7 +2294,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '3.5';
+const VERSAO_LOCAL = '3.6';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 
 (function verificarNovaVersao() {
