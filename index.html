@@ -267,6 +267,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 /* Footer */
 .footer{text-align:center;margin-top:20px;font-size:.8rem;color:#adb5bd}
 
+/* ===== CALCULADORA SANCAO ===== */
+.form-text-muted{display:block;margin-top:.5rem;font-size:.8rem;color:#6c757d;font-style:italic}
+.status-ok{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}
+.status-fora{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}
+
 /* ===== ESTATISTICAS ===== */
 .estat-container{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;max-width:1100px;margin-left:auto;margin-right:auto}
 .estat-card{background:white;border-radius:14px;padding:20px;box-shadow:0 4px 20px rgba(0,0,0,.08);border:1px solid #e9ecef;max-width:520px;margin:0 auto}
@@ -308,17 +313,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <span class="versao-badge" id="versaoBadge">v3.2</span>
 </div>
 
-<!-- ABA 1: CALCULADORA DE PRAZO -->
+<!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
 <div id="aba-prazo" class="tab-content active">
     <div class="card calc-wrap">
-        <h2>Calculadora de Prazo</h2>
-        <p class="subtitle">Calcule datas futuras com base em dias uteis ou corridos</p>
-        <div class="dica-box"><strong>Dica:</strong> Use para prazo de recurso de multa. Informe a data da fatura e some 30 dias.</div>
-        <div class="campo"><label for="dataInicialPrazo">Data Inicial</label><input type="date" id="dataInicialPrazo"></div>
-        <div class="row"><div class="campo"><label for="quantidadePrazo">Quantidade de Dias</label><input type="number" id="quantidadePrazo" min="1" value="30"></div><div class="campo"><label for="tipoDiasPrazo">Tipo de Dias</label><select id="tipoDiasPrazo"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
-        <button class="btn-calcular" onclick="calcularPrazo()">Calcular Data Final</button>
-        <div id="resultadoPrazo"><h3>Resultado</h3><div class="data-final" id="dataFinalPrazo"></div><div class="info" id="infoAdicionalPrazo"></div></div>
-        <div class="footer">v1.0</div>
+        <div class="titulo-wrapper">
+            <h2>Análise de Prazo para Devolução</h2>
+            <p class="subtitle" style="font-size:.9rem;color:#555;font-weight:400;margin-top:4px">(Sanção de Esgoto)</p>
+        </div>
+        <div class="dica-box"><strong>Dica:</strong> A data limite é calculada somando 30 dias corridos a partir da data de faturamento da sanção.</div>
+        <div class="campo"><label for="dataSancao">1. Data de Lançamento da Sanção:</label><input type="date" id="dataSancao" required></div>
+        <div class="campo"><label for="dataFaturamento">2. Data de Faturamento da Sanção:</label><input type="date" id="dataFaturamento" required><small class="form-text-muted">Procurar, na tela 4, a próxima data de fatura após a data do lançamento de sanção.</small></div>
+        <div class="campo"><label for="dataSolicitacao">3. Data da Solicitação de Vistoria (após regularização):</label><input type="date" id="dataSolicitacao" required></div>
+        <button class="btn-calcular" onclick="calcularPrazoSancao()">Analisar Prazo</button>
+        <div id="resultadoPrazoSancao" style="display:none;margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #007bff">
+            <h3>Resultado da Análise:</h3>
+            <p style="margin:.4rem 0;font-size:1rem"><strong>Data Limite para Solicitação:</strong> <span id="dataLimiteSancao" style="font-size:1.5rem;font-weight:700;color:#007bff">--</span></p>
+            <div id="statusSancao" style="padding:.8rem;margin-top:.8rem;border-radius:4px;font-size:1rem;font-weight:700;text-align:center">
+                <p id="statusTextoSancao" style="margin:0">--</p>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -798,24 +811,65 @@ function fecharModalAjuda() {
 
 // Preenche data de hoje
 const hoje = new Date().toISOString().split('T')[0];
-document.getElementById('dataInicialPrazo').value = hoje;
 document.getElementById('dataInicialDilacao').value = hoje;
 
-// ===== ABA 1: PRAZO =====
-function calcularPrazo() {
-    const dataInicial = document.getElementById('dataInicialPrazo').value;
-    const quantidade = parseInt(document.getElementById('quantidadePrazo').value);
-    const tipoDias = document.getElementById('tipoDiasPrazo').value;
-    if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
-    const data = new Date(dataInicial + 'T12:00:00');
-    let dataFinal, diasUsados = 0;
-    if (tipoDias === 'corridos') { dataFinal = new Date(data); dataFinal.setDate(dataFinal.getDate() + quantidade); diasUsados = quantidade; }
-    else { dataFinal = new Date(data); let d = 0; while (d < quantidade) { dataFinal.setDate(dataFinal.getDate() + 1); if (dataFinal.getDay() !== 0 && dataFinal.getDay() !== 6) d++; } diasUsados = d; }
-    const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
-    const badgeText = tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS';
-    document.getElementById('dataFinalPrazo').innerHTML = dataFinal.toLocaleDateString('pt-BR') + ' <span class="badge ' + badgeClass + '">' + badgeText + '</span>';
-    document.getElementById('infoAdicionalPrazo').innerHTML = '<strong>' + dataFinal.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '</strong><br>Adicionado <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' + new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
-    document.getElementById('resultadoPrazo').style.display = 'block';
+// ===== ABA 1: CALCULADORA DE PRAZO (SANCAO DE ESGOTO) =====
+function calcularPrazoSancao() {
+    const dataSancaoStr = document.getElementById('dataSancao').value;
+    const dataFaturamentoStr = document.getElementById('dataFaturamento').value;
+    const dataSolicitacaoStr = document.getElementById('dataSolicitacao').value;
+
+    if (!dataSancaoStr || !dataFaturamentoStr || !dataSolicitacaoStr) {
+        window.alert("Por favor, preencha todos os tres campos de data.");
+        return;
+    }
+
+    const MILISSEGUNDOS_POR_DIA = 1000 * 60 * 60 * 24;
+
+    function formatarData(data) {
+        const dia = String(data.getUTCDate()).padStart(2, '0');
+        const mes = String(data.getUTCMonth() + 1).padStart(2, '0');
+        const ano = data.getUTCFullYear();
+        return `${dia}/${mes}/${ano}`;
+    }
+
+    function parseDateAsUTC(dateString) {
+        const parts = dateString.split('-').map(Number);
+        return new Date(Date.UTC(parts[0], parts[1] - 1, parts[2]));
+    }
+
+    const dataFaturamento = parseDateAsUTC(dataFaturamentoStr);
+    const dataSolicitacao = parseDateAsUTC(dataSolicitacaoStr);
+    const prazoEmDias = 30;
+
+    const dataLimite = new Date(dataFaturamento.getTime());
+    dataLimite.setUTCDate(dataLimite.getUTCDate() + prazoEmDias);
+
+    const diffEmMilissegundos = dataLimite.getTime() - dataSolicitacao.getTime();
+    const diffEmDias = Math.floor(diffEmMilissegundos / MILISSEGUNDOS_POR_DIA);
+
+    const resultadoDiv = document.getElementById('resultadoPrazoSancao');
+    const statusDiv = document.getElementById('statusSancao');
+    const statusTextoP = document.getElementById('statusTextoSancao');
+
+    document.getElementById('dataLimiteSancao').textContent = formatarData(dataLimite);
+
+    if (diffEmDias >= 0) {
+        statusDiv.className = 'status-ok';
+        statusDiv.style.cssText = 'padding:.8rem;margin-top:.8rem;border-radius:4px;font-size:1rem;font-weight:700;text-align:center';
+        if (diffEmDias === 0) {
+            statusTextoP.textContent = "CLIENTE NO PRAZO. Solicitou no ultimo dia.";
+        } else {
+            statusTextoP.textContent = `CLIENTE NO PRAZO. Solicitou com ${diffEmDias} dia(s) de antecedencia.`;
+        }
+    } else {
+        statusDiv.className = 'status-fora';
+        statusDiv.style.cssText = 'padding:.8rem;margin-top:.8rem;border-radius:4px;font-size:1rem;font-weight:700;text-align:center';
+        const diasAtraso = Math.abs(diffEmDias);
+        statusTextoP.textContent = `CLIENTE FORA DO PRAZO. Solicitacao feita ${diasAtraso} dia(s) apos o vencimento.`;
+    }
+
+    resultadoDiv.style.display = 'block';
 }
 
 // ===== ABA 2: DILACAO =====
