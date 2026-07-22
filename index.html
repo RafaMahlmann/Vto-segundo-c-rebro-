@@ -2,11 +2,12 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v3.7 — Prazos e Vistorias</title>
+<title>VTO v3.8 — Prazos e Vistorias</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#e9ecef;min-height:100vh;padding:20px;padding-bottom:90px}
@@ -332,7 +333,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <span class="versao-badge" id="versaoBadge">v3.7</span>
+    <span class="versao-badge" id="versaoBadge">v3.8</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -343,9 +344,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <p class="subtitle" style="font-size:.9rem;color:#555;font-weight:400;margin-top:4px">(Sanção de Esgoto)</p>
         </div>
         <div class="dica-box"><strong>Dica:</strong> A data limite é calculada somando 30 dias corridos a partir da data de faturamento da sanção.</div>
-        <div class="campo"><label for="dataSancao">1. Data de Lançamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataSancao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSancao')" title="Abrir calendario">📅</button></div></div>
-        <div class="campo"><label for="dataFaturamento">2. Data de Faturamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataFaturamento" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataFaturamento')" title="Abrir calendario">📅</button></div><small class="form-text-muted">Procurar, na tela 4, a próxima data de fatura após a data do lançamento de sanção.</small></div>
-        <div class="campo"><label for="dataSolicitacao">3. Data da Solicitação de Vistoria (após regularização):</label><div class="data-input-wrap"><input type="text" id="dataSolicitacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSolicitacao')" title="Abrir calendario">📅</button></div></div>
+        <div class="campo"><label for="dataSancao">1. Data de Lançamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataSancao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSancao')" title="Abrir calendario"><i class=" fa-solid fa-calendar-days\></i></button></div></div>
+        <div class="campo"><label for="dataFaturamento">2. Data de Faturamento da Sanção:</label><div class="data-input-wrap"><input type="text" id="dataFaturamento" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataFaturamento')" title="Abrir calendario"><i class=" fa-solid fa-calendar-days\></i></button></div><small class="form-text-muted">Procurar, na tela 4, a próxima data de fatura após a data do lançamento de sanção.</small></div>
+        <div class="campo"><label for="dataSolicitacao">3. Data da Solicitação de Vistoria (após regularização):</label><div class="data-input-wrap"><input type="text" id="dataSolicitacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataSolicitacao')" title="Abrir calendario"><i class=" fa-solid fa-calendar-days\></i></button></div></div>
         <button class="btn-calcular" onclick="calcularPrazoSancao()">Analisar Prazo</button>
         <div id="resultadoPrazoSancao" style="display:none;margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #007bff">
             <h3>Resultado da Análise:</h3>
@@ -364,7 +365,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <h2>Calculadora de Dilacao</h2>
         <p class="subtitle">Calcule prazos de dilacao (30, 60 ou 90 dias)</p>
         <div class="dica-box"><strong>Dica:</strong> Cliente pode solicitar ate 90 dias corridos adicionais para regularizar.</div>
-        <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario">📅</button></div></div>
+        <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario"><i class=" fa-solid fa-calendar-days\></i></button></div></div>
         <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
         <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
         <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
