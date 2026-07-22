@@ -19,7 +19,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .btn-ajuda,.btn-config{padding:10px 14px;font-size:.85rem;font-weight:700;color:#6c757d;background:white;border:2px solid #ced4da;border-radius:8px;cursor:pointer;transition:all .3s;font-family:inherit;white-space:nowrap}
 .btn-ajuda:hover,.btn-config:hover{background:#e9ecef;border-color:#adb5bd}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
-.versao-badge{margin-left:auto;padding:6px 12px;font-size:.72rem;font-weight:700;color:#adb5bd;background:#f8f9fa;border:1px solid #e9ecef;border-radius:8px;font-family:'Courier New',monospace;letter-spacing:1px;cursor:default;user-select:none}
+.versao-badge{margin-left:auto;padding:6px 12px;font-size:.72rem;font-weight:700;color:#495057;background:#e9ecef;border:2px solid #ced4da;border-radius:8px;font-family:'Courier New',monospace;letter-spacing:1px;cursor:default;user-select:none}
 .btn-config.ativo{background:#495057;color:white;border-color:#343a40}
 .card{background:white;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.08);padding:30px;margin-bottom:20px}
 .card h2{font-size:1.3rem;color:#343a40;margin-bottom:6px}
@@ -346,6 +346,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.4</div>
     </div>
 </div>
 
@@ -359,7 +360,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
         <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
         <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
-        <div class="footer">v1.0</div>
+        <div class="footer">v3.4</div>
     </div>
 </div>
 
