@@ -1016,7 +1016,9 @@ function confirmarDiasCustom() {
     const dias = parseInt(input.value);
     if (!dias || dias < 1 || dias > 999) {
         input.value = '';
-        input.focus();
+        input.style.display = 'none';
+        document.getElementById('chipOutroDias').style.display = '';
+        document.getElementById('chipOutroDias').textContent = 'Outro...';
         return;
     }
     document.getElementById('quantidadeDilacao').value = dias;
