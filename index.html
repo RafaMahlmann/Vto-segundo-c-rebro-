@@ -39,14 +39,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;margin-left:8px}
 .badge-util{background:#d4edda;color:#155724}.badge-corridos{background:#fff3cd;color:#856404}
 .dica-box{background:#e7f3ff;border:1px solid #b8daff;border-radius:10px;padding:14px 18px;margin-bottom:20px;font-size:.85rem;color:#004085;line-height:1.6}
-.dilacao-chips{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-.dilacao-chip{padding:10px 14px;font-size:.9rem;font-weight:600;border:2px solid #ced4da;border-radius:10px;background:white;color:#495057;cursor:pointer;transition:all .2s;font-family:inherit;white-space:nowrap}
-.dilacao-chip:hover{background:#e9ecef;border-color:#adb5bd}
-.dilacao-chip.active{background:#007bff;color:white;border-color:#0056b3}
-.dilacao-chip-outro{font-style:italic;border-style:dashed}
-.dilacao-chip-outro.ativo{background:#007bff;color:white;border-style:dashed;border-color:#0056b3}
-.dilacao-input-custom{width:90px;padding:10px 12px;font-size:.9rem;font-weight:600;border:2px solid #007bff;border-radius:10px;outline:none;text-align:center;font-family:inherit;background:#f0f7ff}
-.dilacao-input-custom:focus{border-color:#0056b3;box-shadow:0 0 0 3px rgba(0,123,255,.2)}
 .dica-box strong{color:#002752}
 
 /* ===== FLUXO DE VISTORIAS ===== */
@@ -371,19 +363,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 <div id="aba-dilacao" class="tab-content">
     <div class="card calc-wrap">
         <h2>Calculadora de Dilacao</h2>
-        <p class="subtitle">Calcule prazos de dilacao (30, 60, 90 ou dias personalizados)</p>
+        <p class="subtitle">Calcule prazos de dilacao (30, 60 ou 90 dias)</p>
         <div class="dica-box"><strong>Dica:</strong> Cliente pode solicitar ate 90 dias corridos adicionais para regularizar.</div>
         <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario"><i class=" fa-solid fa-calendar-days\></i></button></div></div>
-        <div class="campo"><label>Dias de Dilacao</label>
-          <div class="dilacao-chips" id="dilacaoChips">
-            <button type="button" class="dilacao-chip" data-dias="30" onclick="selecionarDiasDilacao(30, this)">30 dias</button>
-            <button type="button" class="dilacao-chip active" data-dias="60" onclick="selecionarDiasDilacao(60, this)">60 dias</button>
-            <button type="button" class="dilacao-chip" data-dias="90" onclick="selecionarDiasDilacao(90, this)">90 dias</button>
-            <button type="button" class="dilacao-chip dilacao-chip-outro" id="chipOutroDias" data-dias="outro" onclick="ativarDiasCustom()">Outro...</button>
-            <input type="number" id="inputDiasCustom" class="dilacao-input-custom" placeholder="dias" min="1" max="999" style="display:none" onblur="confirmarDiasCustom()" onkeydown="if(event.key==='Enter')confirmarDiasCustom()">
-          </div>
-          <input type="hidden" id="quantidadeDilacao" value="60">
-        </div>
+        <div class="row"><div class="campo"><label for="quantidadeDilacao">Dias de Dilacao</label><select id="quantidadeDilacao"><option value="30">30 dias</option><option value="60" selected>60 dias</option><option value="90">90 dias</option></select></div><div class="campo"><label for="tipoDiasDilacao">Tipo de Dias</label><select id="tipoDiasDilacao"><option value="corridos" selected>Dias Corridos</option><option value="uteis">Dias Uteis</option></select></div></div>
         <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
         <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
         <div class="footer">v3.7</div>
@@ -984,54 +967,19 @@ function calcularPrazoSancao() {
 }
 
 // ===== ABA 2: DILACAO =====
-let diasCustomAtivo = false;
-
-function selecionarDiasDilacao(dias, btn) {
-    document.querySelectorAll('.dilacao-chip').forEach(c => c.classList.remove('active'));
-    document.querySelectorAll('.dilacao-chip-outro').forEach(c => c.classList.remove('ativo'));
-    btn.classList.add('active');
-    document.getElementById('quantidadeDilacao').value = dias;
-    diasCustomAtivo = false;
-    document.getElementById('inputDiasCustom').style.display = 'none';
-    document.getElementById('chipOutroDias').style.display = '';
-    document.getElementById('chipOutroDias').textContent = 'Outro...';
-}
-
-function ativarDiasCustom() {
-    diasCustomAtivo = true;
-    document.querySelectorAll('.dilacao-chip').forEach(c => c.classList.remove('active'));
-    document.getElementById('chipOutroDias').classList.add('ativo');
-    document.getElementById('chipOutroDias').style.display = 'none';
-    const input = document.getElementById('inputDiasCustom');
-    input.style.display = '';
-    input.value = '';
-    input.focus();
-}
-
-function confirmarDiasCustom() {
-    const input = document.getElementById('inputDiasCustom');
-    const dias = parseInt(input.value);
-    if (!dias || dias < 1 || dias > 999) {
-        input.value = '';
-        input.focus();
-        return;
-    }
-    document.getElementById('quantidadeDilacao').value = dias;
-    document.getElementById('chipOutroDias').style.display = '';
-    document.getElementById('chipOutroDias').textContent = dias + ' dias';
-    input.style.display = 'none';
-}
-
 function calcularDilacao() {
     const dataInicialTxt = document.getElementById('dataInicialDilacao').value;
     const dataInicial = textoParaISODate(dataInicialTxt);
     const quantidade = parseInt(document.getElementById('quantidadeDilacao').value);
+    const tipoDias = document.getElementById('tipoDiasDilacao').value;
     if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
     const data = new Date(dataInicial + 'T12:00:00');
-    const dataFinal = new Date(data);
-    dataFinal.setDate(dataFinal.getDate() + quantidade);
-    document.getElementById('dataFinalDilacao').textContent = dataFinal.toLocaleDateString('pt-BR');
-    document.getElementById('infoAdicionalDilacao').innerHTML = '<strong>' + dataFinal.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '</strong><br>Dilacao de <strong>' + quantidade + ' dia(s) corrido(s)</strong> a partir de ' + new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
+    let dataFinal, diasUsados = 0;
+    if (tipoDias === 'corridos') { dataFinal = new Date(data); dataFinal.setDate(dataFinal.getDate() + quantidade); diasUsados = quantidade; }
+    else { dataFinal = new Date(data); let d = 0; while (d < quantidade) { dataFinal.setDate(dataFinal.getDate() + 1); if (dataFinal.getDay() !== 0 && dataFinal.getDay() !== 6) d++; } diasUsados = d; }
+    const badgeClass = tipoDias === 'uteis' ? 'badge-util' : 'badge-corridos';
+    document.getElementById('dataFinalDilacao').innerHTML = dataFinal.toLocaleDateString('pt-BR') + ' <span class="badge ' + badgeClass + '">' + (tipoDias === 'uteis' ? 'DIAS UTEIS' : 'DIAS CORRIDOS') + '</span>';
+    document.getElementById('infoAdicionalDilacao').innerHTML = '<strong>' + dataFinal.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}) + '</strong><br>Dilacao de <strong>' + diasUsados + ' ' + (tipoDias === 'uteis' ? 'dia(s) util(eis)' : 'dia(s) corrido(s)') + '</strong> a partir de ' + new Date(dataInicial + 'T12:00:00').toLocaleDateString('pt-BR') + '.';
     document.getElementById('resultadoDilacao').style.display = 'block';
 }
 
