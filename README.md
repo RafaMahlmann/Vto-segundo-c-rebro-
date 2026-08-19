@@ -7,7 +7,10 @@
 - **Dominio:** Gestao de Vistorias Tecnicas Operacionais (VTO) da Sanepar
 - **Norma Base:** IT OPE 1580 — Vistorias Tecnicas Operacionais em Ligacoes Prediais de Esgoto
 - **Repositorio:** `RafaMahlmann/Vto-segundo-c-rebro-` (GitHub)
-- **Versao Atual:** 3.2 (Timeline Proporcional + 30 Mocks)
+- **Versao Atual:** 3.7 (Sancao de Esgoto + Dilacao parcial + Banner de versao)
+
+> **ATENCAO, AGENTE DE IA:** antes de qualquer alteracao, leia o `AGENTS.md` desta pasta.
+> Ele define o protocolo de edicao cirurgica, as proibicoes e o mapa do `index.html`.
 
 ---
 
@@ -22,9 +25,11 @@ Codigo HTML → Copiar → Google Docs → Bloco de Notas → Renomear para .htm
 **Consequencias:**
 - Zero dependencias externas (nenhum CDN, nenhum framework, nenhuma biblioteca)
 - Nenhum uso de `fetch()`, `import`, `require`, `module`
+  - **Excecao autorizada:** o verificador de nova versao (secao `VERIFICADOR DE NOVA VERSAO`) faz UM `fetch()` ao `version.json` do GitHub, com falha silenciosa. Nenhum outro `fetch()` e permitido.
 - Tudo inline: CSS no `<style>`, JavaScript no `<script>`, dados em memoria
 - Sem imagens externas (emojis Unicode para icones)
 - Sem localStorage (dados persistem via exportar JSON / importar JSON)
+- Sem acentos/cedilha em IDs, classes e nomes de funcao/variavel (compatibilidade Google Docs)
 
 ---
 
@@ -68,21 +73,24 @@ let servicoPendente = null;  // servico aguardando modal de datas
 
 O aplicativo possui 5 abas principais:
 
-### Aba 1: Calculadora de Prazo
-- Calcula datas futuras somando dias uteis ou corridos
-- Caso de uso: prazo de recurso de multa (30 dias da fatura)
-- Input: data inicial, quantidade, tipo (uteis/corridos)
-- Output: data final formatada + info adicional
+### Aba 1: Analise de Prazo para Devolucao (Sancao de Esgoto)
+- Substituiu a antiga "Calculadora de Prazo" generica na v3.3
+- Calcula a data limite para o cliente solicitar vistoria apos regularizar sancao
+- Regra: 30 dias corridos a partir da data de faturamento da sancao
+- Inputs: data de lancamento da sancao, data de faturamento, data da solicitacao de vistoria
+- Output: data limite em destaque + status (dentro do prazo / dias de atraso)
 
 ### Aba 2: Calculadora de Dilacao
-- Calcula prazos de dilacao (30, 60 ou 90 dias)
-- Caso de uso: cliente solicita prazo adicional para regularizar
-- Input: data base, quantidade (dropdown), tipo
-- Output: data final com badge identificador
+- Calcula prazos de dilacao, **sempre em dias corridos** (seletor de dias uteis removido na v3.7)
+- **Dilacao simples:** botoes rapidos 30/60/90 + input numerico livre
+- **Caso especial (dilacao parcial):** para cliente que ja pediu dilacao antes
+  - Inputs: data do pedido original, dias totais do pedido antigo, dias a conceder agora (padrao 90)
+  - Output: dias decorridos, dias restantes, quanto ainda falta pedir, data de vencimento e nova data base
 
 ### Aba 3: Fluxo de Vistorias VTO
 - Interface visual em 3 colunas representando as 3 fases do processo
-- 18 codigos de servico distribuidos nas fases
+- 20 codigos de servico distribuidos nas fases (array `CODIGOS_SERVICO`)
+- Prazo por codigo configuravel (modal de configuracoes, `prazosPorCodigo`, padrao 30 dias, em memoria)
 - Cards de sancao com ativacao automatica baseada em datas
 - Matricula ativa sincronizada com aba Matriculas
 
@@ -166,6 +174,24 @@ Interface para registrar datas de servico com navegacao 100% por teclado:
 
 - Auto-focus no campo "Data de Criacao" ao abrir
 - Nenhum clique de mouse necessario
+
+---
+
+## CAMPOS DE DATA (PADRAO DO APP)
+
+- Input de texto com mascara automatica `DD/MM/AAAA` (`aplicarMascaraData`)
+- Botao 📅 ao lado abre calendario nativo via input oculto (`abrirCalendario`)
+- Conversao para `AAAA-MM-DD` apenas dentro da logica (`textoParaISODate`)
+- **Todo campo de data novo DEVE seguir este padrao** (input texto + mascara + botao calendario)
+
+---
+
+## VERIFICADOR DE NOVA VERSAO
+
+- Banner discreto no topo quando ha versao mais nova no GitHub
+- Le `version.json` do repositorio via `fetch()` (UNICA excecao autorizada a regra de zero dependencias)
+- Falha silenciosa: sem internet, nada acontece e o app funciona normal
+- Versao local exibida em badge no header + footers das abas
 
 ---
 
@@ -260,10 +286,13 @@ Os seguintes documentos foram extraidos de PDFs da Sanepar e transformados em MD
 4. **Max-width nos graficos:** 1100px para manter proporcoes consistentes em telas grandes
 5. **Mock data de 30 matriculas:** Dados aleatorios gerados via `gerarMockData()` para demonstracao imediata
 6. **Sistema de sanacao simbolica:** Codigos `1a_sancao` e `multa_dobro` nao sao codigos Sanepar oficiais; sao flags internas do app
-7. **Prazo padrao de 30 dias:** `calcularStatusExecucao()` usa 30 dias como referencia para status OK/Alerta/Critico por servico
+7. **Prazo por codigo configuravel:** status OK/Alerta/Critico por servico usa `prazosPorCodigo` (padrao 30 dias, editavel no modal de configuracoes, em memoria)
 8. **Contador de 180 dias:** Calculado a partir da PRIMEIRA data de criacao da matricula ate a data atual
 9. **Evolucao para carteira VTO:** O app deve evoluir para acompanhar grandes conjuntos de matriculas, reclassificando riscos diariamente com base na data atual, sem depender de servidor.
 10. **Colaboracao offline:** Como nao ha backend em nuvem, trabalho em equipe deve ser resolvido por exportacao/importacao e mesclagem inteligente de arquivos JSON.
+11. **Campos de data com mascara:** digitacao direta DD/MM/AAAA + botao calendario separado (v3.6), nunca `<input type="date">` visivel
+12. **Textos de interface revisados pela skill `voz-do-vto`** (`.claude/skills/voz-do-vto/`): nenhum texto visivel muda sem passar por essas regras
+13. **Verificador de versao:** unico `fetch()` do app, autorizado, com falha silenciosa
 
 ---
 
@@ -287,4 +316,4 @@ Os seguintes documentos foram extraidos de PDFs da Sanepar e transformados em MD
 
 ---
 
-*Documento gerado em 2026-07-13. Versao do aplicativo: 3.2*
+*Documento gerado em 2026-07-13. Atualizado em 2026-08-19. Versao do aplicativo: 3.7*

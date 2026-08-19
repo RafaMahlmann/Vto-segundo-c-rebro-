@@ -7,8 +7,9 @@
 - **Regra de Transferencia:** Monobloco HTML — Google Docs → Bloco de Notas → .html
 - **Repositorio GitHub:** `RafaMahlmann/Vto-segundo-c-rebro-`
 - **Data de Inicio:** 2026-07-11
-- **Data deste registro:** 2026-07-13
-- **Status:** Parte 1, 2 e 3 concluidas. Projeto funcional e operacional.
+- **Data deste registro:** 2026-08-19
+- **Versao atual do app:** 3.7
+- **Status:** Partes 1 a 6 concluidas. Projeto funcional e operacional.
 
 ---
 
@@ -98,9 +99,9 @@ As "Partes" mencionadas abaixo foram definidas organicamente durante o desenvolv
 ### Funcionalidades Operacionais (100%)
 | Funcionalidade | Status | Notas |
 |----------------|--------|-------|
-| Calculadora de Prazo | OK | Dias uteis e corridos, badge identificador |
-| Calculadora de Dilacao | OK | Dropdown 30/60/90 dias |
-| Fluxo de Vistorias VTO | OK | 3 colunas, 18 codigos, selecao de matricula ativa |
+| Analise de Prazo para Devolucao (Sancao) | OK | 30 dias corridos do faturamento (desde v3.3) |
+| Calculadora de Dilacao | OK | Botoes 30/60/90 + input manual + caso especial (v3.7) |
+| Fluxo de Vistorias VTO | OK | 3 colunas, 20 codigos, selecao de matricula ativa |
 | Cards de Sancao | OK | Auto-ativação baseada em datas, 3 estados visuais |
 | CRUD de Matriculas | OK | Adicionar, remover, selecionar, tabela Excel |
 | Timeline Inferior | OK | Pontos de evento, marcador 180 dias, contador dinamico |
@@ -235,16 +236,51 @@ Nao ha pendencias obrigatorias. O aplicativo esta funcional e completo. As itens
 
 ---
 
+## PARTE 6: V3.3 ATE V3.7 + BLINDAGEM CONTRA SESSOES DE IA
+
+**Periodo:** 2026-07-14 a 2026-08-19
+
+### Entregas (resumo por versao, conforme historico git)
+- **v3.3:** Aba 1 substituida: saiu a "Calculadora de Prazo" generica, entrou a **Analise de Prazo para Devolucao (Sancao de Esgoto)** — 30 dias corridos a partir do faturamento da sancao
+- **v3.3.1 / v3.3.2:** cabecalho da tabela de matriculas congelado ao rolar (sticky)
+- **v3.4:** vistorias intermediarias, dilacao, habite-se e convenios nas colunas 2 e 3 do fluxo; fase registrada por servico; **sistema de aviso de nova versao** (banner + `version.json` + `fetch()` ao GitHub — unica excecao autorizada a regra de zero dependencias)
+- **v3.4.1:** roleta de servicos no grupo da 1a vistoria (prototipo)
+- **v3.5:** ajustes visuais no fluxo; auto-foco nos campos ao trocar de aba; navegacao TAB no fluxo; **agente de teste automatizado** (`agente_vto.py`, Playwright, screenshots)
+- **v3.6:** campos de data com digitacao direta DD/MM/AAAA (mascara automatica) + botao 📅 de calendario separado
+- **v3.7:** largura dos campos de data alinhada; **Calculadora de Dilacao reformulada**:
+  - Removido seletor "dias uteis" (dilacao e sempre em dias corridos)
+  - Botoes rapidos 30/60/90 + input numerico livre
+  - Nova secao **Caso especial — dilacao parcial** (pedido antigo + concessao de 90 dias agora)
+  - Textos revisados pela skill `.claude/skills/voz-do-vto`
+
+### Incidente: sessoes de IA destruindo configuracoes
+- Uma sessao paralela adicionou Font Awesome, refez UI nao solicitada e bumpou versao sozinha (commits v3.8/v3.9).
+- **Tudo foi revertido** (5 commits de revert no topo do historico).
+- Causa raiz identificada: nao existia protocolo de edicao, os docs estavam desatualizados em relacao ao codigo e nao havia mapa do `index.html`.
+
+### Blindagem criada (2026-08-19)
+- [x] **`AGENTS.md`** — protocolo de edicao cirurgica, proibicoes explicitas, mapa do `index.html`, checklist obrigatorio pos-edicao
+- [x] **`CLAUDE.md`** — apontador para o AGENTS.md
+- [x] README.md atualizado para v3.7 (aba 1, dilacao, excecao do fetch, padrao de campos de data)
+- [x] Scripts de patch temporarios movidos para `patches/`
+
+### Regra para qualquer nova sessao de IA
+**Ler AGENTS.md antes de tocar no codigo. O codigo e a fonte da verdade; doc divergente nao autoriza "corrigir" o codigo.**
+
+---
+
 ## COMO CONTINUAR EM UMA NOVA SESSAO
 
 Se um novo agente/IA precisar continuar este projeto:
 
-1. **Leia o README.md** — contem a documentacao completa do aplicativo
-2. **Leia este TIMELINE.md** — contem o estado atual e o que ja foi feito
-3. **Abra o `index.html`** no navegador para ver o estado funcional
-4. **Verifique a pasta `/docs/`** para os documentos semanticos da Sanepar
-5. **Nunca quebre a Regra Inquebrantavel** (Google Docs → Bloco de Notas → .html)
-6. **Sempre teste no browser** apos qualquer modificacao antes de declarar pronto
+1. **Leia o AGENTS.md PRIMEIRO** — protocolo de edicao cirurgica, proibicoes e mapa do index.html (INEGOCIAVEL)
+2. **Leia o README.md** — contem a documentacao completa do aplicativo
+3. **Leia este TIMELINE.md** — contem o estado atual e o que ja foi feito
+4. **Abra o `index.html`** no navegador para ver o estado funcional
+5. **Verifique a pasta `/docs/`** para os documentos semanticos da Sanepar
+6. **Nunca quebre a Regra Inquebrantavel** (Google Docs → Bloco de Notas → .html)
+7. **Nunca reescreva o index.html inteiro** — edicoes cirurgicas por ancora, conforme AGENTS.md
+8. **Sempre teste no browser** apos qualquer modificacao antes de declarar pronto (checklist do AGENTS.md, secao 6)
 
 ---
 
@@ -269,4 +305,4 @@ O aplicativo substitui/controle planilhas Excel e papelada manual. O usuario pre
 
 ---
 
-*Registro gerado em 2026-07-13. Estado: Projeto operacional, sem pendencias criticas.*
+*Registro gerado em 2026-07-13. Atualizado em 2026-08-19. Estado: Projeto operacional em v3.7, sem pendencias criticas. Sessoes de IA devem seguir o AGENTS.md.*
