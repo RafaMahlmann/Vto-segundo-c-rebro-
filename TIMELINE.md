@@ -8,7 +8,7 @@
 - **Repositorio GitHub:** `RafaMahlmann/Vto-segundo-c-rebro-`
 - **Data de Inicio:** 2026-07-11
 - **Data deste registro:** 2026-08-19
-- **Versao atual do app:** 3.7
+- **Versao atual do app:** 3.8
 - **Status:** Partes 1 a 6 concluidas. Projeto funcional e operacional.
 
 ---
@@ -305,4 +305,4 @@ O aplicativo substitui/controle planilhas Excel e papelada manual. O usuario pre
 
 ---
 
-*Registro gerado em 2026-07-13. Atualizado em 2026-08-19. Estado: Projeto operacional em v3.7, sem pendencias criticas. Sessoes de IA devem seguir o AGENTS.md.*
+*Registro gerado em 2026-07-13. Atualizado em 2026-08-19. Estado: Projeto operacional em v3.8, sem pendencias criticas. Sessoes de IA devem seguir o AGENTS.md.*
