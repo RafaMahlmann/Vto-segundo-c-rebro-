@@ -16,7 +16,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .tab-btn:hover{background:rgba(255,255,255,.4);color:#495057}
 .tab-btn.active{background:#007bff;color:white;box-shadow:0 2px 8px rgba(0,123,255,.3)}
 .tab-content{display:none}.tab-content.active{display:block}
-.btn-ajuda,.btn-config{padding:10px 14px;font-size:.85rem;font-weight:700;color:#6c757d;background:white;border:2px solid #ced4da;border-radius:8px;cursor:pointer;transition:all .3s;font-family:inherit;white-space:nowrap}
+.btn-ajuda,.btn-config,.btn-zip{padding:10px 14px;font-size:.85rem;font-weight:700;color:#6c757d;background:white;border:2px solid #ced4da;border-radius:8px;cursor:pointer;transition:all .3s;font-family:inherit;white-space:nowrap}
+.btn-ajuda:hover,.btn-config:hover,.btn-zip:hover{background:#e9ecef;border-color:#adb5bd}
+.btn-zip:hover{background:#d4edda;border-color:#28a745;color:#155724}
+.btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
 .btn-ajuda:hover,.btn-config:hover{background:#e9ecef;border-color:#adb5bd}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
 .versao-badge{margin-left:auto;padding:6px 12px;font-size:.72rem;font-weight:700;color:#495057;background:#e9ecef;border:2px solid #ced4da;border-radius:8px;font-family:'Courier New',monospace;letter-spacing:1px;cursor:default;user-select:none}
@@ -53,7 +56,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .separador-dilacao{border:none;border-top:1px solid #dee2e6;margin:24px 0}
 .btn-calcular--secundario{background:#007bff}
 .btn-calcular--secundario:hover{background:#0056b3}
-#resultadoCasoEspecial{display:none;margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #28a745}
+#resultadoCasoEspecial{margin-top:22px;padding:20px;background:#f8f9fa;border-radius:10px;border-left:4px solid #28a745}
 #resultadoCasoEspecial h3{font-size:1rem;color:#343a40;margin-bottom:14px}
 .info-grid{display:grid;gap:10px}
 .info-item{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:white;border-radius:8px;border:1px solid #e9ecef}
@@ -61,6 +64,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .info-label{font-size:.85rem;color:#6c757d}
 .info-valor{font-size:.95rem;font-weight:700;color:#343a40}
 .info-item.destaque .info-valor{color:#155724;font-size:1.05rem}
+.nota-recomendacao{margin-top:14px;padding:12px 16px;background:#e7f3ff;border-radius:8px;border-left:4px solid #007bff;text-align:right;font-size:.85rem;color:#495057;line-height:1.5}
+.nota-recomendacao strong{color:#004085;font-weight:700}
+.nota-recomendacao .data-negrito{font-size:1rem;color:#004085;font-weight:700}
+.resposta-gerada-wrap{margin-top:18px;border:1px solid #dee2e6;border-radius:10px;overflow:hidden;background:white}
+.resposta-gerada-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#f8f9fa;border-bottom:1px solid #dee2e6;font-size:.85rem;font-weight:600;color:#495057}
+.btn-copiar{padding:6px 14px;font-size:.8rem;font-weight:700;color:#007bff;background:white;border:2px solid #007bff;border-radius:6px;cursor:pointer;transition:all .2s;font-family:inherit}
+.btn-copiar:hover{background:#007bff;color:white}
+.resposta-gerada-texto{width:100%;min-height:220px;padding:14px;font-size:.88rem;line-height:1.6;color:#343a40;border:none;outline:none;resize:vertical;font-family:inherit;background:white}
+/* ===== CARD RESPOSTA COM ABAS M1/M2 ===== */
+.card-resposta{margin-top:18px;border:1px solid #ffd699;border-radius:10px;overflow:hidden;background:#fff8e6}
+.card-resposta-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:#ffeeba;border-bottom:1px solid #ffd699}
+.card-resposta-titulo{font-size:.9rem;font-weight:700;color:#856404}
+.mini-tabs{display:flex;gap:4px}
+.mini-tab{padding:5px 12px;font-size:.78rem;font-weight:600;border:2px solid #ffd699;border-radius:6px;background:transparent;color:#856404;cursor:pointer;transition:all .2s;font-family:inherit}
+.mini-tab:hover{background:rgba(255,255,255,.5)}
+.mini-tab.ativa{background:white;border-color:#856404;color:#856404}
+.card-resposta-body{padding:14px}
+.modelo-resposta{display:none}
+.modelo-resposta.ativa{display:block}
+.card-resposta-body textarea{width:100%;min-height:180px;padding:12px;font-size:.88rem;line-height:1.6;color:#343a40;border:1px solid #ffd699;border-radius:6px;outline:none;resize:vertical;font-family:inherit;background:white}
+
+/* ===== FLUXO DE VISTORIAS ===== */
+
+/* ===== FLUXO DE VISTORIAS ===== */
 
 /* ===== FLUXO DE VISTORIAS ===== */
 .fluxo-toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap}
@@ -354,7 +381,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <span class="versao-badge" id="versaoBadge">v3.7</span>
+    <button class="btn-zip" onclick="gerarZipPortatil()" title="Gerar ZIP para compartilhar">&#128230; ZIP</button>
+    <span class="versao-badge" id="versaoBadge" data-versao>v3.7</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -376,7 +404,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd">v3.7</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v3.7</div>
     </div>
 </div>
 
@@ -388,35 +416,35 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
         <div class="dica-box">
             <strong>Como usar:</strong><br>
             <strong>Dilacao simples</strong> — quando o cliente pede agora pela primeira vez. Escolha a data base e os dias (30, 60, 90 ou outro valor).<br><br>
-            <strong>Caso especial</strong> — quando o cliente ja tinha pedido dilação antes e voce vai dar mais prazo agora. Coloque a data do pedido antigo e os dias totais que ele pediu. Aqui voce ve quanto tempo ja passou, quanto ainda falta, e quanto dar hoje (padrao: 90 dias). Tambem mostra quando vence esse prazo novo e quanto faltara pedir depois.
+            <strong>Casos especiais, sugestao de procedimento</strong> — quando o cliente ja tinha pedido dilação antes e voce vai dar mais prazo agora. Coloque a data do pedido antigo e os dias totais que ele pediu. Aqui voce ve quanto tempo ja passou, quanto ainda falta, e quanto dar hoje (padrao: 90 dias). Tambem mostra quando vence esse prazo novo e quanto faltara pedir depois.
         </div>
 
         <!-- DILACAO SIMPLES -->
         <div class="secao-dilacao">
             <h3 class="secao-titulo">Dilacao Simples</h3>
-            <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario">📅</button></div></div>
+            <div class="campo"><label for="dataInicialDilacao">Data Base</label><div class="data-input-wrap"><input type="text" id="dataInicialDilacao" placeholder="DD/MM/AAAA" maxlength="10" oninput="calcularDilacao()"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataInicialDilacao')" title="Abrir calendario">📅</button></div></div>
             <div class="campo"><label>Dias de Dilacao</label>
                 <div class="botoes-dias-wrap">
                     <button type="button" class="btn-dia-rapido" onclick="setDiasDilacao(30)">30</button>
                     <button type="button" class="btn-dia-rapido" onclick="setDiasDilacao(60)">60</button>
                     <button type="button" class="btn-dia-rapido" onclick="setDiasDilacao(90)">90</button>
-                    <input type="number" id="quantidadeDilacao" class="input-dias-manual" placeholder="Outro" min="1" oninput="validarDiasDilacao(this)">
+                    <input type="number" id="quantidadeDilacao" class="input-dias-manual" placeholder="Outro" min="1" oninput="validarDiasDilacao(this); calcularDilacao();">
                 </div>
             </div>
-            <button class="btn-calcular" onclick="calcularDilacao()">Calcular Data Final</button>
-            <div id="resultadoDilacao"><h3>Resultado</h3><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
+            <div id="resultadoDilacao" style="margin-top:18px;display:none"><div class="data-final" id="dataFinalDilacao"></div><div class="info" id="infoAdicionalDilacao"></div></div>
         </div>
 
         <hr class="separador-dilacao">
 
         <!-- CASO ESPECIAL / DATA BASE EXTRA -->
         <div class="secao-dilacao">
-            <h3 class="secao-titulo">Caso especial — dilação parcial</h3>
+            <h3 class="secao-titulo">Casos especiais, sugestao de procedimento — dilação parcial</h3>
             <p class="secao-subtitle">Use quando o cliente ja tinha pedido dilacao antes e voce vai dar mais prazo agora.</p>
-            <div class="campo"><label for="dataPedidoOriginal">Data do Pedido Original</label><div class="data-input-wrap"><input type="text" id="dataPedidoOriginal" placeholder="DD/MM/AAAA" maxlength="10"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataPedidoOriginal')" title="Abrir calendario">📅</button></div></div>
-            <div class="campo"><label for="diasTotaisSolicitados">Dias totais do pedido antigo</label><input type="number" id="diasTotaisSolicitados" placeholder="Ex: 365" min="1"></div>
-            <div class="campo"><label for="diasConcederAgora">Dias para dar agora (padrao: 90)</label><input type="number" id="diasConcederAgora" value="90" min="1"></div>
-            <button class="btn-calcular btn-calcular--secundario" onclick="calcularDilacaoCasoEspecial()">Calcular prazo parcial</button>
+            <div class="campo"><label for="dataPedidoOriginal">Data do Pedido do Documento</label><div class="data-input-wrap"><input type="text" id="dataPedidoOriginal" placeholder="DD/MM/AAAA" maxlength="10" oninput="calcularDilacaoCasoEspecial()"><button type="button" class="btn-calendario" onclick="abrirCalendario('dataPedidoOriginal')" title="Abrir calendario">📅</button></div></div>
+            <div class="campo"><label for="diasTotaisSolicitados">Dias totais do pedido antigo</label><input type="number" id="diasTotaisSolicitados" placeholder="Ex: 365" min="1" oninput="calcularDilacaoCasoEspecial()"></div>
+            <div class="campo"><label for="diasConcederAgora">Dias para dar agora (padrao: 90)</label><input type="number" id="diasConcederAgora" value="90" min="1" oninput="calcularDilacaoCasoEspecial()"></div>
+            <div class="campo"><label for="matriculaCasoEspecial">Numero da matricula (8 digitos)</label><input type="text" id="matriculaCasoEspecial" placeholder="Ex: 12345678" maxlength="8" oninput="this.value = this.value.replace(/\D/g,'').slice(0,8); calcularDilacaoCasoEspecial();"></div>
+            <div class="campo"><label for="protocoloCasoEspecial">Numero do protocolo</label><input type="text" id="protocoloCasoEspecial" placeholder="Ex: 2026-00012345" oninput="calcularDilacaoCasoEspecial()"></div>
             <div id="resultadoCasoEspecial"><h3>Resultado do Caso Especial</h3>
                 <div class="info-grid" id="gridCasoEspecial">
                     <div class="info-item"><span class="info-label">Dias decorridos ate hoje:</span><span class="info-valor" id="ceDecorridos">—</span></div>
@@ -424,12 +452,38 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                     <div class="info-item"><span class="info-label">Dias concedidos agora:</span><span class="info-valor" id="ceConcedidos">—</span></div>
                     <div class="info-item"><span class="info-label">Quanto ainda falta pedir:</span><span class="info-valor" id="ceFaltarao">—</span></div>
                     <div class="info-item destaque"><span class="info-label">Data de vencimento (prazo atual):</span><span class="info-valor" id="ceVencimento">—</span></div>
-                    <div class="info-item"><span class="info-label">Nova data base para proximo pedido:</span><span class="info-valor" id="ceNovaDataBase">—</span></div>
+                </div>
+                <div class="nota-recomendacao" id="notaRecomendacao">
+                    <strong>Orientacao:</strong> casos especiais (orgaos publicos, escolas, habite-se, convenio com prefeitura ou interesse social) recebem prazo total direto. Demais casos comecam com 90 dias e, se necessario, analisam prazo maior depois.<br>
+                    Prazo final do pedido original: <span class="data-negrito" id="prazoFinalPedido">—</span>
+                </div>
+                <div class="card-resposta" id="cardResposta">
+                    <div class="card-resposta-header">
+                        <span class="card-resposta-titulo">Resposta para o cliente</span>
+                        <div class="mini-tabs">
+                            <button type="button" class="mini-tab" id="tabM1" onclick="mostrarModeloResposta(1)">Modelo 1</button>
+                            <button type="button" class="mini-tab" id="tabM2" onclick="mostrarModeloResposta(2)">Modelo 2</button>
+                        </div>
+                    </div>
+                    <div class="card-resposta-body">
+                        <div class="modelo-resposta" id="modelo1">
+                            <textarea id="respostaModelo1" readonly></textarea>
+                            <div style="text-align:right;margin-top:8px">
+                                <button type="button" class="btn-copiar" onclick="copiarTexto('respostaModelo1')">Copiar Modelo 1</button>
+                            </div>
+                        </div>
+                        <div class="modelo-resposta" id="modelo2">
+                            <textarea id="respostaModelo2" readonly></textarea>
+                            <div style="text-align:right;margin-top:8px">
+                                <button type="button" class="btn-copiar" onclick="copiarTexto('respostaModelo2')">Copiar Modelo 2</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="footer">v3.7</div>
+        <div class="footer" data-versao>v3.7</div>
     </div>
 </div>
 
@@ -708,6 +762,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 </div>
 
 <script>
+// ===== VERSAO DINAMICA =====
+(function() {
+    const agora = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const dataHora = agora.getFullYear() + '-' + pad(agora.getMonth()+1) + '-' + pad(agora.getDate()) + '.' + pad(agora.getHours()) + '-' + pad(agora.getMinutes());
+    const versao = 'v3.7.' + dataHora;
+    document.querySelectorAll('[data-versao]').forEach(el => { el.textContent = versao; });
+})();
+
 // ===== DADOS =====
 let matriculas = [];
 let matriculaAtiva = null;
@@ -820,7 +883,7 @@ function mostrarAba(aba) {
     if (aba === 'fluxo') { atualizarTodasRoletas(); }
     // Auto-foco no primeiro campo da aba
     if (aba === 'prazo') { setTimeout(() => { const el = document.getElementById('dataSancao'); if (el) el.focus(); }, 100); }
-    if (aba === 'dilacao') { setTimeout(() => { const el = document.getElementById('dataInicialDilacao'); if (el) el.focus(); }, 100); }
+    if (aba === 'dilacao') { setTimeout(() => { const el = document.getElementById('dataInicialDilacao'); if (el) el.focus(); calcularDilacaoCasoEspecial(); mostrarModeloResposta(1); }, 100); }
     if (aba === 'fluxo') { setTimeout(() => { const el = document.getElementById('matriculaInputCard1'); if (el) el.focus(); }, 100); }
 }
 
@@ -940,20 +1003,50 @@ function abrirCalendario(inputId) {
 // ===== MASCARA DD/MM/AAAA =====
 function aplicarMascaraData(input) {
     input.addEventListener('input', function(e) {
-        let val = this.value.replace(/\D/g, '');
+        // Guarda posicao do cursor
+        var cursorPos = this.selectionStart || 0;
+        var lenAntes = this.value.length;
+
+        // Remove tudo que nao e digito
+        var val = this.value.replace(/\D/g, '');
         if (val.length > 8) val = val.slice(0, 8);
+
+        // Reaplica as barras (apenas barras — converte ano no blur)
+        var formatado = '';
         if (val.length >= 5) {
-            this.value = val.slice(0,2) + '/' + val.slice(2,4) + '/' + val.slice(4);
+            formatado = val.slice(0, 2) + '/' + val.slice(2, 4) + '/' + val.slice(4);
         } else if (val.length >= 3) {
-            this.value = val.slice(0,2) + '/' + val.slice(2);
+            formatado = val.slice(0, 2) + '/' + val.slice(2);
         } else {
-            this.value = val;
+            formatado = val;
+        }
+
+        this.value = formatado;
+
+        // Ajusta cursor para nao pular para o fim ao digitar no meio
+        var lenDepois = formatado.length;
+        var diferenca = lenDepois - lenAntes;
+        var novoCursor = Math.max(0, cursorPos + diferenca);
+        // Se o cursor caiu em cima de uma barra, avanca 1
+        if (formatado.charAt(novoCursor) === '/' && formatado.charAt(cursorPos - 1) !== '/') {
+            novoCursor += 1;
+        }
+        this.setSelectionRange(novoCursor, novoCursor);
+    });
+    // Ao perder foco, completa ano se sobrar 2 digitos (ex: 13/03/26 -> 13/03/2026)
+    input.addEventListener('blur', function() {
+        var v = this.value;
+        if (/^\d{2}\/\d{2}\/\d{2}$/.test(v)) {
+            var partes = v.split('/');
+            var ano = parseInt(partes[2], 10);
+            var anoCompleto = ano >= 50 ? (1900 + ano) : (2000 + ano);
+            this.value = partes[0] + '/' + partes[1] + '/' + anoCompleto;
         }
     });
 }
 
 // Aplica mascara em todos os campos de data
-['dataSancao','dataFaturamento','dataSolicitacao','dataInicialDilacao'].forEach(function(id) {
+['dataSancao','dataFaturamento','dataSolicitacao','dataInicialDilacao','dataPedidoOriginal'].forEach(function(id) {
     var el = document.getElementById(id);
     if (el) aplicarMascaraData(el);
 });
@@ -1031,7 +1124,10 @@ function calcularDilacao() {
     const dataInicialTxt = document.getElementById('dataInicialDilacao').value;
     const dataInicial = textoParaISODate(dataInicialTxt);
     const quantidade = parseInt(document.getElementById('quantidadeDilacao').value);
-    if (!dataInicial || isNaN(quantidade) || quantidade < 1) { alert('Preencha todos os campos.'); return; }
+    if (!dataInicial || isNaN(quantidade) || quantidade < 1) {
+        document.getElementById('resultadoDilacao').style.display = 'none';
+        return;
+    }
     const data = new Date(dataInicial + 'T12:00:00');
     const dataFinal = new Date(data);
     dataFinal.setDate(dataFinal.getDate() + quantidade);
@@ -1046,6 +1142,7 @@ function setDiasDilacao(valor) {
     document.querySelectorAll('.btn-dia-rapido').forEach(btn => btn.classList.remove('ativo'));
     const btn = Array.from(document.querySelectorAll('.btn-dia-rapido')).find(b => parseInt(b.textContent) === valor);
     if (btn) btn.classList.add('ativo');
+    calcularDilacao();
 }
 function validarDiasDilacao(input) {
     const val = parseInt(input.value);
@@ -1063,25 +1160,121 @@ function calcularDilacaoCasoEspecial() {
     const dataPedido = textoParaISODate(dataPedidoTxt);
     const diasTotais = parseInt(document.getElementById('diasTotaisSolicitados').value);
     const diasConceder = parseInt(document.getElementById('diasConcederAgora').value);
-    if (!dataPedido || isNaN(diasTotais) || diasTotais < 1 || isNaN(diasConceder) || diasConceder < 1) {
-        alert('Preencha todos os campos do Caso Especial.'); return;
+    const matricula = document.getElementById('matriculaCasoEspecial').value.trim() || '________';
+    const protocolo = document.getElementById('protocoloCasoEspecial').value.trim() || '________';
+
+    var decorridos = '—';
+    var restantes = '—';
+    var faltarao = '—';
+    var dataVencStr = '________';
+    var dataFinalStr = '________';
+    var modelo1Texto = '';
+    var modelo2Texto = '';
+
+    if (dataPedido && !isNaN(diasTotais) && diasTotais >= 1 && !isNaN(diasConceder) && diasConceder >= 1) {
+        const hoje = new Date();
+        const hojeIso = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
+        const decorridosNum = calcularDiferencaDias(dataPedido, hojeIso);
+        if (decorridosNum >= 0) {
+            decorridos = decorridosNum;
+            restantes = Math.max(0, diasTotais - decorridosNum);
+            faltarao = Math.max(0, restantes - diasConceder);
+            const dataVencimento = new Date(hoje);
+            dataVencimento.setDate(dataVencimento.getDate() + diasConceder);
+            const dataFinalPedido = new Date(dataPedido + 'T12:00:00');
+            dataFinalPedido.setDate(dataFinalPedido.getDate() + diasTotais);
+            dataVencStr = dataVencimento.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+            dataFinalStr = dataFinalPedido.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+            const proto2 = (protocolo !== '________') ? (', conforme protocolo ' + protocolo + '.') : '.';
+            modelo2Texto = `Prezado cliente,
+
+A respeito da matricula ${matricula}, informamos que sua solicitacao foi aceita e foi concedido prazo de ${diasConceder} dias para regularizacao` + proto2 + `
+
+O prazo vencera em ${dataVencStr}.
+
+Atenciosamente,
+Sanepar`;
+
+            const proto1 = (protocolo !== '________') ? (', conforme protocolo ' + protocolo + '.') : ', conforme solicitado.';
+            modelo1Texto = `Prezado cliente,
+
+A respeito da matricula ${matricula}, informamos que foi concedido prazo inicial de ${diasConceder} dias para regularizacao` + proto1 + `
+
+O prazo vencera em ${dataVencStr}.
+
+Caso necessite de prazo adicional, protocolize novo pedido proximo ao final deste prazo, informando que ja possui um prazo em vigor que esta proximo do vencimento e que necessita de prazo maior, com a devida justificativa.
+
+Para facilitar a nova apreciacao, sugerimos anexar ao pedido comprovantes de orcamentos, fotos do local e um resumo da situacao.
+
+Informamos que concedemos inicialmente prazo de ate 90 dias para que o cliente se organize e resolva a situacao.
+
+Atenciosamente,
+Sanepar`;
+        }
     }
-    const hoje = new Date();
-    const hojeIso = hoje.getFullYear() + '-' + String(hoje.getMonth()+1).padStart(2,'0') + '-' + String(hoje.getDate()).padStart(2,'0');
-    const decorridos = calcularDiferencaDias(dataPedido, hojeIso);
-    if (decorridos < 0) { alert('A data do pedido original nao pode ser no futuro.'); return; }
-    const restantes = Math.max(0, diasTotais - decorridos);
-    const faltarao = Math.max(0, restantes - diasConceder);
-    const dataVencimento = new Date(hoje);
-    dataVencimento.setDate(dataVencimento.getDate() + diasConceder);
-    const novaDataBase = new Date(dataVencimento);
-    document.getElementById('ceDecorridos').textContent = decorridos + ' dia(s)';
-    document.getElementById('ceRestantes').textContent = restantes + ' dia(s)';
-    document.getElementById('ceConcedidos').textContent = diasConceder + ' dia(s)';
-    document.getElementById('ceFaltarao').textContent = faltarao + ' dia(s)';
-    document.getElementById('ceVencimento').textContent = dataVencimento.toLocaleDateString('pt-BR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-    document.getElementById('ceNovaDataBase').textContent = novaDataBase.toLocaleDateString('pt-BR');
-    document.getElementById('resultadoCasoEspecial').style.display = 'block';
+
+    if (!modelo1Texto) {
+        const proto1e = (protocolo !== '________') ? (', conforme protocolo ' + protocolo + '.') : ', conforme solicitado.';
+        modelo1Texto = `Prezado cliente,
+
+A respeito da matricula ${matricula}, informamos que foi concedido prazo inicial de ______ dias para regularizacao` + proto1e + `
+
+O prazo vencera em ______.
+
+Caso necessite de prazo adicional, protocolize novo pedido proximo ao final deste prazo, informando que ja possui um prazo em vigor que esta proximo do vencimento e que necessita de prazo maior, com a devida justificativa.
+
+Para facilitar a nova apreciacao, sugerimos anexar ao pedido comprovantes de orcamentos, fotos do local e um resumo da situacao.
+
+Informamos que concedemos inicialmente prazo de ate 90 dias para que o cliente se organize e resolva a situacao.
+
+Atenciosamente,
+Sanepar`;
+    }
+    if (!modelo2Texto) {
+        const proto2e = (protocolo !== '________') ? (', conforme protocolo ' + protocolo + '.') : '.';
+        modelo2Texto = `Prezado cliente,
+
+A respeito da matricula ${matricula}, informamos que sua solicitacao foi aceita e foi concedido prazo de ______ dias para regularizacao` + proto2e + `
+
+O prazo vencera em ______.
+
+Atenciosamente,
+Sanepar`;
+    }
+
+    document.getElementById('ceDecorridos').textContent = decorridos + (typeof decorridos === 'number' ? ' dia(s)' : '');
+    document.getElementById('ceRestantes').textContent = restantes + (typeof restantes === 'number' ? ' dia(s)' : '');
+    document.getElementById('ceConcedidos').textContent = (isNaN(diasConceder) ? '—' : diasConceder + ' dia(s)');
+    document.getElementById('ceFaltarao').textContent = faltarao + (typeof faltarao === 'number' ? ' dia(s)' : '');
+    document.getElementById('ceVencimento').textContent = dataVencStr;
+    document.getElementById('prazoFinalPedido').textContent = dataFinalStr;
+    document.getElementById('respostaModelo1').value = modelo1Texto;
+    document.getElementById('respostaModelo2').value = modelo2Texto;
+
+    // Ativa a aba correta automaticamente
+    if (dataPedido && !isNaN(diasTotais) && diasTotais >= 1 && !isNaN(diasConceder) && diasConceder >= 1) {
+        mostrarModeloResposta(diasConceder >= diasTotais ? 2 : 1);
+    }
+}
+
+function mostrarModeloResposta(num) {
+    document.querySelectorAll('.modelo-resposta').forEach(el => el.classList.remove('ativa'));
+    document.querySelectorAll('.mini-tab').forEach(el => el.classList.remove('ativa'));
+    document.getElementById('modelo' + num).classList.add('ativa');
+    document.getElementById('tabM' + num).classList.add('ativa');
+}
+
+function copiarTexto(id) {
+    var ta = document.getElementById(id);
+    ta.select();
+    ta.setSelectionRange(0, 999999);
+    try {
+        document.execCommand('copy');
+        alert('Texto copiado para a area de transferencia.');
+    } catch (err) {
+        alert('Nao foi possivel copiar automaticamente. Selecione o texto e use Ctrl+C.');
+    }
 }
 
 // ===== ABA 4: MATRICULAS =====
@@ -2417,6 +2610,138 @@ const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c
 
 function fecharBannerVersao() {
     document.getElementById('bannerVersao').classList.remove('ativo');
+}
+
+
+// ===== GERAR ZIP PORTATIL =====
+function gerarZipPortatil() {
+    const btn = document.querySelector('.btn-zip');
+    const original = btn.textContent;
+    btn.textContent = '...';
+
+    // Tenta obter HTML original via fetch (se em servidor)
+    // Fallback: serializa o DOM atual
+    let html;
+    try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', window.location.href, false);
+        xhr.send();
+        if (xhr.status === 0 || xhr.status === 200) {
+            html = xhr.responseText;
+        }
+    } catch (e) {
+        html = null;
+    }
+    if (!html) {
+        html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    }
+
+    // Gera ZIP stored
+    const zip = criarZipStored('index.html', html);
+
+    // Dispara download
+    const blob = new Blob([zip], { type: 'application/zip' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'vto-segundo-cerebro.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    btn.textContent = original;
+}
+
+function criarZipStored(nome, conteudo) {
+    const enc = new TextEncoder();
+    const nomeBytes = enc.encode(nome);
+    const dados = enc.encode(conteudo);
+    const crc = calcularCrc32(conteudo);
+    const t = dados.length;
+    const n = nomeBytes.length;
+
+    // helpers little-endian
+    const u16 = v => [v & 0xFF, (v >> 8) & 0xFF];
+    const u32 = v => [v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF];
+
+    // Local file header (30 + n)
+    const lf = new Uint8Array(30 + n);
+    let p = 0;
+    const w = (arr) => { lf.set(arr, p); p += arr.length; };
+    w([0x50, 0x4B, 0x03, 0x04]);
+    w(u16(10));   // version needed
+    w(u16(0));    // flags
+    w(u16(0));    // compression = stored
+    w(u16(0));    // mod time
+    w(u16(0));    // mod date
+    w(u32(crc));
+    w(u32(t));    // compressed size
+    w(u32(t));    // uncompressed size
+    w(u16(n));
+    w(u16(0));    // extra field length
+    lf.set(nomeBytes, p);
+
+    // Central directory (46 + n)
+    const cd = new Uint8Array(46 + n);
+    p = 0;
+    const x = (arr) => { cd.set(arr, p); p += arr.length; };
+    x([0x50, 0x4B, 0x01, 0x02]);
+    x(u16(10));   // version made by
+    x(u16(10));   // version needed
+    x(u16(0));    // flags
+    x(u16(0));    // compression
+    x(u16(0));    // mod time
+    x(u16(0));    // mod date
+    x(u32(crc));
+    x(u32(t));
+    x(u32(t));
+    x(u16(n));
+    x(u16(0));    // extra length
+    x(u16(0));    // comment length
+    x(u16(0));    // disk number
+    x(u16(0));    // internal attr
+    x(u32(0));    // external attr
+    x(u32(0));    // local header offset
+    cd.set(nomeBytes, p);
+
+    // End of central directory (22)
+    const eocd = new Uint8Array(22);
+    p = 0;
+    const y = (arr) => { eocd.set(arr, p); p += arr.length; };
+    y([0x50, 0x4B, 0x05, 0x06]);
+    y(u16(0));    // disk number
+    y(u16(0));    // disk with CD
+    y(u16(1));    // entries on disk
+    y(u16(1));    // total entries
+    y(u32(cd.length));
+    y(u32(lf.length + t));
+    y(u16(0));    // comment length
+
+    // Monta ZIP final
+    const out = new Uint8Array(lf.length + t + cd.length + eocd.length);
+    let o = 0;
+    out.set(lf, o); o += lf.length;
+    out.set(dados, o); o += t;
+    out.set(cd, o); o += cd.length;
+    out.set(eocd, o);
+    return out;
+}
+
+function calcularCrc32(str) {
+    const tabela = new Uint32Array(256);
+    for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) {
+            c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        }
+        tabela[i] = c;
+    }
+    let crc = 0 ^ (-1);
+    for (let i = 0; i < str.length; i++) {
+        crc = (crc >>> 8) ^ tabela[(crc ^ str.charCodeAt(i)) & 0xFF];
+    }
+    return (crc ^ (-1)) >>> 0;
 }
 
 // Inicializa
