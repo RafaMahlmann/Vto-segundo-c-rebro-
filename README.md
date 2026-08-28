@@ -7,7 +7,7 @@
 - **Dominio:** Gestao de Vistorias Tecnicas Operacionais (VTO) da Sanepar
 - **Norma Base:** IT OPE 1580 — Vistorias Tecnicas Operacionais em Ligacoes Prediais de Esgoto
 - **Repositorio:** `RafaMahlmann/Vto-segundo-c-rebro-` (GitHub)
-- **Versao Atual:** 3.8 (Sancao de Esgoto + Dilacao parcial + Banner de versao)
+- **Versao Atual:** 3.9 (Sancao de Esgoto + Dilacao parcial + Banner de versao)
 
 > **ATENCAO, AGENTE DE IA:** antes de qualquer alteracao, leia o `AGENTS.md` desta pasta.
 > Ele define o protocolo de edicao cirurgica, as proibicoes e o mapa do `index.html`.
@@ -81,7 +81,7 @@ O aplicativo possui 5 abas principais:
 - Output: data limite em destaque + status (dentro do prazo / dias de atraso)
 
 ### Aba 2: Calculadora de Dilacao
-- Calcula prazos de dilacao, **sempre em dias corridos** (seletor de dias uteis removido na v3.8)
+- Calcula prazos de dilacao, **sempre em dias corridos** (seletor de dias uteis removido na v3.9)
 - **Dilacao simples:** botoes rapidos 30/60/90 + input numerico livre
 - **Caso especial (dilacao parcial):** para cliente que ja pediu dilacao antes
   - Inputs: data do pedido original, dias totais do pedido antigo, dias a conceder agora (padrao 90)
@@ -316,4 +316,4 @@ Os seguintes documentos foram extraidos de PDFs da Sanepar e transformados em MD
 
 ---
 
-*Documento gerado em 2026-07-13. Atualizado em 2026-08-19. Versao do aplicativo: 3.8*
+*Documento gerado em 2026-07-13. Atualizado em 2026-08-19. Versao do aplicativo: 3.9*
