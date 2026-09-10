@@ -2707,12 +2707,12 @@ function gerarZipCompleto() {
         'anonimizador.html': htmlAnon
     });
 
-    // Dispara download
+    // Dispara download (nome inclui a versao do app)
     const blob = new Blob([zip], { type: 'application/zip' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'vto-completo.zip';
+    a.download = 'vto-completo-v' + VERSAO_LOCAL + '.zip';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
