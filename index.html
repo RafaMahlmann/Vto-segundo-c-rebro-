@@ -6,7 +6,13 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v3.9 — Prazos e Vistorias</title>
+<title>VTO v4.0 — Prazos e Vistorias</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007bff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="VTO">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' rx='32' fill='%23007bff'/%3E%3Ctext x='96' y='120' font-family='Arial,sans-serif' font-size='96' font-weight='bold' fill='white' text-anchor='middle'%3EV%3C/text%3E%3C/svg%3E">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#e9ecef;min-height:100vh;padding:20px;padding-bottom:90px}
@@ -382,10 +388,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="tab-btn" onclick="mostrarAba('fluxo')">Fluxo de Vistorias VTO</button>
     <button class="tab-btn" onclick="mostrarAba('matriculas')">Matriculas</button>
     <button class="tab-btn" onclick="mostrarAba('estatisticas')">Estatisticas</button>
+    <button class="tab-btn" onclick="mostrarAba('anonimizador')">Anonimizador</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <button class="btn-zip" onclick="gerarZipPortatil()" title="Gerar ZIP para compartilhar">&#128230; ZIP</button>
-    <span class="versao-badge" id="versaoBadge" data-versao>v3.9</span>
+    <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">&#128230; Exportar ZIP</button>
+    <span class="versao-badge" id="versaoBadge" data-versao>v4.0</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -486,7 +493,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
 
-        <div class="footer" data-versao>v3.9</div>
+        <div class="footer" data-versao>v4.0</div>
     </div>
 </div>
 
@@ -727,7 +734,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
     </div>
-    <div class="footer">v3.9 - Timeline Proporcional</div>
+    <div class="footer">v4.0 - Timeline Proporcional</div>
+</div>
+
+<!-- ABA 6: ANONIMIZADOR -->
+<div id="aba-anonimizador" class="tab-content">
+    <div class="card" style="padding:0;overflow:hidden">
+        <iframe src="anonimizador.html" style="width:100%;height:85vh;border:none;border-radius:12px" title="Anonimizador Sanepar"></iframe>
+    </div>
 </div>
 
 </div>
@@ -770,7 +784,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     const agora = new Date();
     const pad = n => String(n).padStart(2, '0');
     const dataHora = agora.getFullYear() + '-' + pad(agora.getMonth()+1) + '-' + pad(agora.getDate()) + '.' + pad(agora.getHours()) + '-' + pad(agora.getMinutes());
-    const versao = 'v3.9.' + dataHora;
+    const versao = 'v4.0.' + dataHora;
     document.querySelectorAll('[data-versao]').forEach(el => { el.textContent = versao; });
 })();
 
@@ -881,7 +895,8 @@ function mostrarAba(aba) {
     document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('aba-' + aba).classList.add('active');
-    event.target.classList.add('active');
+    const btn = document.querySelector('.tab-btn[onclick*="mostrarAba(\'' + aba + '\')"]');
+    if (btn) btn.classList.add('active');
     if (aba === 'estatisticas') { setTimeout(renderGraficos, 50); }
     if (aba === 'fluxo') { atualizarTodasRoletas(); }
     // Auto-foco no primeiro campo da aba
@@ -2592,7 +2607,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '3.9';
+const VERSAO_LOCAL = '4.0';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 const URL_INDEX_HTML = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/index.html';
 let VERSAO_REMOTA = null;
@@ -2646,43 +2661,145 @@ function baixarNovaVersao() {
 
 
 // ===== GERAR ZIP PORTATIL =====
-function gerarZipPortatil() {
+function gerarZipCompleto() {
     const btn = document.querySelector('.btn-zip');
     const original = btn.textContent;
     btn.textContent = '...';
 
-    // Tenta obter HTML original via fetch (se em servidor)
-    // Fallback: serializa o DOM atual
-    let html;
+    // Coleta HTML do VTO (DOM atual)
+    let htmlVto = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+
+    // Coleta HTML do Anonimizador via fetch
+    let htmlAnon = '';
     try {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', window.location.href, false);
+        xhr.open('GET', 'anonimizador.html', false);
         xhr.send();
         if (xhr.status === 0 || xhr.status === 200) {
-            html = xhr.responseText;
+            htmlAnon = xhr.responseText;
         }
     } catch (e) {
-        html = null;
-    }
-    if (!html) {
-        html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+        htmlAnon = '';
     }
 
-    // Gera ZIP stored
-    const zip = criarZipStored('index.html', html);
+    if (!htmlAnon) {
+        alert('Nao foi possivel carregar anonimizador.html. Verifique se o arquivo esta na mesma pasta.');
+        btn.textContent = original;
+        return;
+    }
+
+    // Gera ZIP com os dois arquivos
+    const zip = criarZipMulti({
+        'index.html': htmlVto,
+        'anonimizador.html': htmlAnon
+    });
 
     // Dispara download
     const blob = new Blob([zip], { type: 'application/zip' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'vto-segundo-cerebro.zip';
+    a.download = 'vto-completo.zip';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
     btn.textContent = original;
+}
+
+function criarZipMulti(arquivos) {
+    const enc = new TextEncoder();
+    let localFiles = [];
+    let centralDirs = [];
+    let offset = 0;
+
+    for (const [nome, conteudo] of Object.entries(arquivos)) {
+        const nomeBytes = enc.encode(nome);
+        const dados = enc.encode(conteudo);
+        const crc = calcularCrc32(conteudo);
+        const t = dados.length;
+        const n = nomeBytes.length;
+
+        const u16 = v => [v & 0xFF, (v >> 8) & 0xFF];
+        const u32 = v => [v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF];
+
+        // Local file header
+        const lf = new Uint8Array(30 + n);
+        let p = 0;
+        const w = (arr) => { lf.set(arr, p); p += arr.length; };
+        w([0x50, 0x4B, 0x03, 0x04]);
+        w(u16(10));
+        w(u16(0));
+        w(u16(0));
+        w(u16(0));
+        w(u16(0));
+        w(u32(crc));
+        w(u32(t));
+        w(u32(t));
+        w(u16(n));
+        w(u16(0));
+        lf.set(nomeBytes, p);
+
+        localFiles.push(lf, dados);
+
+        // Central directory
+        const cd = new Uint8Array(46 + n);
+        p = 0;
+        const x = (arr) => { cd.set(arr, p); p += arr.length; };
+        x([0x50, 0x4B, 0x01, 0x02]);
+        x(u16(10));
+        x(u16(10));
+        x(u16(0));
+        x(u16(0));
+        x(u16(0));
+        x(u16(0));
+        x(u32(crc));
+        x(u32(t));
+        x(u32(t));
+        x(u16(n));
+        x(u16(0));
+        x(u16(0));
+        x(u16(0));
+        x(u16(0));
+        x(u32(0));
+        x(u32(offset));
+        cd.set(nomeBytes, p);
+
+        centralDirs.push(cd);
+        offset += lf.length + t;
+    }
+
+    const cdStart = offset;
+    const cdSize = centralDirs.reduce((s, cd) => s + cd.length, 0);
+
+    // End of central directory
+    const eocd = new Uint8Array(22);
+    let q = 0;
+    const y = (arr) => { eocd.set(arr, q); q += arr.length; };
+    y([0x50, 0x4B, 0x05, 0x06]);
+    y([0, 0, 0, 0]);
+    y([Object.keys(arquivos).length & 0xFF, (Object.keys(arquivos).length >> 8) & 0xFF]);
+    y([Object.keys(arquivos).length & 0xFF, (Object.keys(arquivos).length >> 8) & 0xFF]);
+    y([cdSize & 0xFF, (cdSize >> 8) & 0xFF]);
+    y([0, 0]);
+    y([cdStart & 0xFF, (cdStart >> 8) & 0xFF]);
+    y([0, 0]);
+    y([0, 0, 0, 0]);
+
+    const totalLen = offset + cdSize + eocd.length;
+    const out = new Uint8Array(totalLen);
+    let pos = 0;
+    for (const part of localFiles) {
+        out.set(part, pos);
+        pos += part.length;
+    }
+    for (const cd of centralDirs) {
+        out.set(cd, pos);
+        pos += cd.length;
+    }
+    out.set(eocd, pos);
+    return out;
 }
 
 function criarZipStored(nome, conteudo) {
@@ -2761,19 +2878,26 @@ function criarZipStored(nome, conteudo) {
 }
 
 function calcularCrc32(str) {
-    const tabela = new Uint32Array(256);
-    for (let i = 0; i < 256; i++) {
-        let c = i;
-        for (let j = 0; j < 8; j++) {
-            c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
-        }
-        tabela[i] = c;
+  const tabela = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
     }
-    let crc = 0 ^ (-1);
-    for (let i = 0; i < str.length; i++) {
-        crc = (crc >>> 8) ^ tabela[(crc ^ str.charCodeAt(i)) & 0xFF];
-    }
-    return (crc ^ (-1)) >>> 0;
+    tabela[i] = c;
+  }
+  let crc = 0 ^ (-1);
+  for (let i = 0; i < str.length; i++) {
+    crc = (crc >>> 8) ^ tabela[(crc ^ str.charCodeAt(i)) & 0xFF];
+  }
+  return (crc ^ (-1)) >>> 0;
+}
+
+// ===== REGISTRO SERVICE WORKER (PWA) =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(function(reg) { console.log('SW registrado:', reg.scope); })
+    .catch(function(err) { console.log('SW falhou:', err); });
 }
 
 // Inicializa
