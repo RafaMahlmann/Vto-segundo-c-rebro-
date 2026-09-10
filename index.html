@@ -2727,15 +2727,15 @@ function criarZipMulti(arquivos) {
     let centralDirs = [];
     let offset = 0;
 
+    const u16 = v => [v & 0xFF, (v >> 8) & 0xFF];
+    const u32 = v => [v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF];
+
     for (const [nome, conteudo] of Object.entries(arquivos)) {
         const nomeBytes = enc.encode(nome);
         const dados = enc.encode(conteudo);
         const crc = calcularCrc32(conteudo);
         const t = dados.length;
         const n = nomeBytes.length;
-
-        const u16 = v => [v & 0xFF, (v >> 8) & 0xFF];
-        const u32 = v => [v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF];
 
         // Local file header
         const lf = new Uint8Array(30 + n);
@@ -2786,19 +2786,20 @@ function criarZipMulti(arquivos) {
     const cdStart = offset;
     const cdSize = centralDirs.reduce((s, cd) => s + cd.length, 0);
 
-    // End of central directory
+    // End of central directory (22 bytes)
     const eocd = new Uint8Array(22);
     let q = 0;
     const y = (arr) => { eocd.set(arr, q); q += arr.length; };
-    y([0x50, 0x4B, 0x05, 0x06]);
-    y([0, 0, 0, 0]);
-    y([Object.keys(arquivos).length & 0xFF, (Object.keys(arquivos).length >> 8) & 0xFF]);
-    y([Object.keys(arquivos).length & 0xFF, (Object.keys(arquivos).length >> 8) & 0xFF]);
-    y([cdSize & 0xFF, (cdSize >> 8) & 0xFF]);
-    y([0, 0]);
-    y([cdStart & 0xFF, (cdStart >> 8) & 0xFF]);
-    y([0, 0]);
-    y([0, 0, 0, 0]);
+    const nArq = Object.keys(arquivos).length;
+    y([0x50, 0x4B, 0x05, 0x06]);   // 4: signature
+    y([0, 0]);                      // 2: disk number
+    y([0, 0]);                      // 2: disk with central directory
+    y([nArq & 0xFF, (nArq >> 8) & 0xFF]);   // 2: entries on this disk
+    y([nArq & 0xFF, (nArq >> 8) & 0xFF]);   // 2: total entries
+    y(u32(cdSize));                 // 4: size of central directory
+    y(u32(cdStart));                // 4: offset of central directory
+    y([0, 0]);                      // 2: comment length
+    // total = 4+2+2+2+2+4+4+2 = 22
 
     const totalLen = offset + cdSize + eocd.length;
     const out = new Uint8Array(totalLen);

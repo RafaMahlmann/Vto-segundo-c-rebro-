@@ -19,5 +19,9 @@ Thumbs.db
 
 # Project specific
 *.zip
-Calculadora pós sanção/
+Calculadora pÃ³s sanÃ§Ã£o/
 .claude/
+
+# Testes locais e dependencias
+_test_*.js
+node_modules/
