@@ -1,4 +1,4 @@
-const CACHE_NAME = 'vto-cache-v4';
+const CACHE_NAME = 'vto-cache-v4.2';
 const urlsToCache = [
   './',
   './index.html',

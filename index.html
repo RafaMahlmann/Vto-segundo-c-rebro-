@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v4.0 — Prazos e Vistorias</title>
+<title>VTO v4.2 — Prazos e Vistorias</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007bff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -392,7 +392,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
     <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">&#128230; Exportar ZIP</button>
-    <span class="versao-badge" id="versaoBadge" data-versao>v4.0</span>
+    <span class="versao-badge" id="versaoBadge" data-versao>v4.2</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -414,7 +414,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v3.9</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v4.2</div>
     </div>
 </div>
 
@@ -493,7 +493,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
 
-        <div class="footer" data-versao>v4.0</div>
+        <div class="footer" data-versao>v4.2</div>
     </div>
 </div>
 
@@ -617,7 +617,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo &#10095;</button>
         </div>
     </div>
-    <div class="footer">v3.0 - IT OPE 1580</div>
+    <div class="footer">v4.2 - IT OPE 1580</div>
 </div>
 
 <!-- ABA 4: MATRICULAS -->
@@ -734,7 +734,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
             </div>
         </div>
     </div>
-    <div class="footer">v4.0 - Timeline Proporcional</div>
+    <div class="footer">v4.2 - Timeline Proporcional</div>
 </div>
 
 <!-- ABA 6: ANONIMIZADOR -->
@@ -784,7 +784,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
     const agora = new Date();
     const pad = n => String(n).padStart(2, '0');
     const dataHora = agora.getFullYear() + '-' + pad(agora.getMonth()+1) + '-' + pad(agora.getDate()) + '.' + pad(agora.getHours()) + '-' + pad(agora.getMinutes());
-    const versao = 'v4.0.' + dataHora;
+    const versao = 'v4.2.' + dataHora;
     document.querySelectorAll('[data-versao]').forEach(el => { el.textContent = versao; });
 })();
 
@@ -2607,7 +2607,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '4.0';
+const VERSAO_LOCAL = '4.2';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 const URL_INDEX_HTML = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/index.html';
 let VERSAO_REMOTA = null;
