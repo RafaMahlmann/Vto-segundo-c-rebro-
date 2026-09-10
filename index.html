@@ -2707,12 +2707,12 @@ function gerarZipCompleto() {
         'anonimizador.html': htmlAnon
     });
 
-    // Dispara download (nome inclui a versao do app)
+    // Dispara download
     const blob = new Blob([zip], { type: 'application/zip' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'vto-completo-v' + VERSAO_LOCAL + '.zip';
+    a.download = 'vto-completo.zip';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -2733,7 +2733,7 @@ function criarZipMulti(arquivos) {
     for (const [nome, conteudo] of Object.entries(arquivos)) {
         const nomeBytes = enc.encode(nome);
         const dados = enc.encode(conteudo);
-        const crc = calcularCrc32(conteudo);
+        const crc = calcularCrc32Bytes(dados);
         const t = dados.length;
         const n = nomeBytes.length;
 
@@ -2820,7 +2820,7 @@ function criarZipStored(nome, conteudo) {
     const enc = new TextEncoder();
     const nomeBytes = enc.encode(nome);
     const dados = enc.encode(conteudo);
-    const crc = calcularCrc32(conteudo);
+    const crc = calcularCrc32Bytes(dados);
     const t = dados.length;
     const n = nomeBytes.length;
 
@@ -2891,6 +2891,26 @@ function criarZipStored(nome, conteudo) {
     return out;
 }
 
+// CRC32 sobre os BYTES UTF-8 (correto para ZIP).
+// O bug anterior calculava sobre charCodeAt (UTF-16), corrompendo o ZIP
+// sempre que havia acentos/emojis no conteudo.
+function calcularCrc32Bytes(bytes) {
+  const tabela = new Uint32Array(256);
+  for (let i = 0; i < 256; i++) {
+    let c = i;
+    for (let j = 0; j < 8; j++) {
+      c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    tabela[i] = c;
+  }
+  let crc = 0 ^ (-1);
+  for (let i = 0; i < bytes.length; i++) {
+    crc = (crc >>> 8) ^ tabela[(crc ^ bytes[i]) & 0xFF];
+  }
+  return (crc ^ (-1)) >>> 0;
+}
+
+// Mantido por compatibilidade (nao usar em ZIP): CRC sobre string UTF-16.
 function calcularCrc32(str) {
   const tabela = new Uint32Array(256);
   for (let i = 0; i < 256; i++) {
@@ -2920,6 +2940,7 @@ initRoletas();
 atualizarTodasRoletas();
 alternarModoFluxo('grade');
 </script>
+
 
 
 <!-- ANONIMIZADOR EMBUTIDO (Base64) -->
