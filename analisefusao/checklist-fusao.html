@@ -206,14 +206,14 @@ label.item input:checked ~ .txt{color:var(--muted);text-decoration:line-through;
 
   <div class="placar">
     <div>
-      <span class="placar-num" id="pct">81%</span>
+      <span class="placar-num" id="pct">88%</span>
       <span class="placar-lab">concluído</span>
     </div>
     <div>
-      <span class="placar-num" id="cont">39/48</span>
+      <span class="placar-num" id="cont">42/48</span>
       <span class="placar-lab">itens marcados</span>
     </div>
-    <div class="barra"><i id="barraGeral" style="width: 81%;"></i></div>
+    <div class="barra"><i id="barraGeral" style="width: 88%;"></i></div>
   </div>
   <p class="criterio">Estado reconstruído em 15/09/2026 a partir do código real do repositório (não do salvamento do artefato), com os testes de navegador da Etapa 2 rodados e gravados neste mesmo dia. Critério: só fica marcado o que está comprovado no código, em teste automatizado com saída gravada ou em validação manual reproduzida por automação de navegador. Visualização estática — marcar/desmarcar aqui não persiste nem altera o projeto.</p>
 </header>
@@ -232,7 +232,7 @@ label.item input:checked ~ .txt{color:var(--muted);text-decoration:line-through;
 <div class="corpo">
   <nav class="rail" aria-label="Etapas">
     <p class="rail-t">Etapas</p>
-    <a href="#e0" data-rail="e0"><span class="n">0</span><span>Restauração<br><span class="c" data-c="e0">0/5</span></span></a>
+    <a href="#e0" data-rail="e0"><span class="n">0</span><span>Restauração<br><span class="c" data-c="e0">3/5</span></span></a>
     <a href="#e1" data-rail="e1" class="feito"><span class="n">1</span><span>Export limpo<br><span class="c" data-c="e1">8/8</span></span></a>
     <a href="#e2" data-rail="e2" class="feito"><span class="n">2</span><span>Arquivo único<br><span class="c" data-c="e2">10/10</span></span></a>
     <a href="#e3" data-rail="e3" class="feito"><span class="n">3</span><span>Versão<br><span class="c" data-c="e3">7/7</span></span></a>
@@ -254,11 +254,11 @@ label.item input:checked ~ .txt{color:var(--muted);text-decoration:line-through;
         <div class="nao"><h3>Não toco em</h3><p>index.html · anonimizador.html · qualquer código</p></div>
       </div>
       <ul class="itens">
-        <li><label class="item"><input type="checkbox" id="e0a" data-id="e0a" data-etapa="e0"><span class="txt">Rodar git status e olhar o que está solto<span class="nota">hoje: Calculadora pós sanção/, _test_unzip/, _valida_e2e.py — tudo ainda solto em 15/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0a" data-id="e0a" data-etapa="e0" checked><span class="txt">Rodar git status e olhar o que está solto<span class="nota">feito em 15/09: git status conferido; entrega estava toda solta e foi commitada no d3ccb19</span></span></label></li>
         <li><label class="item"><input type="checkbox" id="e0b" data-id="e0b" data-etapa="e0"><span class="txt">Decidir o destino desses três untracked antes de commitar</span></label></li>
-        <li><label class="item"><input type="checkbox" id="e0c" data-id="e0c" data-etapa="e0"><span class="txt">Commit de segurança na main, ou abrir a branch fusao-anonimizador<span class="nota">nada das etapas 1–5 foi commitado — 2 dias de trabalho sem ponto de restauração</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0c" data-id="e0c" data-etapa="e0" checked><span class="txt">Commit de segurança na main, ou abrir a branch fusao-anonimizador<span class="nota">feito em 15/09: commit d3ccb19 na main, 33 arquivos (+8603/-177)</span></span></label></li>
         <li><label class="item"><input type="checkbox" id="e0d" data-id="e0d" data-etapa="e0"><span class="txt">Guardar uma cópia do index.html atual fora do repositório<span class="nota">Drive ou rede — plano B se tudo der errado</span></span></label></li>
-        <li><label class="item"><input type="checkbox" id="e0e" data-id="e0e" data-etapa="e0"><span class="txt">Confirmar que o anonimizador.html do disco é mesmo a v19.0.0<span class="nota">é ela que vira a fonte única; a v18.2.2 reprovou no pentest de 01/09/2026 — comprovado: o Base64 embutido diz v19.0.0</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0e" data-id="e0e" data-etapa="e0" checked><span class="txt">Confirmar que o anonimizador.html do disco é mesmo a v19.0.0<span class="nota">é ela que vira a fonte única; a v18.2.2 reprovou no pentest de 01/09/2026 — confirmado em 15/09: disco e Base64 embutido dizem 19.0.0</span></span></label></li>
       </ul>
     </section>
 
