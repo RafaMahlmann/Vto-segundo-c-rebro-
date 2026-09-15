@@ -1,0 +1,9 @@
+{
+  "name": "checklist-fusao-vto",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Visualizacao estatica do checklist Fusao VTO + Anonimizador",
+  "scripts": {
+    "dev": "node server.js"
+  }
+}

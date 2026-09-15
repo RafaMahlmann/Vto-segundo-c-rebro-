@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Fusão VTO + Anonimizador — Checklist</title>
+<style>
+:root{
+  --ground:#F1F4F5;
+  --surface:#FFFFFF;
+  --surface-2:#E9EEEF;
+  --ink:#10242A;
+  --ink-soft:#3C5257;
+  --muted:#65797E;
+  --line:#D5DEE0;
+  --line-soft:#E4EBEC;
+  --agua:#0E7C86;
+  --agua-soft:#D9EDEF;
+  --critico:#AE3227;
+  --critico-soft:#F6E2DF;
+  --alto:#B0720C;
+  --alto-soft:#F7ECD8;
+  --baixo:#4E6A71;
+  --baixo-soft:#E4EBEC;
+  --ok:#17795E;
+  --sombra:0 1px 2px rgba(16,36,42,.05), 0 8px 24px -16px rgba(16,36,42,.25);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0C181B;
+    --surface:#132326;
+    --surface-2:#182C30;
+    --ink:#E4EDED;
+    --ink-soft:#BACACB;
+    --muted:#8BA2A6;
+    --line:#24393D;
+    --line-soft:#1C3034;
+    --agua:#39B0B4;
+    --agua-soft:#123336;
+    --critico:#E8776A;
+    --critico-soft:#2E1B18;
+    --alto:#E0A83F;
+    --alto-soft:#2C2314;
+    --baixo:#8BA2A6;
+    --baixo-soft:#1C3034;
+    --ok:#4FC0A0;
+    --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0C181B;
+  --surface:#132326;
+  --surface-2:#182C30;
+  --ink:#E4EDED;
+  --ink-soft:#BACACB;
+  --muted:#8BA2A6;
+  --line:#24393D;
+  --line-soft:#1C3034;
+  --agua:#39B0B4;
+  --agua-soft:#123336;
+  --critico:#E8776A;
+  --critico-soft:#2E1B18;
+  --alto:#E0A83F;
+  --alto-soft:#2C2314;
+  --baixo:#8BA2A6;
+  --baixo-soft:#1C3034;
+  --ok:#4FC0A0;
+  --sombra:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -16px rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--ground);
+  color:var(--ink);
+  font-family:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  font-size:16px;
+  line-height:1.7;
+  margin:0;
+  padding-inline:20px;
+  padding-block:0 64px;
+}
+.wrap{max-width:1140px;margin:0 auto}
+h1,h2,h3{font-family:Chivo,"IBM Plex Sans",system-ui,sans-serif;text-wrap:balance;margin:0}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+
+/* ---------- topo ---------- */
+.topo{padding-block:44px 28px;border-bottom:1px solid var(--line)}
+.eyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--agua);margin:0 0 10px
+}
+h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-.02em;line-height:1.08}
+.sub{color:var(--ink-soft);max-width:60ch;margin:14px 0 0;font-size:1.02rem}
+
+.placar{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;margin-top:26px}
+.placar-num{font-family:Chivo,sans-serif;font-weight:900;font-size:2.6rem;line-height:1;font-variant-numeric:tabular-nums}
+.placar-lab{font-family:"IBM Plex Mono",monospace;font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block;margin-top:6px}
+.barra{height:6px;border-radius:99px;background:var(--surface-2);overflow:hidden;flex:1 1 220px;min-width:180px;margin-bottom:12px}
+.barra > i{display:block;height:100%;background:var(--agua);border-radius:99px;transition:width .35s ease}
+.criterio{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--muted);margin:14px 0 0;max-width:76ch;line-height:1.7}
+
+/* ---------- regras ---------- */
+.regras{
+  margin-top:30px;border:1px solid var(--line);border-left:3px solid var(--critico);
+  background:var(--surface);border-radius:4px;padding:20px 22px
+}
+.regras h2{font-size:.78rem;font-family:"IBM Plex Mono",monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--critico)}
+.regras ul{margin:12px 0 0;padding:0;list-style:none;display:grid;gap:9px}
+.regras li{padding-left:20px;position:relative;color:var(--ink-soft);font-size:.94rem}
+.regras li::before{content:"—";position:absolute;left:0;color:var(--critico)}
+
+/* ---------- corpo ---------- */
+.corpo{display:grid;gap:40px;margin-top:44px;align-items:start}
+@media(min-width:1000px){.corpo{grid-template-columns:212px minmax(0,1fr);gap:56px}}
+
+.rail{position:sticky;top:24px;display:grid;gap:4px}
+.rail-t{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.rail a{
+  display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:baseline;
+  text-decoration:none;color:var(--ink-soft);padding:7px 9px;border-radius:4px;font-size:.88rem;
+  border-left:2px solid var(--line-soft)
+}
+.rail a:hover{background:var(--surface);color:var(--ink);border-left-color:var(--agua)}
+.rail a .n{font-family:"IBM Plex Mono",monospace;font-size:.74rem;color:var(--agua)}
+.rail a .c{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.rail a.feito{border-left-color:var(--ok)}
+.rail a.feito .c{color:var(--ok)}
+@media(max-width:999px){.rail{position:static;grid-auto-flow:row}}
+
+/* ---------- etapa ---------- */
+.etapa{margin-bottom:52px;scroll-margin-top:20px}
+.etapa-topo{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:baseline}
+.cod{font-family:"IBM Plex Mono",monospace;font-size:.78rem;letter-spacing:.1em;color:var(--agua);font-weight:500}
+.etapa h2{font-size:clamp(1.3rem,3vw,1.75rem);font-weight:700;letter-spacing:-.01em;width:100%}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+.chip{
+  font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.06em;
+  padding:3px 9px;border-radius:3px;border:1px solid var(--line);color:var(--muted);background:var(--surface)
+}
+.chip.critico{color:var(--critico);border-color:var(--critico);background:var(--critico-soft)}
+.chip.alto{color:var(--alto);border-color:var(--alto);background:var(--alto-soft)}
+.chip.baixo{color:var(--baixo);border-color:var(--line);background:var(--baixo-soft)}
+.porque{color:var(--ink-soft);margin:14px 0 0;max-width:62ch}
+
+/* escopo cirurgico */
+.escopo{display:grid;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:4px;margin-top:20px;overflow:hidden}
+@media(min-width:720px){.escopo{grid-template-columns:1fr 1fr}}
+.escopo > div{background:var(--surface);padding:15px 17px}
+.escopo h3{
+  font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.13em;text-transform:uppercase;margin-bottom:9px
+}
+.escopo .toca h3{color:var(--agua)}
+.escopo .nao h3{color:var(--critico)}
+.escopo p{margin:0;font-size:.86rem;color:var(--ink-soft);font-family:"IBM Plex Mono",monospace;line-height:1.65}
+
+/* itens */
+ul.itens{list-style:none;margin:20px 0 0;padding:0;display:grid;gap:1px;background:var(--line-soft);border-radius:4px;overflow:hidden;border:1px solid var(--line-soft)}
+ul.itens li{background:var(--surface);margin:0}
+label.item{
+  display:grid;grid-template-columns:auto 1fr;gap:13px;align-items:start;
+  padding:13px 16px;cursor:pointer
+}
+label.item:hover{background:var(--surface-2)}
+label.item input{
+  appearance:none;width:17px;height:17px;margin:5px 0 0;flex:none;
+  border:1.5px solid var(--muted);border-radius:3px;background:var(--surface);cursor:pointer;
+  display:grid;place-content:center;transition:.14s
+}
+label.item input:checked{background:var(--ok);border-color:var(--ok)}
+label.item input:checked::after{content:"";width:9px;height:5px;border:2px solid var(--surface);border-top:0;border-right:0;transform:rotate(-45deg) translateY(-1px)}
+label.item input:focus-visible{outline:2px solid var(--agua);outline-offset:2px}
+.txt{font-size:.96rem;color:var(--ink)}
+label.item input:checked ~ .txt{color:var(--muted);text-decoration:line-through;text-decoration-color:var(--line)}
+.nota{display:block;font-size:.83rem;color:var(--muted);margin-top:3px;font-family:"IBM Plex Mono",monospace;line-height:1.6}
+
+/* ---------- gestao ---------- */
+.gestao{border-top:1px solid var(--line);padding-top:44px;margin-top:8px}
+.ritual{display:grid;gap:14px;margin-top:22px;counter-reset:passo}
+@media(min-width:860px){.ritual{grid-template-columns:repeat(5,1fr)}}
+.passo{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:15px 16px}
+.passo b{
+  counter-increment:passo;font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--agua);
+  display:block;margin-bottom:7px;letter-spacing:.1em
+}
+.passo b::before{content:counter(passo) " · "}
+.passo span{font-size:.88rem;color:var(--ink-soft);display:block;line-height:1.6}
+
+.leis{display:grid;gap:14px;margin-top:30px}
+@media(min-width:760px){.leis{grid-template-columns:1fr 1fr}}
+.lei{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--agua);border-radius:4px;padding:16px 18px}
+.lei h3{font-size:1rem;font-weight:700;margin-bottom:6px}
+.lei p{margin:0;font-size:.9rem;color:var(--ink-soft)}
+.lei .evid{display:block;margin-top:9px;font-family:"IBM Plex Mono",monospace;font-size:.78rem;color:var(--muted);border-top:1px dotted var(--line);padding-top:8px}
+
+.rodape{margin-top:48px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.84rem;font-family:"IBM Plex Mono",monospace}
+.estado-db{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--muted);margin-top:10px}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="topo">
+  <p class="eyebrow">Protocolo de execução · VTO Repositório</p>
+  <h1>Fusão VTO + Anonimizador</h1>
+  <p class="sub">Quatro etapas para transformar dois monoblocos num arquivo só, sem regressão funcional e sem levar dado pessoal junto no pacote.</p>
+
+  <div class="placar">
+    <div>
+      <span class="placar-num" id="pct">81%</span>
+      <span class="placar-lab">concluído</span>
+    </div>
+    <div>
+      <span class="placar-num" id="cont">39/48</span>
+      <span class="placar-lab">itens marcados</span>
+    </div>
+    <div class="barra"><i id="barraGeral" style="width: 81%;"></i></div>
+  </div>
+  <p class="criterio">Estado reconstruído em 15/09/2026 a partir do código real do repositório (não do salvamento do artefato), com os testes de navegador da Etapa 2 rodados e gravados neste mesmo dia. Critério: só fica marcado o que está comprovado no código, em teste automatizado com saída gravada ou em validação manual reproduzida por automação de navegador. Visualização estática — marcar/desmarcar aqui não persiste nem altera o projeto.</p>
+</header>
+
+<section class="regras">
+  <h2>Regras da casa — valem em toda etapa</h2>
+  <ul>
+    <li>Nada de CDN, biblioteca, framework ou fonte externa. O app é monobloco e tem que sobreviver ao fluxo Google&nbsp;Docs → Bloco de Notas.</li>
+    <li>Nenhum <span class="mono">fetch</span> novo. A única exceção autorizada é o verificador de versão.</li>
+    <li>Versão só muda quando o Rafa pedir — e aí sobe tudo junto.</li>
+    <li>Edição cirúrgica: substituição localizada por âncora. Reescrever o arquivo inteiro é proibido.</li>
+    <li>Sem <span class="mono">localStorage</span>, sem acento em identificador, sem apagar função “que parece não usada”.</li>
+  </ul>
+</section>
+
+<div class="corpo">
+  <nav class="rail" aria-label="Etapas">
+    <p class="rail-t">Etapas</p>
+    <a href="#e0" data-rail="e0"><span class="n">0</span><span>Restauração<br><span class="c" data-c="e0">0/5</span></span></a>
+    <a href="#e1" data-rail="e1" class="feito"><span class="n">1</span><span>Export limpo<br><span class="c" data-c="e1">8/8</span></span></a>
+    <a href="#e2" data-rail="e2" class="feito"><span class="n">2</span><span>Arquivo único<br><span class="c" data-c="e2">10/10</span></span></a>
+    <a href="#e3" data-rail="e3" class="feito"><span class="n">3</span><span>Versão<br><span class="c" data-c="e3">7/7</span></span></a>
+    <a href="#e4" data-rail="e4"><span class="n">4</span><span>Higiene<br><span class="c" data-c="e4">5/9</span></span></a>
+    <a href="#er" data-rail="er" class="feito"><span class="n">R</span><span>Regressão<br><span class="c" data-c="er">9/9</span></span></a>
+  </nav>
+
+  <main id="main">
+
+    <section class="etapa" id="e0">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA 0</span>
+        <h2>Ponto de restauração</h2>
+      </div>
+      <div class="chips"><span class="chip baixo">você faz</span><span class="chip">eu não commito</span></div>
+      <p class="porque">Antes de qualquer linha mudar. O protocolo do projeto proíbe a IA de commitar, reverter ou “organizar” trabalho seu em andamento — então a rede de segurança é sua.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>git status · commit ou branch novo · cópia de segurança fora do repo</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>index.html · anonimizador.html · qualquer código</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="e0a" data-id="e0a" data-etapa="e0"><span class="txt">Rodar git status e olhar o que está solto<span class="nota">hoje: Calculadora pós sanção/, _test_unzip/, _valida_e2e.py — tudo ainda solto em 15/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0b" data-id="e0b" data-etapa="e0"><span class="txt">Decidir o destino desses três untracked antes de commitar</span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0c" data-id="e0c" data-etapa="e0"><span class="txt">Commit de segurança na main, ou abrir a branch fusao-anonimizador<span class="nota">nada das etapas 1–5 foi commitado — 2 dias de trabalho sem ponto de restauração</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0d" data-id="e0d" data-etapa="e0"><span class="txt">Guardar uma cópia do index.html atual fora do repositório<span class="nota">Drive ou rede — plano B se tudo der errado</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e0e" data-id="e0e" data-etapa="e0"><span class="txt">Confirmar que o anonimizador.html do disco é mesmo a v19.0.0<span class="nota">é ela que vira a fonte única; a v18.2.2 reprovou no pentest de 01/09/2026 — comprovado: o Base64 embutido diz v19.0.0</span></span></label></li>
+      </ul>
+    </section>
+
+    <section class="etapa" id="e1">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA 1</span>
+        <h2>Export limpo — tirar o dado pessoal do pacote</h2>
+      </div>
+      <div class="chips"><span class="chip critico">risco LGPD</span><span class="chip">resolve F2 e F3</span><span class="chip">âncora: GERAR ZIP PORTATIL</span><span class="chip baixo">feita em 14/09</span></div>
+      <p class="porque">Hoje o ZIP guarda o que está na tela, não o arquivo-fonte. Medi: o index exportado sai com 43 KB a mais, e as matrículas ficam gravadas em texto claro dentro dele. Com dados reais na tela, esse arquivo vai por e-mail e Drive carregando dado pessoal. É o maior risco da lista — por isso vem primeiro.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>// ===== GERAR ZIP PORTATIL ===== (~linha 2663)</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>abas 1 a 6 · CSS global · matriculas[] · timeline · gráficos · modal · verificador de versão</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="e1a" data-id="e1a" data-etapa="e1" checked><span class="txt">Trocar o retrato do DOM vivo por uma cópia limpa antes de serializar<span class="nota">comprovado: prepararHtmlLimpo() no index.html, linha ~2756</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1b" data-id="e1b" data-etapa="e1" checked><span class="txt">Limpar na cópia: linhas da tabela de matrículas, banner de versão, aba ativa de volta na aba 1, painel de configuração</span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1c" data-id="e1c" data-etapa="e1" checked><span class="txt">Pedir confirmação antes de baixar, dizendo que o pacote vai sem os dados da tela<span class="nota">texto passa pela skill voz-do-vto</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1d" data-id="e1d" data-etapa="e1" checked><span class="txt">Teste de vazamento: exportar com 30 matrículas na tela e procurar 10045201 no arquivo<span class="nota">tem que dar zero ocorrência — medido: 0 matrículas no pacote</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1e" data-id="e1e" data-etapa="e1" checked><span class="txt">Teste de tamanho: o exportado tem que bater com o arquivo em disco<span class="nota">hoje dá 304.657 contra 261.230 bytes — medido na entrega: voltou ao tamanho do disco</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1f" data-id="e1f" data-etapa="e1" checked><span class="txt">Reabrir o arquivo exportado: 6 abas abrem, console sem erro<span class="nota">saída gravada em patches/_saida_teste_etapa1/</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1g" data-id="e1g" data-etapa="e1" checked><span class="txt">Decidir a fonte única do anonimizador: arquivo em disco ou Base64 embutido<span class="nota">decidido: Base64 embutido (script id="anonimizadorFonte")</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e1h" data-id="e1h" data-etapa="e1" checked><span class="txt">Escrever no AGENTS.md a regra anti-divergência<span class="nota">editou o anonimizador → rodar patches/embutir_anonimizador.py antes de exportar — registrado no AGENTS.md §9</span></span></label></li>
+      </ul>
+    </section>
+
+    <section class="etapa" id="e2">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA 2</span>
+        <h2>Arquivo único — matar a dependência do arquivo irmão</h2>
+      </div>
+      <div class="chips"><span class="chip critico">é a aba que falha</span><span class="chip">resolve F1 e F5</span><span class="chip">âncora: ABA 6</span><span class="chip baixo">validada em navegador em 15/09</span></div>
+      <p class="porque">O iframe usa caminho relativo e só funciona com o anonimizador.html do lado. Sem ele a aba fica em branco e calada. E o irmão não viaja no fluxo Google Docs, nem no botão Baixar do banner, nem no cache do service worker. Testei a saída: alimentar o iframe pelo Base64 que já está embutido funciona, com contexto seguro e Web Crypto ativos dentro do frame.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>&lt;!-- ABA 6: ANONIMIZADOR --&gt; (740–745) · bloco novo junto ao anonimizadorFonte · CSS escopado só à aba 6 · sw.js</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>abas 1 a 5 · navegação · CSS global · matriculas[] · timeline · gráficos · export ZIP</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="e2a" data-id="e2a" data-etapa="e2" checked><span class="txt">Trocar o iframe de caminho relativo por um alimentado pelo Base64 embutido<span class="nota">comprovado: quadro.srcdoc = html em carregarAnonimizador()</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2b" data-id="e2b" data-etapa="e2" checked><span class="txt">Carregar o anonimizador só quando a aba for aberta<span class="nota">comprovado: _anonimizadorCarregado + chamada em mostrarAba()</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2c" data-id="e2c" data-etapa="e2" checked><span class="txt">Mostrar erro visível se o Base64 não decodificar<span class="nota">hoje a falha é silenciosa: tela branca e nada no console — comprovado: aviso #anonimizadorAviso</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2d" data-id="e2d" data-etapa="e2" checked><span class="txt">Pôr target="_top" no link ← VTO de dentro do anonimizador<span class="nota">resolvido melhor: o link é removido do HTML embutido — dentro da aba ele não faz sentido</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2e" data-id="e2e" data-etapa="e2" checked><span class="txt">Ajustar a altura da aba 6 para o painel Linha do Tempo não cortar o rodapé</span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2f" data-id="e2f" data-etapa="e2" checked><span class="txt">Resolver o layout espremido do anonimizador dentro da aba<span class="nota">causa real encontrada: .header do anonimizador nunca fechado (37 div para 36) — corrigido no embutido</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2g" data-id="e2g" data-etapa="e2" checked><span class="txt">VALIDAR NA MÃO em navegador real: processar um arquivo e baixar o resultado<span class="nota">validado em 15/09 via Playwright (Chromium): CSV anexado na aba 6, download disparou e os dados originais não aparecem no resultado</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2h" data-id="e2h" data-etapa="e2" checked><span class="txt">Testar o index.html sozinho, numa pasta vazia, sem o anonimizador.html do lado<span class="nota">validado em 15/09: pasta só com o index.html, as 6 abas abrem e a aba 6 carrega pelo Base64</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2i" data-id="e2i" data-etapa="e2" checked><span class="txt">Testar o fluxo Google Docs → Bloco de Notas → renomear .html<span class="nota">validado em 15/09 em duas variantes: UTF-8 com CRLF e ANSI (Windows-1252) — a aba 6 carrega nas duas, o Base64 é à prova de encoding</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e2j" data-id="e2j" data-etapa="e2" checked><span class="txt">Tirar o anonimizador da conta do sw.js e conferir o app offline como PWA<span class="nota">comprovado: sw.js só cacheia index.html + manifest.json</span></span></label></li>
+      </ul>
+    </section>
+
+    <section class="etapa" id="e3">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA 3</span>
+        <h2>Versão, banner falso e nome do ZIP</h2>
+      </div>
+      <div class="chips"><span class="chip alto">só com você pedindo</span><span class="chip">resolve F4 e F6</span><span class="chip baixo">feita em 14/09</span></div>
+      <p class="porque">O version.json diz 4.3 e o index inteiro diz v4.2. Resultado: todo mundo vê “Nova versao v4.3 disponivel!” para sempre, inclusive quem acabou de baixar a 4.3. É o mesmo bug que o commit ef2c0b8 já consertou uma vez. Só faço esta etapa a pedido — o protocolo proíbe mexer em versão por conta própria.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>title (9) · badge (395) · rodapés (417, 496, 620, 737) · versão dinâmica (787) · VERSAO_LOCAL (2610) · sw.js · version.json · README · TIMELINE</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>lógica de qualquer aba · export · anonimizador</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="e3a" data-id="e3a" data-etapa="e3" checked><span class="txt">Definir o número novo da versão<span class="nota">definido: v4.4</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3b" data-id="e3b" data-etapa="e3" checked><span class="txt">Subir os 7 pontos do index.html de uma vez<span class="nota">title, badge, 4 rodapés, versão dinâmica, VERSAO_LOCAL — conferidos um a um</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3c" data-id="e3c" data-etapa="e3" checked><span class="txt">Subir CACHE_NAME no sw.js e o version.json<span class="nota">conferidos: vto-cache-v4.4 e "versao": "4.4"</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3d" data-id="e3d" data-etapa="e3" checked><span class="txt">Atualizar README.md e TIMELINE.md<span class="nota">os dois atualizados em 14/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3e" data-id="e3e" data-etapa="e3" checked><span class="txt">Devolver a versão ao nome do ZIP<span class="nota">vto-completo-vX.Y.zip — perdido no commit 5a09c31 — comprovado: vto-completo-v' + VERSAO_LOCAL + '.zip</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3f" data-id="e3f" data-etapa="e3" checked><span class="txt">Conferir: abrir o app e o banner de nova versão NÃO aparecer<span class="nota">a checagem virou versaoEhMaior() — antes disparava em qualquer diferença</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e3g" data-id="e3g" data-etapa="e3" checked><span class="txt">Conferir que o botão Baixar do banner agora entrega um app completo<span class="nota">ele baixa só o index.html — depois da Etapa 2 isso passa a estar certo: o arquivo único já contém o anonimizador</span></span></label></li>
+      </ul>
+    </section>
+
+    <section class="etapa" id="e4">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA 4</span>
+        <h2>Higiene do repositório e do mapa</h2>
+      </div>
+      <div class="chips"><span class="chip baixo">sem risco funcional</span><span class="chip">resolve F7</span><span class="chip alto">limpeza final pendente</span></div>
+      <p class="porque">A raiz virou bancada de trabalho. O protocolo manda script temporário para patches/. E o mapa do AGENTS.md ficou velho: ele ainda descreve 5 abas e 2.430 linhas.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>raiz do repositório · patches/ · .gitignore · AGENTS.md · TIMELINE.md · README.md</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>index.html · anonimizador.html · qualquer comportamento do app</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="e4a" data-id="e4a" data-etapa="e4" checked><span class="txt">Mover os _test_*.js e o _valida_e2e.py para patches/<span class="nota">feito: foram para patches/testes_antigos/ e patches/</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4b" data-id="e4b" data-etapa="e4"><span class="txt">Apagar _test_out.zip, _teste_e2e.zip e a pasta _test_unzip/<span class="nota">ainda na raiz em 15/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4c" data-id="e4c" data-etapa="e4"><span class="txt">Decidir o destino do index.html.bak<span class="nota">o git já guarda o histórico — o arquivo continua na raiz, destino não decidido</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4d" data-id="e4d" data-etapa="e4"><span class="txt">Apagar a pasta vazia “vto zip rep”<span class="nota">continua na raiz</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4e" data-id="e4e" data-etapa="e4"><span class="txt">Decidir se .claude/ entra no git<span class="nota">hoje ignorado: as skills voz-do-vto e game-feel-ui se perdem ao trocar de máquina — decisão não registrada</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4f" data-id="e4f" data-etapa="e4" checked><span class="txt">Atualizar o mapa do AGENTS.md<span class="nota">6 abas, linhas novas, aba 6 sem arquivo irmão, regra do Base64 — atualizado em 14/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4g" data-id="e4g" data-etapa="e4" checked><span class="txt">Registrar uma PARTE nova no TIMELINE.md<span class="nota">PARTE 9 (Fusão) e PARTE 10 (Refazer) registradas</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4h" data-id="e4h" data-etapa="e4" checked><span class="txt">Atualizar o README: aba 6, export limpo, arquivo único<span class="nota">atualizado em 14/09</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="e4i" data-id="e4i" data-etapa="e4" checked><span class="txt">Deixar calcularCrc32 e criarZipStored em paz<span class="nota">estão mortas, mas o protocolo proíbe remover função não solicitada — intactas</span></span></label></li>
+      </ul>
+    </section>
+
+    <section class="etapa" id="er">
+      <div class="etapa-topo">
+        <span class="cod">ETAPA R</span>
+        <h2>Teste de regressão — roda ao fim de TODA etapa</h2>
+      </div>
+      <div class="chips"><span class="chip alto">portão de saída</span><span class="chip">AGENTS.md §6</span><span class="chip baixo">coberto por testes automatizados</span></div>
+      <p class="porque">Não é uma etapa que termina: é o portão que cada etapa precisa atravessar antes de ser dada como pronta. Desmarque tudo e rode de novo a cada rodada.</p>
+      <div class="escopo">
+        <div class="toca"><h3>Toco em</h3><p>nada — só testa</p></div>
+        <div class="nao"><h3>Não toco em</h3><p>nada</p></div>
+      </div>
+      <ul class="itens">
+        <li><label class="item"><input type="checkbox" id="era" data-id="era" data-etapa="er" checked><span class="txt">Console (F12): zero erros<span class="nota">coberto pelos testes das etapas 1 e 5, com saída gravada — não re-rodado nesta análise</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="erb" data-id="erb" data-etapa="er" checked><span class="txt">As 6 abas abrem e renderizam — não só a que mudou</span></label></li>
+        <li><label class="item"><input type="checkbox" id="erc" data-id="erc" data-etapa="er" checked><span class="txt">Botão de calendário abre e grava data<span class="nota">validado em 15/09 via Playwright: 📅 cria o input date, grava DD/MM/AAAA no campo, remove o input oculto e abre pré-preenchido quando a data já existe</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="erd" data-id="erd" data-etapa="er" checked><span class="txt">Ctrl+Z e Ctrl+Shift+Z ainda funcionam<span class="nota">refeito com duas pilhas e testado por _test_etapa5.py (31 verificações)</span></span></label></li>
+        <li><label class="item"><input type="checkbox" id="ere" data-id="ere" data-etapa="er" checked><span class="txt">Timeline inferior renderiza ao clicar numa matrícula</span></label></li>
+        <li><label class="item"><input type="checkbox" id="erf" data-id="erf" data-etapa="er" checked><span class="txt">Exportar e importar JSON</span></label></li>
+        <li><label class="item"><input type="checkbox" id="erg" data-id="erg" data-etapa="er" checked><span class="txt">Exportar CSV</span></label></li>
+        <li><label class="item"><input type="checkbox" id="erh" data-id="erh" data-etapa="er" checked><span class="txt">Exportar ZIP e reabrir o arquivo exportado</span></label></li>
+        <li><label class="item"><input type="checkbox" id="eri" data-id="eri" data-etapa="er" checked><span class="txt">Textos novos passaram pela voz-do-vto<span class="nota">revisado em 15/09: aviso da aba 6 e confirmação do export aprovados; 1 ajuste aplicado ("Nao foi possivel carregar" → "Nao deu para carregar", regras 3+8 da skill)</span></span></label></li>
+      </ul>
+    </section>
+
+  </main>
+</div>
+
+<section class="gestao">
+  <p class="eyebrow">Como administrar</p>
+  <h2 style="font-size:clamp(1.4rem,3vw,1.9rem);font-weight:900;letter-spacing:-.015em">O ritual de cada etapa</h2>
+  <p class="sub" style="margin-top:12px">Sempre os mesmos cinco passos, na mesma ordem. É isso que impede a próxima sessão de refazer o estrago da anterior.</p>
+
+  <div class="ritual">
+    <div class="passo"><b>Declaro</b><span>Eu digo quais âncoras vou tocar e o que <em>não</em> vou tocar. Por escrito, antes de editar.</span></div>
+    <div class="passo"><b>Você aprova</b><span>Mostro o diff exato. Se aparecer linha fora do escopo, é sinal de erro — recusa.</span></div>
+    <div class="passo"><b>Aplico</b><span>Substituição localizada. Um assunto por vez, nunca duas etapas na mesma sessão.</span></div>
+    <div class="passo"><b>Testo</b><span>Rodo o teste de regressão da Etapa R inteiro, não só o que mudei.</span></div>
+    <div class="passo"><b>Você fecha</b><span>Valida no navegador real, commita e registra no <span class="mono">TIMELINE.md</span>.</span></div>
+  </div>
+
+  <div class="leis">
+    <div class="lei">
+      <h3>Uma etapa por sessão</h3>
+      <p>Etapa que cruza mais de uma seção do mapa precisa da sua confirmação antes. Duas etapas juntas é como o escopo escapa.</p>
+    </div>
+    <div class="lei">
+      <h3>Commit de segurança antes de cada etapa</h3>
+      <p>Não só no começo do projeto. Um ponto de restauração por etapa, para poder voltar uma casa em vez de voltar tudo.</p>
+    </div>
+    <div class="lei">
+      <h3>Bug fora do escopo? Anota, não conserta</h3>
+      <p>Achou outro problema no meio do caminho: registra e segue. Conserto oportunista é o que quebra coisa boa.</p>
+      <span class="evid">Foi exatamente assim que o commit 5a09c31, que corrigia o CRC32, desfez sem querer o nome versionado do ZIP.</span>
+    </div>
+    <div class="lei">
+      <h3>Portão de saída verde</h3>
+      <p>Só passa para a próxima etapa depois do teste de regressão inteiro. Se algo não deu para testar, isso é dito em voz alta — nunca “pronto” no escuro.</p>
+    </div>
+    <div class="lei">
+      <h3>Versão é etapa própria</h3>
+      <p>Nunca subir versão no meio de outra coisa. Quando subir: título, badge, os quatro rodapés, versão dinâmica, <span class="mono">VERSAO_LOCAL</span>, <span class="mono">sw.js</span>, <span class="mono">version.json</span>, README e TIMELINE — tudo na mesma entrega.</p>
+    </div>
+    <div class="lei">
+      <h3>O mapa envelhece</h3>
+      <p>Ao fim de cada etapa, atualizar o <span class="mono">AGENTS.md</span> e o <span class="mono">TIMELINE.md</span>. Documento divergente é o que faz a próxima IA “corrigir” o código certo.</p>
+    </div>
+  </div>
+</section>
+
+<p class="rodape">
+  Visualização reconstruída em 15/09/2026 a partir do estado real do repositório vto-repo (commits até 5a09c31 + trabalho não commitado de 14/09).
+  <span class="estado-db" id="estadoDb">estático — sem persistência; marcar/desmarcar não altera o projeto</span>
+</p>
+
+</div>
+
+<script>
+// Contagem por etapa: o total de cada uma vem das checkboxes visiveis.
+// Estado inicial = comprovado no codigo/testes em 15/09/2026 (atributo checked no HTML).
+const ETAPA_IDS = ["e0","e1","e2","e3","e4","er"];
+
+function pintar(){
+  ETAPA_IDS.forEach(id => {
+    const boxes = document.querySelectorAll('input[data-etapa="' + id + '"]');
+    let feitos = 0, total = 0;
+    boxes.forEach(b => { total++; if (b.checked) feitos++; });
+    const c = document.querySelector('[data-c="' + id + '"]');
+    if (c) c.textContent = feitos + "/" + total;
+    const a = document.querySelector('[data-rail="' + id + '"]');
+    if (a) a.classList.toggle('feito', feitos === total && total > 0);
+  });
+  let n = 0, t = 0;
+  document.querySelectorAll('input[data-etapa]').forEach(b => { t++; if (b.checked) n++; });
+  const p = t ? Math.round(n / t * 100) : 0;
+  document.getElementById('pct').textContent = p + '%';
+  document.getElementById('cont').textContent = n + '/' + t;
+  document.getElementById('barraGeral').style.width = p + '%';
+}
+
+document.getElementById('main').addEventListener('change', pintar);
+pintar();
+</script>
+
+</body>
+</html>

@@ -306,3 +306,59 @@ O aplicativo substitui/controle planilhas Excel e papelada manual. O usuario pre
 ---
 
 *Registro gerado em 2026-07-13. Atualizado em 2026-08-19. Estado: Projeto operacional em v3.9, sem pendencias criticas. Sessoes de IA devem seguir o AGENTS.md.*
+
+---
+
+## PARTE 9 — Fusão VTO + Anonimizador (2026-09-14, v4.4)
+
+Quatro etapas para transformar os dois monoblocos num arquivo só.
+
+**Etapa 1 — Export limpo (LGPD).**
+`gerarZipCompleto()` serializava o DOM vivo: o `index.html` distribuído saía com
+as 30 matrículas gravadas em texto claro e 43 KB de HTML gerado em tela.
+Nasceu `prepararHtmlLimpo()`, que clona o documento e limpa antes de empacotar.
+O botão agora também confirma antes de baixar.
+Medido: 0 matrículas no pacote, exportado voltou ao tamanho do arquivo em disco.
+
+**Etapa 2 — Arquivo único.**
+A aba 6 era `<iframe src="anonimizador.html">`: sem o arquivo irmão do lado,
+abria em branco e calada. Passou a ser `iframe srcdoc` alimentado pelo Base64 já
+embutido, carregado sob demanda, com aviso visível se o bloco falhar.
+De quebra: o `.header` do anonimizador nunca era fechado (37 `<div>` para 36
+`</div>`), e o app inteiro renderizava dentro de um cabeçalho `display:flex` —
+era essa a causa do layout espremido, e não o iframe.
+O `patches/embutir_anonimizador.py` foi desarmado: ele reescrevia o
+`gerarZipCompleto()` com a versão antiga e teria desfeito a Etapa 1.
+
+**Etapa 3 — Versão e banner.**
+Tudo subiu junto para v4.4. E a checagem do banner virou `versaoEhMaior()`:
+antes era "diferente de", então qualquer descompasso ligava o aviso de nova
+versão — inclusive para quem tinha acabado de baixar a versão nova.
+
+**Etapa 4 — Higiene.**
+Scripts de teste soltos na raiz foram para `patches/testes_antigos/`.
+Documentos atualizados para o mapa de 6 abas.
+
+Teste automatizado da entrega: `patches/_test_etapa1.py` (21 verificações).
+
+---
+
+## PARTE 10 — Refazer (2026-09-14, v4.4)
+
+O `Ctrl+Shift+Z` e o botão Refazer nunca funcionaram. Não era o atalho.
+
+O histórico era uma pilha só com um índice. Como o protocolo manda chamar
+`salvarHistorico()` **antes** de alterar `matriculas[]`, a pilha só guardava
+estados anteriores — o estado pós-alteração não era gravado em lugar nenhum.
+Refazer era impossível por construção, e o `Ctrl+Z` só acertava por
+coincidência, porque os dois últimos estados eram iguais.
+
+Passou a ter duas pilhas: `historico` e `historicoFuturo`. O `undo()` empilha o
+estado de agora antes de voltar — era esse o estado que faltava. Os 9 pontos que
+chamam `salvarHistorico()` não mudaram: o protocolo do `AGENTS.md` continua
+valendo palavra por palavra.
+
+De quebra, o `gerarMockData()` passou a chamar `limparHistorico()`: os dados de
+demonstração são ponto de partida, não alteração do usuário.
+
+Teste: `patches/_test_etapa5.py` (31 verificações).

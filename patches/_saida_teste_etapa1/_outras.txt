@@ -1,0 +1,78 @@
+-<html lang="pt-BR">
+-<head>
++<html lang="pt-BR"><head>
+-<div id="bannerVersao">
+-    <button class="banner-fechar" onclick="fecharBannerVersao()" title="Fechar aviso">&times;</button>
++    <button class="banner-fechar" onclick="fecharBannerVersao()" title="Fechar aviso">×</button>
+-    <span class="versao-badge" id="versaoBadge" data-versao>v4.2</span>
++    <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">⚙</button>
++    <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">❓ Ajuda</button>
++    <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">📦 Exportar ZIP</button>
++    <span class="versao-badge" id="versaoBadge" data-versao="">v4.2.2026-09-14.20-59</span>
+-                            <textarea id="respostaModelo1" readonly></textarea>
++                            <textarea id="respostaModelo1" readonly=""></textarea>
+-                            <textarea id="respostaModelo2" readonly></textarea>
++                            <textarea id="respostaModelo2" readonly=""></textarea>
+-        <div class="footer" data-versao>v4.2</div>
++        <div class="footer" data-versao="">v4.2.2026-09-14.20-59</div>
++                <button id="btnModoGrade" class="btn-fluxo-visor ativo" onclick="alternarModoFluxo('grade')" title="Exibir todos os cards lado a lado">☷ Modo Grade</button>
++                <button id="btnModoCarrossel" class="btn-fluxo-visor" onclick="alternarModoFluxo('carrossel')" title="Exibir um card por vez">⛶ 1 card</button>
++                <button class="btn-fluxo-visor btn-zoom" onclick="aplicarZoom(-0.1)" title="Diminuir zoom">−</button>
++                <button class="btn-fluxo-visor btn-zoom" onclick="aplicarZoom(0.1)" title="Aumentar zoom">+</button>
+-            <div class="coluna-vistoria coluna-1" id="coluna1">
++            <div class="coluna-vistoria coluna-1 ativo card-foco" id="coluna1">
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8421')" data-cod="8421"><span class="codigo">8421</span> - 1a Vistoria<span class="desc">Sem AS, direto SGC</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8563')" data-cod="8563"><span class="codigo">8563</span> - 1a Vistoria Obras<span class="desc">Novas ligacoes</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8407')" data-cod="8407"><span class="codigo">8407</span> - Topografia<span class="desc">Condicoes tecnicas</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(1,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
++            <div class="seta-container"><div class="seta">➔</div></div>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8416')" data-cod="8416"><span class="codigo">8416</span> - 2a Vistoria Convenio<span class="desc">Parceria Prefeitura</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8574')" data-cod="8574"><span class="codigo">8574</span> - 2a Vistoria Obras<span class="desc">Novas ligacoes</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8407')" data-cod="8407"><span class="codigo">8407</span> - Topografia<span class="desc">Condicoes tecnicas</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8433')" data-cod="8433"><span class="codigo">8433</span> - Dilacao 60 dias<span class="desc">Prazo adicional</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8434')" data-cod="8434"><span class="codigo">8434</span> - Dilacao 90 dias<span class="desc">Prazo adicional</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(2,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
++                    <button class="servico-btn sancao-btn" onclick="registrarSancao('1a_sancao')" id="btnSancao1" data-cod="1a_sancao"><span class="codigo">⚠</span> 1a SANCAO<span class="desc">Multa - aguardando</span></button>
++            <div class="seta-container"><div class="seta">➔</div></div>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8417')" data-cod="8417"><span class="codigo">8417</span> - Autuacao Municipal<span class="desc">Terceira em convenio</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8421')" data-cod="8421"><span class="codigo">8421</span> - Ajuste de Baixa<span class="desc">Correcao SGC</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8402')" data-cod="8402"><span class="codigo">8402</span> - Rec. Tarifaria<span class="desc">Sem cadastro</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8400')" data-cod="8400"><span class="codigo">8400</span> - Solic. Cliente<span class="desc">Via 0800</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8407')" data-cod="8407"><span class="codigo">8407</span> - Topografia<span class="desc">Condicoes tecnicas</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8409')" data-cod="8409"><span class="codigo">8409</span> - Orient. Tecnica<span class="desc">Guia amarela</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8419')" data-cod="8419"><span class="codigo">8419</span> - Carta Anuencia<span class="desc">Efluente nao domestico</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8425')" data-cod="8425"><span class="codigo">8425</span> - Vistoria Refluxo<span class="desc">Ressarcimento</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8433')" data-cod="8433"><span class="codigo">8433</span> - Dilacao 60 dias<span class="desc">Prazo adicional</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8434')" data-cod="8434"><span class="codigo">8434</span> - Dilacao 90 dias<span class="desc">Prazo adicional</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8480')" data-cod="8480"><span class="codigo">8480</span> - Habite-se -600<span class="desc">Edificacao menor</span></button>
+-                    <button class="servico-btn" onclick="selecionarServico(3,'8485')" data-cod="8485"><span class="codigo">8485</span> - Habite-se Social<span class="desc">Conjunto habitacional</span></button>
++                    <button class="servico-btn sancao-btn" onclick="registrarSancao('multa_dobro')" id="btnSancaoDobro" data-cod="multa_dobro"><span class="codigo">🔴</span> MULTA DOBRO<span class="desc">Reincidencia</span></button>
++            <button class="btn-enviar" id="btnEnviarFluxo" onclick="enviarFluxoParaMatriculas()">➤ Enviar</button>
++            <button onclick="mudarCardFluxo(-1)" id="btnCarrosselAnterior">❮ Anterior</button>
++            <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo ❯</button>
+-<div class="timeline-panel" id="timelinePanel">
+-        <div class="contador-bloco dias-restantes" id="contadorBlocoDias"><span class="numero" id="contadorNumero">180</span><span class="rotulo" id="contadorRotulo">dias restantes</span></div>
++    <div class="timeline-header"><h4>📅 Linha do Tempo</h4><button class="timeline-toggle" onclick="toggleTimeline()">▼ Recolher</button></div>
++        <div class="contador-bloco dias-restantes" id="contadorBlocoDias"><span class="numero" id="contadorNumero">89</span><span class="rotulo" id="contadorRotulo">dias restantes</span></div>
+-    <div class="timeline-empty" id="timelineEmpty">Nenhuma matricula selecionada</div>
+-        <div class="timeline-fill" id="timelineFill"></div>
+-        <div class="timeline-marco-180" id="marco180"><span class="timeline-marco-180-label">180 dias</span></div>
+-    </div>
+-</body>
+-</html>
+-
++
++
++</body></html>

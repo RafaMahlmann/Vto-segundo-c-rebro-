@@ -11,10 +11,13 @@
 
 ## 1. O que é este projeto (30 segundos)
 
-- `index.html` **é o aplicativo inteiro**: ~2.430 linhas / ~147 KB, HTML + CSS + JS monobloco.
+- `index.html` **é o aplicativo inteiro**: ~3.110 linhas / ~263 KB, HTML + CSS + JS monobloco.
+- Desses 263 KB, ~96 KB são o **anonimizador embutido em Base64** (`<script id="anonimizadorFonte">`).
 - **Zero dependências externas.** Sem CDN, sem framework, sem fonte externa, sem biblioteca de ícones.
 - Motivo: o arquivo precisa sobreviver ao fluxo **Google Docs → Bloco de Notas → renomear para .html**.
-- 5 abas: `prazo` (Calculadora de Sanção de Esgoto), `dilacao`, `fluxo`, `matriculas`, `estatisticas`.
+- 6 abas: `prazo` (Calculadora de Sanção de Esgoto), `dilacao`, `fluxo`, `matriculas`, `estatisticas`, `anonimizador`.
+- A aba 6 roda o **Anonimizador LGPD v19** dentro de um `iframe srcdoc`, alimentado pelo Base64 embutido.
+  **Não existe dependência de arquivo irmão.** O `anonimizador.html` da raiz é só a fonte de edição.
 - O usuário (Rafa) é gestor de VTO da Sanepar e **disléxico**: linhas curtas, uma ideia por parágrafo.
 
 ---
@@ -24,7 +27,7 @@
 - **O código (`index.html`) é a verdade.** Documentos `.md` descrevem intenção e podem estar desatualizados.
 - **Se um documento divergir do código, NÃO "corrija" o código para bater com o documento.** Pare e pergunte ao Rafa.
 - Divergências conhecidas hoje (não são bugs do código):
-  - README.md e TIMELINE.md dizem "v3.2"; o app está em **v3.7**.
+  - O app está em **v4.4** (título, badge, 4 rodapés, `VERSAO_LOCAL`, `sw.js` e `version.json` sobem juntos).
   - README descreve a aba 1 como "soma de dias úteis/corridos"; ela foi substituída pela **Calculadora de Sanção de Esgoto** (`calcularPrazoSancao`).
   - README diz "nenhum uso de `fetch()`"; existe **uma exceção autorizada**: o verificador de nova versão (seção 5, linhas ~2398–2426).
 
@@ -66,11 +69,13 @@ Use este mapa para localizar trechos **sem reescrever o arquivo**. Os números d
 | `<!-- ABA 2 -->` | 383–435 | Calculadora de Dilação (simples + caso especial) |
 | `<!-- ABA 3 -->` | 436–558 | Fluxo de Vistorias VTO (3 colunas, cards de sanção) |
 | `<!-- ABA 4 -->` | 559–622 | Matrículas (tabela mestre) |
-| `<!-- ABA 5 -->` | 623–708 | Estatísticas (Canvas) |
+| `<!-- ABA 5 -->` | ~690–745 | Estatísticas (Canvas) |
+| `<!-- ABA 6: ANONIMIZADOR -->` | ~747–757 | `iframe#anonimizadorFrame` (sem `src`) + aviso de falha |
 | `// ===== DADOS =====` | 711+ | `matriculas[]`, estrutura central — **nunca mudar sem atualizar todos os consumidores** |
-| `// ===== UNDO / REDO =====` | 716+ | Snapshots; chamar `salvarHistorico()` **antes** de alterar `matriculas[]` |
+| `// ===== UNDO / REDO =====` | ~809+ | **Duas pilhas**: `historico` (antes) e `historicoFuturo` (desfeito). Chamar `salvarHistorico()` **antes** de alterar `matriculas[]` — quem guarda o estado de agora é o `undo()` |
 | `// ===== CONFIGURACAO DE PRAZOS =====` | 769+ | `prazosPorCodigo` (padrão 30 dias, em memória) |
-| `// ===== SISTEMA DE ABAS =====` | 813+ | `mostrarAba()` + auto-foco por aba |
+| `// ===== SISTEMA DE ABAS =====` | ~904+ | `mostrarAba()` + auto-foco + carrega a aba 6 sob demanda |
+| `// ===== ABA 6: ANONIMIZADOR EMBUTIDO =====` | ~922+ | `carregarAnonimizador()` — decodifica o Base64 para o `srcdoc` |
 | `// ===== ABA 1: ... SANCAO =====` | 968+ | `calcularPrazoSancao()` |
 | `// ===== ABA 2: DILACAO =====` | 1029+ | `calcularDilacao()` + funções do caso especial |
 | `// ===== ABA 4: MATRICULAS =====` | 1087+ | CRUD da tabela |
@@ -78,9 +83,10 @@ Use este mapa para localizar trechos **sem reescrever o arquivo**. Os números d
 | `// ===== TIMELINE =====` | 1525+ | Timeline inferior proporcional (marcador 180 dias) |
 | `// ===== GRAFICOS CANVAS =====` | 1713+ | 4 gráficos da aba Estatísticas |
 | `// ===== CONTADOR 180 =====` | 2077+ | Contagem a partir da 1ª data de criação da matrícula |
-| `// ===== EXPORTAR/IMPORTAR =====` | 2146+ | CSV e JSON |
+| `// ===== EXPORTAR/IMPORTAR =====` | ~2420+ | CSV e JSON |
+| `// ===== GERAR ZIP PORTATIL =====` | ~2728+ | `prepararHtmlLimpo()` + `gerarZipCompleto()` + `criarZipMulti()` |
 | `// ===== DADOS MOCK =====` | 2310+ | `gerarMockData()` — 30 matrículas de demonstração |
-| `// ===== VERIFICADOR DE NOVA VERSAO =====` | 2398+ | Único `fetch()` autorizado (lê `version.json` do GitHub) |
+| `// ===== VERIFICADOR DE NOVA VERSAO =====` | ~2661+ | Único `fetch()` autorizado + `versaoEhMaior()` |
 
 Consumidores de `matriculas[]` (se mexer na estrutura, todos quebram):
 `renderMatriculas`, `atualizarTimeline`, `renderGraficos`, `exportarCSV`,
@@ -121,4 +127,43 @@ Se não deu para testar algo, **diga explicitamente o que não foi testado**. Nu
 
 ---
 
-*Criado em 2026-08-19 após análise dos incidentes das sessões anteriores. App em v3.7.*
+*Criado em 2026-08-19 após análise dos incidentes das sessões anteriores. Atualizado em 2026-09-14. App em v4.4.*
+
+---
+
+## 9. Duas regras que nasceram da Etapa 1–4 (2026-09-14)
+
+**O export NÃO pode serializar o DOM vivo.**
+`gerarZipCompleto()` usa `prepararHtmlLimpo()`, que clona o documento e apaga
+tudo que foi gerado na tela antes de empacotar. Sem isso o arquivo distribuído
+levava as matrículas em texto claro — incidente de LGPD — e duplicava as setas
+das roletas a cada ciclo exportar/reabrir.
+Mexeu em algo que é renderizado em tempo de execução? Acrescente a limpeza
+correspondente em `prepararHtmlLimpo()` — ela é o plano B.
+
+**Não insira nada entre o `</script>` principal e o bloco `RETRATO DO ARQUIVO LIMPO`.**
+Esse bloco precisa ser o último do `<body>`. Ele tira a cópia do documento antes
+de o app desenhar a primeira coisa, e só então chama `aplicarVersaoDinamica()`,
+`gerarMockData()`, `initRoletas()`, `atualizarTodasRoletas()` e
+`alternarModoFluxo('grade')`.
+Qualquer `<script>`, `defer` ou imagem grande colocado nessa fresta passa a rodar
+antes do retrato. O retrato é tirado uma única vez, então o arquivo sairia sujo
+em **todo** export daquela sessão — e ninguém perceberia.
+
+**Editou o `anonimizador.html`? Rode `patches/embutir_anonimizador.py`.**
+A aba 6 e o ZIP leem os dois do mesmo bloco Base64. Sem regerar, a aba mostra a
+versão nova e o pacote distribui a velha — e a v18.2.2 do anonimizador foi
+reprovada em pentest. O script deixa o Base64 byte a byte igual ao arquivo em
+disco, então dá para conferir a qualquer momento.
+
+**Desfazer e refazer são duas pilhas, não um índice.**
+`salvarHistorico()` é chamado **antes** de alterar `matriculas[]` — os 9 pontos
+que fazem isso estão certos e não devem mudar. A consequência é que o estado
+*atual* nunca está em `historico`: quem o empilha é o `undo()`, em
+`historicoFuturo`, no instante em que desfaz.
+Foi a falta disso que deixou o Refazer quebrado desde sempre — com uma pilha só
+e um índice, o estado pós-alteração não existia em lugar nenhum.
+Ao criar uma função que altera `matriculas[]`: chame `salvarHistorico()` antes,
+e só isso. Não empilhe nada depois, não mexa em `historicoFuturo`.
+Para definir um novo ponto de partida (carga de dados, não alteração do
+usuário), use `limparHistorico()` — é o que o `gerarMockData()` faz.
