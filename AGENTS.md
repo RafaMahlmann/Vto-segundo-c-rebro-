@@ -27,7 +27,7 @@
 - **O código (`index.html`) é a verdade.** Documentos `.md` descrevem intenção e podem estar desatualizados.
 - **Se um documento divergir do código, NÃO "corrija" o código para bater com o documento.** Pare e pergunte ao Rafa.
 - Divergências conhecidas hoje (não são bugs do código):
-  - O app está em **v4.4** (título, badge, 4 rodapés, `VERSAO_LOCAL`, `sw.js` e `version.json` sobem juntos).
+  - O app está em **v4.5** (título, badge, 4 rodapés, `VERSAO_LOCAL`, `sw.js` e `version.json` sobem juntos).
   - README descreve a aba 1 como "soma de dias úteis/corridos"; ela foi substituída pela **Calculadora de Sanção de Esgoto** (`calcularPrazoSancao`).
   - README diz "nenhum uso de `fetch()`"; existe **uma exceção autorizada**: o verificador de nova versão (seção 5, linhas ~2398–2426).
 
@@ -80,6 +80,7 @@ Use este mapa para localizar trechos **sem reescrever o arquivo**. Os números d
 | `// ===== ABA 2: DILACAO =====` | 1029+ | `calcularDilacao()` + funções do caso especial |
 | `// ===== ABA 4: MATRICULAS =====` | 1087+ | CRUD da tabela |
 | `// ===== MODAL =====` | 1456+ | Modal de datas (teclado: Tab/Enter/Espaço/Esc) |
+| `// ===== ROLETA DE SERVICOS =====` | ~1619+ | `setupRoletaGrupo()`: casa vazia, busca por codigo, giro com efeito. Os botoes reais ficam no HTML (escondidos); palco, vazio e busca sao gerados por JS e limpos em `prepararHtmlLimpo()` |
 | `// ===== TIMELINE =====` | 1525+ | Timeline inferior proporcional (marcador 180 dias) |
 | `// ===== GRAFICOS CANVAS =====` | 1713+ | 4 gráficos da aba Estatísticas |
 | `// ===== CONTADOR 180 =====` | 2077+ | Contagem a partir da 1ª data de criação da matrícula |
@@ -127,7 +128,7 @@ Se não deu para testar algo, **diga explicitamente o que não foi testado**. Nu
 
 ---
 
-*Criado em 2026-08-19 após análise dos incidentes das sessões anteriores. Atualizado em 2026-09-14. App em v4.4.*
+*Criado em 2026-08-19 após análise dos incidentes das sessões anteriores. Atualizado em 2026-09-21. App em v4.5.*
 
 ---
 

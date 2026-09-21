@@ -362,3 +362,42 @@ De quebra, o `gerarMockData()` passou a chamar `limparHistorico()`: os dados de
 demonstração são ponto de partida, não alteração do usuário.
 
 Teste: `patches/_test_etapa5.py` (31 verificações).
+
+---
+
+## PARTE 11 — Retângulo vazio, busca e roleta com efeito (2026-09-21, v4.5)
+
+Todo retângulo de código do Fluxo agora começa **vazio**.
+São 11, nas 3 vistorias. Deixar vazio é uma escolha válida.
+
+Clicar no vazio abre a busca.
+Digite o código ou parte do nome. A lista filtra na hora.
+Código completo (4 dígitos) encaixa sozinho.
+A busca só aceita códigos daquele retângulo.
+Se o código existe em outro, a mensagem diz onde ele mora.
+
+A roleta ficou inteira: setas, rodinha, bolinhas.
+A novidade é que a casa vazia entra no giro.
+Com o grupo armado: digitar abre a busca, setas giram, Enter registra, Delete esvazia.
+
+O efeito é só visual: giro que sai e entra, encaixe que assenta, tinta que varre.
+Sem som, sem confete. Desliga sozinho com "reduzir movimento" do Windows.
+
+**Escolher um código não grava nada.**
+Só o 2º clique (janela de datas) grava, como sempre foi.
+Por isso `salvarHistorico()`, `matriculas[]` e o desfazer/refazer não foram tocados.
+
+**Onde mexeu:** CSS novo depois do CSS da roleta, `setupRoletaGrupo()` refeita,
+e uma limpeza nova em `prepararHtmlLimpo()` (plano B do export).
+O HTML das colunas não mudou: os 45 botões reais continuam lá, só escondidos.
+
+**Regra nova para a próxima sessão:** o palco, a casa vazia e a busca são gerados
+em tempo de execução. Quem mexer neles deve manter a limpeza em `prepararHtmlLimpo()`.
+
+**Teste:** `patches/_test_roleta_vazia.py` (61 verificações).
+`patches/_test_regressao_completa.py` foi ajustado: a roleta começa vazia, então o teste escolhe o 8403 pela busca.
+Script da mudança: `patches/roleta_vazia_busca.py` (ajustes finos depois dele foram direto no `index.html`).
+
+**Falhas que já existiam antes desta entrega (não são da roleta):**
+- Console mostra 404: é a checagem de `version.json` no GitHub.
+- `_test_etapa1` reprova "sem inchaço" quando o arquivo está em CRLF, como na pasta do Rafa.

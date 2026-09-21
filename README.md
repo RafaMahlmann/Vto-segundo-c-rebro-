@@ -7,7 +7,7 @@
 - **Dominio:** Gestao de Vistorias Tecnicas Operacionais (VTO) da Sanepar
 - **Norma Base:** IT OPE 1580 — Vistorias Tecnicas Operacionais em Ligacoes Prediais de Esgoto
 - **Repositorio:** `RafaMahlmann/Vto-segundo-c-rebro-` (GitHub)
-- **Versao Atual:** 4.4 (6 abas; Anonimizador LGPD embutido; export sem dado pessoal)
+- **Versao Atual:** 4.5 (6 abas; Anonimizador LGPD embutido; export sem dado pessoal)
 
 > **ATENCAO, AGENTE DE IA:** antes de qualquer alteracao, leia o `AGENTS.md` desta pasta.
 > Ele define o protocolo de edicao cirurgica, as proibicoes e o mapa do `index.html`.
@@ -92,6 +92,13 @@ O aplicativo possui 5 abas principais:
 - 20 codigos de servico distribuidos nas fases (array `CODIGOS_SERVICO`)
 - Prazo por codigo configuravel (modal de configuracoes, `prazosPorCodigo`, padrao 30 dias, em memoria)
 - Cards de sancao com ativacao automatica baseada em datas
+- Cada retangulo de codigo comeca VAZIO (11 retangulos, nas 3 vistorias)
+- Clicar no vazio abre a busca: digite o codigo ou parte do nome (o codigo completo de 4 digitos encaixa sozinho)
+- A busca so aceita codigos daquele retangulo; se o codigo existe em outro, a mensagem diz onde
+- Roleta continua: setas, rodinha do mouse e bolinhas. A casa vazia faz parte do giro
+- Com o grupo armado: digitar abre a busca, setas giram, Enter registra, Delete esvazia
+- Escolher um codigo NAO grava nada: so o 2o clique (janela de datas) grava
+- Efeito de giro e encaixe desliga sozinho com "reduzir movimento" do Windows
 - Matricula ativa sincronizada com aba Matriculas
 
 ### Aba 4: Matriculas (CRUD Principal)
