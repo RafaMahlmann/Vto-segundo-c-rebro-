@@ -241,95 +241,6 @@
             margin-top: 40px; text-align: center; font-size: 13px; color: var(--text-secondary);
             padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); font-weight: 500;
         }
-
-        /* ===== SELETOR DE COLUNAS: galeria + bolinhas + busca + acao em massa ===== */
-        .selc-toolbar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin: 12px 0 4px; }
-        .selc-busca {
-            display: inline-block !important; width: auto !important; flex: 1; min-width: 200px;
-            padding: 10px 16px !important; border-radius: 12px !important; font-size: 14px;
-        }
-        .selc-busca:focus { outline: none; border-color: var(--ios-blue); box-shadow: 0 0 0 4px rgba(0,122,255,0.12); }
-        .selc-btn-mini {
-            display: inline-block; width: auto; margin-top: 0; box-shadow: none;
-            padding: 10px 16px; border-radius: 12px; border: 1px solid var(--border-color);
-            background: #fff; font-size: 13px; font-weight: 600; color: var(--text-primary);
-            cursor: pointer; transition: all 0.15s ease; font-family: inherit;
-        }
-        .selc-btn-mini:hover { background: var(--ios-blue); color: #fff; border-color: var(--ios-blue); box-shadow: 0 4px 12px rgba(0,122,255,0.25); }
-        .selc-btn-mini:active { transform: scale(0.96); }
-        .selc-contador { font-size: 12px; color: var(--text-secondary); margin: 6px 2px 10px; min-height: 16px; font-weight: 500; }
-        .selc-contador.pulsa { animation: selcPulsa 0.35s ease; }
-        @keyframes selcPulsa { 0% { transform: scale(1); } 40% { transform: scale(1.05); color: var(--ios-blue); } 100% { transform: scale(1); } }
-
-        .selc-grade { grid-template-columns: repeat(auto-fill, minmax(178px, 1fr)) !important; max-height: 480px !important; gap: 12px !important; }
-
-        .selc-card { flex-direction: column; align-items: stretch; justify-content: flex-start; white-space: normal; padding: 10px 12px; border-radius: 14px; gap: 6px; }
-        .selc-card .selc-topo { display: flex; align-items: center; gap: 8px; min-width: 0; }
-        .selc-check {
-            width: 18px; height: 18px; border-radius: 50%; border: 2px solid #C7C7CC; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 11px; color: transparent; background: #fff; transition: all 0.15s ease;
-        }
-        .selc-card.selc-on .selc-check { background: var(--ios-blue); border-color: var(--ios-blue); color: #fff; }
-        .selc-card.selc-on { outline: 2px solid var(--ios-blue); outline-offset: 1px; }
-        .selc-nome { font-weight: 700; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .selc-amostras { font-size: 11px; color: var(--text-secondary); line-height: 1.5; font-family: 'SF Mono', 'Menlo', monospace; min-height: 16px; }
-        .selc-amostras .selc-val { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .selc-linha { display: flex; align-items: center; justify-content: space-between; gap: 6px; margin-top: 2px; }
-        .selc-bolinhas { display: flex; gap: 5px; }
-        .selc-bol {
-            width: 18px; height: 18px; margin-top: 0; box-shadow: none; border-radius: 50%; border: none; cursor: pointer; padding: 0;
-            opacity: 0.4; transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
-        }
-        .selc-bol:hover { transform: scale(1.25); opacity: 0.9; }
-        .selc-bol:active { transform: scale(1.05); }
-        .selc-bol.ativa { opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 4px currentColor; }
-        .selc-bol[data-estado="1"] { background: #007AFF; color: #007AFF; }
-        .selc-bol[data-estado="2"] { background: #AF52DE; color: #AF52DE; }
-        .selc-bol[data-estado="3"] { background: #FF9500; color: #FF9500; }
-        .selc-bol[data-estado="4"] { background: #34C759; color: #34C759; }
-        .selc-bol[data-estado="0"] { background: #C7C7CC; color: #8E8E93; }
-        body.selc-modo-csv .selc-bol[data-estado="4"] { display: none; }
-        body.selc-modo-csv .selc-bol-grande[data-estado="4"] { display: none; }
-        .selc-estado-rotulo { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
-        .selc-card.selc-pop { animation: selcPop 0.25s ease; }
-        @keyframes selcPop { 0% { transform: scale(1); } 50% { transform: scale(1.06); } 100% { transform: scale(1); } }
-        .selc-vazio { display: none; text-align: center; color: var(--text-secondary); font-size: 14px; padding: 30px 0; }
-        .selc-vazio.visivel { display: block; }
-        .selc-card.oculto { display: none; }
-
-        .selc-barra {
-            position: fixed; bottom: 18px; left: 50%; transform: translate(-50%, calc(100% + 40px));
-            opacity: 0; pointer-events: none;
-            background: #1D1D1F; color: #fff; border-radius: 100px; padding: 10px 20px;
-            display: flex; align-items: center; gap: 14px; z-index: 999; flex-wrap: wrap; justify-content: center;
-            max-width: 94vw; box-shadow: 0 10px 40px rgba(0,0,0,0.35);
-            transition: transform 0.3s cubic-bezier(0.34, 1.4, 0.64, 1), opacity 0.25s ease;
-        }
-        .selc-barra.aberta { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-        .selc-barra .selc-barra-n { font-size: 13px; font-weight: 700; white-space: nowrap; }
-        .selc-bol-grande {
-            width: 26px; height: 26px; margin-top: 0; box-shadow: none; border-radius: 50%; border: 2px solid rgba(255,255,255,0.3);
-            cursor: pointer; padding: 0; transition: transform 0.12s ease, border-color 0.12s ease;
-        }
-        .selc-bol-grande:hover { transform: scale(1.2); border-color: #fff; }
-        .selc-bol-grande:active { transform: scale(1.05); }
-        .selc-bol-grande[data-estado="1"] { background: #007AFF; }
-        .selc-bol-grande[data-estado="2"] { background: #AF52DE; }
-        .selc-bol-grande[data-estado="3"] { background: #FF9500; }
-        .selc-bol-grande[data-estado="4"] { background: #34C759; }
-        .selc-bol-grande[data-estado="0"] { background: #8E8E93; }
-        .selc-barra .selc-limpar {
-            display: inline-block; width: auto; margin-top: 0; box-shadow: none;
-            background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: 100px;
-            padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
-            font-family: inherit; transition: background 0.15s ease;
-        }
-        .selc-barra .selc-limpar:hover { background: rgba(255,255,255,0.3); }
-
-        @media (prefers-reduced-motion: reduce) {
-            .selc-card, .selc-barra, .selc-bol, .selc-contador, .selc-btn-mini { animation: none !important; transition: none !important; }
-        }
     </style>
 </head>
 <body>
@@ -374,7 +285,7 @@
 
             <label>
                 2. Configuração de Colunas (Aplicada a todos os arquivos)
-                <span class="instruction-note">Clique no cartão para <strong>selecionar</strong> (abre a barra de ação em massa). Nas <strong>bolinhas de cor</strong>, 1 clique já define o destino.</span>
+                <span class="instruction-note">Clique nos balõezinhos para mudar: <strong>Azul</strong> (Original), <strong>Roxo</strong> (Anonimizar), <strong>Laranja</strong> (Matrícula Dublê), <strong>Verde</strong> (Simular) ou <strong>Cinza</strong> (Excluir).</span>
             </label>
 
             <div class="column-legend">
@@ -393,25 +304,7 @@
                 <div class="legend-item"><span class="dot" style="background:#C7C7CC"></span> Excluir</div>
             </div>
 
-            <div class="selc-toolbar">
-                <input type="text" class="selc-busca" id="selcBusca" placeholder="🔍 Buscar coluna pelo nome..." oninput="selcFiltrar()">
-                <button class="selc-btn-mini" onclick="selcSelecionarVisiveis()">Selecionar visíveis</button>
-                <button class="selc-btn-mini" onclick="selcLimparSelecao()">Limpar seleção</button>
-            </div>
-            <div class="selc-contador" id="selcContador"></div>
-
-            <div id="chipsContainer" class="chips-container selc-grade"></div>
-            <div class="selc-vazio" id="selcVazio">Nenhuma coluna com esse nome.</div>
-
-            <div class="selc-barra" id="selcBarra">
-                <span class="selc-barra-n" id="selcBarraN">0 colunas selecionadas</span>
-                <button class="selc-bol-grande" data-estado="1" title="Manter original" onclick="selcAplicarEmMassa(1)"></button>
-                <button class="selc-bol-grande" data-estado="2" title="👻 Anonimizar (hash irreversível)" onclick="selcAplicarEmMassa(2)"></button>
-                <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
-                <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT)" onclick="selcAplicarEmMassa(4)"></button>
-                <button class="selc-bol-grande" data-estado="0" title="Excluir" onclick="selcAplicarEmMassa(0)"></button>
-                <button class="selc-limpar" onclick="selcLimparSelecao()">Limpar</button>
-            </div>
+            <div id="chipsContainer" class="chips-container"></div>
 
             <div style="margin-top: 25px;">
                 <label for="outputFileName">3. Sufixo dos Arquivos Finais</label>
@@ -893,10 +786,6 @@
         FILTRAR_LOCAL_001 = false;
         COLUNAS_DETECTADAS = [];
         document.getElementById('chipsContainer').innerHTML = "";
-        SELECIONADAS.clear(); AMOSTRAS = {};
-        document.getElementById('selcBusca').value = '';
-        document.getElementById('selcVazio').classList.remove('visivel');
-        selcAtualizarBarra();
         const btnPq = document.getElementById('btnPowerQuery');
 
         CSV_ENCODING = await detectarEncoding(FILE_REF);
@@ -911,8 +800,6 @@
             await configurarModoCSV();
             btnPq.style.display = "none";
         }
-        document.body.classList.toggle('selc-modo-csv', MODO_ATUAL === 'CSV');
-        carregarAmostras();
     }
 
     function configurarModoTXT() {
@@ -971,18 +858,8 @@
         COLUNAS_DETECTADAS.push({ id, nome, estado: estadoInicial });
         const chip = document.createElement('div');
         chip.id = `chip-${id}`;
-        chip.className = 'chip selc-card';
-        chip.dataset.nome = selcNorm(nome);
-        chip.innerHTML =
-            `<div class="selc-topo"><span class="selc-check">✓</span>` +
-            `<span class="selc-nome" title="${selcEsc(nome)}">${selcEsc(nome)}</span></div>` +
-            `<div class="selc-amostras" id="amostra-${id}"><span class="selc-val">…</span></div>` +
-            `<div class="selc-linha"><div class="selc-bolinhas">` +
-            [1, 2, 3, 4, 0].map(e =>
-                `<button type="button" class="selc-bol" data-estado="${e}" title="${selcNomeEstado(e)}" onclick="event.stopPropagation(); selcDefinirEstado(${id}, ${e})"></button>`
-            ).join('') +
-            `</div><span class="selc-estado-rotulo"></span></div>`;
-        chip.onclick = () => selcAlternarSelecao(id);
+        chip.className = 'chip';
+        chip.onclick = () => alternarEstado(id);
         atualizarVisualChip(chip, nome, estadoInicial);
         document.getElementById('chipsContainer').appendChild(chip);
     }
@@ -1000,139 +877,11 @@
 
     function atualizarVisualChip(el, nome, estado) {
         el.classList.remove('chip-normal', 'chip-anon', 'chip-exclude', 'chip-duble', 'chip-simular');
-        const classe = { 1: 'chip-normal', 2: 'chip-anon', 3: 'chip-duble', 4: 'chip-simular', 0: 'chip-exclude' }[estado];
-        el.classList.add(classe);
-        const rotulo = el.querySelector('.selc-estado-rotulo');
-        if (rotulo) rotulo.textContent = selcNomeEstado(estado);
-        el.querySelectorAll('.selc-bol').forEach(b => b.classList.toggle('ativa', Number(b.dataset.estado) === estado));
-        selcAtualizarContador();
-    }
-
-    // ===========================================================================
-    // SELETOR DE COLUNAS — selecao multipla, busca, contador e acao em massa
-    // ===========================================================================
-    const SELECIONADAS = new Set();
-    let AMOSTRAS = {};
-
-    function selcEsc(s) {
-        return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-    function selcNorm(s) {
-        return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
-    }
-    function selcNomeEstado(e) {
-        return { 1: 'Manter', 2: 'Anonimizar', 3: 'Dublê', 4: 'Simular', 0: 'Excluir' }[e] || '';
-    }
-
-    function selcAlternarSelecao(id) {
-        const card = document.getElementById(`chip-${id}`);
-        if (!card) return;
-        if (SELECIONADAS.has(id)) { SELECIONADAS.delete(id); card.classList.remove('selc-on'); }
-        else { SELECIONADAS.add(id); card.classList.add('selc-on'); }
-        selcAtualizarBarra();
-    }
-
-    function selcSelecionarVisiveis() {
-        document.querySelectorAll('#chipsContainer .selc-card:not(.oculto)').forEach(card => {
-            const id = Number(card.id.replace('chip-', ''));
-            SELECIONADAS.add(id);
-            card.classList.add('selc-on');
-        });
-        selcAtualizarBarra();
-    }
-
-    function selcLimparSelecao() {
-        SELECIONADAS.clear();
-        document.querySelectorAll('#chipsContainer .selc-on').forEach(c => c.classList.remove('selc-on'));
-        selcAtualizarBarra();
-    }
-
-    function selcAtualizarBarra() {
-        const barra = document.getElementById('selcBarra');
-        const n = SELECIONADAS.size;
-        barra.classList.toggle('aberta', n > 0);
-        document.getElementById('selcBarraN').textContent =
-            n === 1 ? '1 coluna selecionada' : `${n} colunas selecionadas`;
-    }
-
-    function selcDefinirEstado(id, estado) {
-        const col = COLUNAS_DETECTADAS.find(c => c.id === id);
-        if (!col) return;
-        if (estado === 4 && MODO_ATUAL !== 'TXT') return;
-        col.estado = estado;
-        const chip = document.getElementById(`chip-${id}`);
-        if (chip) {
-            chip.classList.remove('selc-pop'); void chip.offsetWidth; chip.classList.add('selc-pop');
-            atualizarVisualChip(chip, col.nome, estado);
-        }
-    }
-
-    function selcAplicarEmMassa(estado) {
-        if (!SELECIONADAS.size) return;
-        if (estado === 4 && MODO_ATUAL !== 'TXT') return;
-        log(`Ação em massa: ${SELECIONADAS.size} coluna(s) -> ${selcNomeEstado(estado)}`);
-        let i = 0;
-        SELECIONADAS.forEach(id => {
-            setTimeout(() => selcDefinirEstado(id, estado), i * 12);
-            i++;
-        });
-    }
-
-    function selcFiltrar() {
-        const q = selcNorm(document.getElementById('selcBusca').value.trim());
-        let visiveis = 0;
-        document.querySelectorAll('#chipsContainer .selc-card').forEach(card => {
-            const ok = !q || card.dataset.nome.includes(q);
-            card.classList.toggle('oculto', !ok);
-            if (ok) visiveis++;
-        });
-        document.getElementById('selcVazio').classList.toggle('visivel', visiveis === 0);
-    }
-
-    function selcAtualizarContador() {
-        const el = document.getElementById('selcContador');
-        if (!el) return;
-        const tot = { 1: 0, 2: 0, 3: 0, 4: 0, 0: 0 };
-        COLUNAS_DETECTADAS.forEach(c => { tot[c.estado] = (tot[c.estado] || 0) + 1; });
-        const partes = [];
-        if (tot[1]) partes.push(`${tot[1]} Manter`);
-        if (tot[2]) partes.push(`${tot[2]} Anonimizar`);
-        if (tot[3]) partes.push(`${tot[3]} Dublê`);
-        if (tot[4]) partes.push(`${tot[4]} Simular`);
-        if (tot[0]) partes.push(`${tot[0]} Excluir`);
-        el.textContent = partes.join('  ·  ');
-        el.classList.remove('pulsa'); void el.offsetWidth; el.classList.add('pulsa');
-    }
-
-    async function carregarAmostras() {
-        if (!FILE_REF || !COLUNAS_DETECTADAS.length) return;
-        try {
-            const chunk = FILE_REF.slice(0, 65536);
-            const buf = await chunk.arrayBuffer();
-            const texto = new TextDecoder(CSV_ENCODING).decode(buf);
-            const linhas = texto.split(/\r?\n/).filter(l => l.length > 0);
-            if (MODO_ATUAL === 'TXT') {
-                COLUNAS_DETECTADAS.forEach(col => {
-                    AMOSTRAS[col.id] = linhas.slice(0, 3).map(l => extrairCampoTxt(l, col.id));
-                });
-            } else {
-                const dados = linhas.slice(1, 4);
-                COLUNAS_DETECTADAS.forEach(col => {
-                    AMOSTRAS[col.id] = dados.map(l => (l.split(CSV_DELIMITADOR)[col.id] || '').replace(/["']/g, '').trim());
-                });
-            }
-            COLUNAS_DETECTADAS.forEach(col => selcRenderAmostra(col.id));
-        } catch (e) {
-            console.warn('Amostras indisponiveis:', e);
-        }
-    }
-
-    function selcRenderAmostra(id) {
-        const box = document.getElementById(`amostra-${id}`);
-        if (!box) return;
-        const vals = (AMOSTRAS[id] || []).map(v => (v === undefined || v === null || v === '') ? '—' : String(v));
-        if (!vals.length) { box.innerHTML = '<span class="selc-val">—</span>'; return; }
-        box.innerHTML = vals.slice(0, 3).map(v => `<span class="selc-val">${selcEsc(v)}</span>`).join('');
+        if (estado === 1) { el.classList.add('chip-normal'); el.innerHTML = `<span>${nome}</span>`; }
+        else if (estado === 2) { el.classList.add('chip-anon'); el.innerHTML = `<span>👻 ${nome}</span>`; }
+        else if (estado === 3) { el.classList.add('chip-duble'); el.innerHTML = `<span>🆔 ${nome}</span>`; }
+        else if (estado === 4) { el.classList.add('chip-simular'); el.innerHTML = `<span>🌍 ${nome}</span>`; }
+        else { el.classList.add('chip-exclude'); el.innerHTML = `<span>${nome}</span>`; }
     }
 
     // ===========================================================================

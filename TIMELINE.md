@@ -401,3 +401,97 @@ Script da mudança: `patches/roleta_vazia_busca.py` (ajustes finos depois dele f
 **Falhas que já existiam antes desta entrega (não são da roleta):**
 - Console mostra 404: é a checagem de `version.json` no GitHub.
 - `_test_etapa1` reprova "sem inchaço" quando o arquivo está em CRLF, como na pasta do Rafa.
+
+
+---
+
+## PARTE 12 — Calculadora rápida dos 180 dias (2026-10-07, v4.5)
+
+Botão azul redondo (calendário) flutuando no canto direito das abas
+**Fluxo de Vistorias** e **Matrículas**. Nas outras abas ele não aparece
+(regra por CSS `:has()`, sem tocar em `mostrarAba()`).
+
+Tocar no botão sobe uma folha do fundo da tela (mola de 420ms).
+Você joga a data da 1ª vistoria e ela responde **na hora, sem botão de calcular**:
+dias corridos, dias que faltam para os 180, barra de progresso e o semáforo
+**do próprio app** (>60 verde, 31–60 laranja, ≤30 vermelho, estourado = vermelho
+cheio com "⚠ Prazo de 180 dias expirado há X dias").
+
+Se houver matrícula ativa, a folha já abre com a data da 1ª vistoria dela
+(e avisa embaixo: "Preenchido com a 1ª vistoria da matrícula N...").
+Trocou a data na mão, o aviso some — a data manual sempre vence.
+
+**Onde mexeu (só código novo, 212+ linhas, zero remoções):**
+- CSS novo: bloco `/* ===== CALCULADORA RAPIDA 180 DIAS ===== */` (depois do contador 180)
+- HTML novo: `#calc180Fab` + `#calc180Overlay` + `#calc180Folha` (entre a aba 4 e a aba 5)
+- JS novo: seção `// ===== CALCULADORA RAPIDA 180 DIAS =====` (antes de EXPORTAR CSV),
+  reusando `getDiaZero()` e o semáforo do `atualizarContador180()`
+- Limpeza "3b" em `prepararHtmlLimpo()` (a folha sai fechada e vazia no export)
+
+**Pegadinha achada pelo Rafa (já resolvida):** o campo usava `aplicarMascaraData`,
+que remonta os dígitos a cada tecla — apagar um pedaço no meio da data fazia a
+máscara restaurar o valor antigo e a folha não recalculava. O campo virou
+`<input type="date">` nativo (edição por pedaços, calendário embutido, sem máscara).
+A máscara do app continua igual nas outras abas — não foi tocada.
+
+**Teste:** `patches/_testa_calc180.py` — 10 verificações, todas OK
+(load sem erros, 6 abas, FAB só em Fluxo/Matrículas, 3 faixas + estouro,
+📅, Esc, prefill, undo/redo 31→30→31, timeline, export limpo, celular 375px).
+Backup de antes da mudança: `patches/_backup_index_antes_calc180.html`.
+
+**Não mudou:** versão (continua v4.5), nenhuma função existente, nenhuma outra aba.
+
+---
+
+## PARTE 13 — Seletor de colunas do Anonimizador (2026-10-07, v4.5 / anon v19.0.0)
+
+A etapa "2. Configuração de Colunas" do anonimizador virou uma **galeria de cartões**
+(propostas S1+S2 combinadas, aprovadas pelo Rafa):
+
+- Cada coluna é um **cartão** com nome, **amostra real dos dados** (3 primeiros
+  valores lidos do arquivo) e **5 bolinhas de cor**: azul Manter, roxo Anonimizar,
+  laranja Dublê, verde Simular, cinza Excluir. **1 clique na bolinha já muda o
+  estado** — não tem mais ciclo de 5 cliques.
+- **Clique no cartão = selecionar.** Abre a **barra de ação em massa** que sobe
+  do fundo (preta, arredondada): "N colunas selecionadas" + as 5 cores em tamanho
+  grande. Aplicar roda em cascata (12ms por cartão, efeito pop).
+- **Busca instantânea** por nome (ignora acento), botões "Selecionar visíveis" e
+  "Limpar seleção", e **contador vivo** ("10 Manter · 1 Dublê · 10 Simular · 138 Excluir")
+  que pulsa a cada mudança.
+- No modo CSV a bolinha verde (Simular) **some** — simulação só existe no TXT/SGCG.
+
+**Onde mexeu (só no anonimizador.html, ~250 linhas novas):**
+- CSS: bloco `/* ===== SELETOR DE COLUNAS ===== */` antes de `</style>`
+- HTML: toolbar de busca + contador + aviso de vazio + `#selcBarra` (barra fixa)
+  ao redor do `#chipsContainer` (que ganhou a classe `selc-grade`)
+- JS: `adicionarColunaInterface()` agora monta o cartão; `atualizarVisualChip()`
+  **não toca mais o innerHTML** (a amostra sobrevive à troca de estado e ao preset);
+  seção nova `// ===== SELETOR DE COLUNAS =====` com seleção, busca, contador,
+  massa e `carregarAmostras()` (lê os primeiros 64KB do arquivo com o encoding detectado)
+- Gancho em `analisarArquivoInicial()`: limpa seleção/amostras e marca
+  `body.selc-modo-csv` quando o arquivo é CSV
+- Base64 regerado com `patches/embutir_anonimizador.py` (regra da seção 9)
+
+**Bug de ferramenta achado e corrigido:** `embutir_anonimizador.py` dizia "Nada a
+fazer" quando o index.html tinha CRLF ao redor das marcas — a regex exigia `\n` puro.
+Agora aceita `\r?\n` e escreve o bloco na mesma quebra do arquivo.
+
+**Decisões de compatibilidade:**
+- `alternarEstado()` (ciclo antigo) continua no código, só não é mais chamada pela interface.
+- As cores/classes de estado (`chip-normal`, `chip-anon`...) são as mesmas — preset,
+  processamento e log não mudaram.
+- Botões novos blindados contra o `button { width:100% }` global do anonimizador.
+
+**Teste:** `patches/_testa_seletor.py` — 18 verificações, todas OK
+(load sem erros, 6 abas, 6 cartões CSV com amostras reais, bolinha 1 clique,
+busca com/sem resultado, Simular escondido no CSV, barra de massa, excluir em massa,
+159 cartões no TXT, preset SGCG com amostras preservadas, contador correto).
+Prints: `propostas/2026-10-07/prints/08..10_seletor_*.png`.
+Backups: `patches/_backup_anonimizador_antes_seletor.html` e `_backup_index_antes_seletor.html`.
+
+**Não mudou:** versão, processamento, preset Power Query, nenhuma outra aba do app.
+
+**Bug conhecido (pré-existente, NÃO corrigido nesta entrega — fase separada):**
+`TERMOS_SENSIVEIS` marca por substring, então NOME-BAIRRO, NOME-FONTE etc. caem como
+"Anonimizar" por padrão no TXT. Está documentado em
+`propostas/2026-10-07/pesquisa-seletor-colunas.md`.

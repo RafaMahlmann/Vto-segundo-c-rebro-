@@ -1,0 +1,9 @@
+{
+  "name": "vto-segundo-cerebro",
+  "private": true,
+  "version": "4.5.0",
+  "description": "App VTO - arquivo unico index.html; este package.json existe so para o servidor local de testes (npm run dev).",
+  "scripts": {
+    "dev": "node patches/servidor_local.js"
+  }
+}

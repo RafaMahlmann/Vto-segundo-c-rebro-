@@ -5,7 +5,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v4.4 — Prazos e Vistorias</title>
+<title>VTO v4.5 — Prazos e Vistorias</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007bff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -165,6 +165,59 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .coluna-1 .roleta-dot.ativo{background:#1976d2}
 .coluna-2 .roleta-dot.ativo{background:#f57c00}
 .coluna-3 .roleta-dot.ativo{background:#c2185b}
+
+/* Roleta: casa vazia, busca por codigo e efeito de giro */
+.coluna-1{--rl-cor:#1976d2;--rl-clara:#90caf9;--rl-txt:#1565c0;--rl-tinta:rgba(25,118,210,.35);--rl-anel:rgba(25,118,210,.45)}
+.coluna-2{--rl-cor:#f57c00;--rl-clara:#ffcc80;--rl-txt:#e65100;--rl-tinta:rgba(245,124,0,.35);--rl-anel:rgba(245,124,0,.45)}
+.coluna-3{--rl-cor:#c2185b;--rl-clara:#f48fb1;--rl-txt:#ad1457;--rl-tinta:rgba(194,24,88,.35);--rl-anel:rgba(194,24,88,.45)}
+.roleta-dot.vazio{background:transparent;box-shadow:inset 0 0 0 1.5px rgba(0,0,0,.35)}
+.roleta-dot.vazio.ativo{box-shadow:inset 0 0 0 1.5px var(--rl-cor)}
+.roleta-mini{width:24px;height:24px;flex-shrink:0;border:none;border-radius:6px;background:rgba(255,255,255,.7);color:#495057;cursor:pointer;font-size:.72rem;display:flex;align-items:center;justify-content:center;transition:transform .15s,background .15s}
+.roleta-mini:hover{background:white;transform:scale(1.1)}
+.roleta-mini[hidden]{display:none}
+.roleta-mini:focus-visible,.roleta-vazio:focus-visible{outline:2px solid var(--rl-cor);outline-offset:2px}
+.roleta-palco{position:relative;display:flow-root;border-radius:8px}
+.roleta-palco.girando{overflow:hidden}
+.roleta-palco .servico-btn{position:relative;overflow:hidden;min-height:62px;margin-bottom:0}
+.roleta-vazio{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:62px;padding:10px 14px;border:2px dashed var(--rl-clara);border-radius:8px;background:rgba(255,255,255,.35);color:var(--rl-txt);font-size:.85rem;font-weight:600;font-family:inherit;cursor:pointer;transition:background .2s,border-color .2s,transform .12s}
+.roleta-vazio .dica{font-weight:400;font-size:.78rem;opacity:.75}
+.roleta-vazio:hover{background:rgba(255,255,255,.75);border-style:solid;border-color:var(--rl-cor)}
+.roleta-vazio:active{transform:scale(.97)}
+.roleta-palco .roleta-fantasma{position:absolute;left:0;top:0;width:100%;pointer-events:none}
+.rl-entra-baixo{animation:rlEntraBaixo .34s cubic-bezier(.2,.9,.3,1.2)}
+.rl-entra-cima{animation:rlEntraCima .34s cubic-bezier(.2,.9,.3,1.2)}
+.rl-sai-cima{animation:rlSaiCima .22s ease-in both}
+.rl-sai-baixo{animation:rlSaiBaixo .22s ease-in both}
+.rl-encaixe{animation:rlEncaixe .42s cubic-bezier(.3,1.5,.5,1)}
+.rl-varre::after{content:"";position:absolute;top:0;right:0;bottom:0;left:0;background:linear-gradient(90deg,transparent,var(--rl-tinta),transparent);transform:translateX(-100%);animation:rlVarre .5s ease-out;pointer-events:none}
+.rl-anel{animation:rlAnel .5s ease-out}
+.rl-treme{animation:rlTreme .32s ease-in-out}
+@keyframes rlEntraBaixo{from{transform:translateY(85%);opacity:0}}
+@keyframes rlEntraCima{from{transform:translateY(-85%);opacity:0}}
+@keyframes rlSaiCima{to{transform:translateY(-85%);opacity:0}}
+@keyframes rlSaiBaixo{to{transform:translateY(85%);opacity:0}}
+@keyframes rlEncaixe{from{transform:scale(.88)}}
+@keyframes rlVarre{to{transform:translateX(100%)}}
+@keyframes rlAnel{from{box-shadow:0 0 0 0 var(--rl-anel)}to{box-shadow:0 0 0 14px transparent}}
+@keyframes rlTreme{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes rlAbre{from{opacity:0;transform:translateY(-4px)}}
+@keyframes rlLinha{from{opacity:0;transform:translateX(-6px)}}
+.roleta-busca{display:none;margin-bottom:6px;padding:6px;background:rgba(255,255,255,.9);border:2px solid var(--rl-cor);border-radius:8px}
+.roleta-buscando .roleta-palco{display:none}
+.roleta-buscando .roleta-busca{display:block;animation:rlAbre .2s ease-out}
+.roleta-busca input{width:100%;padding:9px 10px;font-family:'Courier New',monospace;font-size:1.1rem;font-weight:700;letter-spacing:2px;color:#343a40;background:white;border:2px solid var(--rl-clara);border-radius:6px;outline:none}
+.roleta-busca input:focus{border-color:var(--rl-cor);box-shadow:0 0 0 3px var(--rl-tinta)}
+.roleta-busca ul{list-style:none;margin-top:6px}
+.roleta-busca li{display:flex;gap:10px;align-items:baseline;padding:7px 8px;border-radius:6px;cursor:pointer;font-size:.85rem;color:#495057}
+.roleta-busca.novo li{animation:rlLinha .18s ease-out backwards}
+.roleta-busca li b{min-width:44px;font-family:'Courier New',monospace;font-size:.95rem;color:var(--rl-txt)}
+.roleta-busca li .d{margin-left:auto;font-size:.75rem;opacity:.75}
+.roleta-busca li.sel{background:var(--rl-cor);color:white}
+.roleta-busca li.sel b{color:white}
+.roleta-busca mark{background:none;color:inherit;font-weight:900;text-decoration:underline;text-underline-offset:3px}
+.roleta-busca .msg{padding:6px 8px;font-size:.8rem;font-weight:600;color:#b71c1c}
+.roleta-busca .rodape{margin-top:4px;padding:6px 8px 2px;font-size:.72rem;color:#6c757d;border-top:1px dashed rgba(0,0,0,.12)}
+@media (prefers-reduced-motion:reduce){.rl-entra-baixo,.rl-entra-cima,.rl-encaixe,.rl-anel,.rl-treme,.rl-varre::after,.roleta-busca.novo li,.roleta-buscando .roleta-busca{animation:none}}
 
 /* Cards de sancao */
 .sancao-btn{background:#e9ecef!important;color:#adb5bd!important;border-color:#dee2e6!important;cursor:not-allowed!important;opacity:.7}
@@ -398,7 +451,7 @@ body.anon-aberto .timeline-panel{display:none}
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">⚙</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">❓ Ajuda</button>
     <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">📦 Exportar ZIP</button>
-    <span class="versao-badge" id="versaoBadge" data-versao="">v4.4</span>
+    <span class="versao-badge" id="versaoBadge" data-versao="">v4.5</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -420,7 +473,7 @@ body.anon-aberto .timeline-panel{display:none}
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao="">v4.4</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao="">v4.5</div>
     </div>
 </div>
 
@@ -499,7 +552,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
 
-        <div class="footer" data-versao="">v4.4</div>
+        <div class="footer" data-versao="">v4.5</div>
     </div>
 </div>
 
@@ -623,7 +676,7 @@ body.anon-aberto .timeline-panel{display:none}
             <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo ❯</button>
         </div>
     </div>
-    <div class="footer">v4.4 - IT OPE 1580</div>
+    <div class="footer">v4.5 - IT OPE 1580</div>
 </div>
 
 <!-- ABA 4: MATRICULAS -->
@@ -740,7 +793,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
     </div>
-    <div class="footer">v4.4 - Timeline Proporcional</div>
+    <div class="footer">v4.5 - Timeline Proporcional</div>
 </div>
 
 <!-- ABA 6: ANONIMIZADOR -->
@@ -796,7 +849,7 @@ function aplicarVersaoDinamica() {
     const agora = new Date();
     const pad = n => String(n).padStart(2, '0');
     const dataHora = agora.getFullYear() + '-' + pad(agora.getMonth()+1) + '-' + pad(agora.getDate()) + '.' + pad(agora.getHours()) + '-' + pad(agora.getMinutes());
-    const versao = 'v4.4.' + dataHora;
+    const versao = 'v4.5.' + dataHora;
     document.querySelectorAll('[data-versao]').forEach(el => { el.textContent = versao; });
 }
 
@@ -1564,6 +1617,23 @@ function toggleEvento(coluna, evento) {
 
 // ===== ROLETA DE SERVICOS (prototipo - grupo "Servicos" da 1a Vistoria) =====
 let _roletaInstances = [];
+let _roletaArmada = null;
+// Efeito visual (giro, encaixe) desliga sozinho se o Windows pediu menos movimento.
+function _rolEfeito() { return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches); }
+function _rolNorm(s) { return String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+function _rolReflow(el, cls) { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
+function _rolEsc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+// Onde um codigo mora (vistoria + grupo), lido do proprio HTML: nada escrito a mao.
+function _rolOnde(cod) {
+    const achou = [];
+    document.querySelectorAll('.roleta-grupo').forEach(g => {
+        if (!g.querySelector('.servico-btn[data-cod="' + cod + '"]')) return;
+        const col = g.closest('.coluna-vistoria');
+        const titulo = g.querySelector('.servicos-grupo-title');
+        achou.push((col ? col.id.replace('coluna', '') + 'a Vistoria' : '') + ' - ' + (titulo ? titulo.textContent : ''));
+    });
+    return achou;
+}
 function initRoletas() {
     document.querySelectorAll('.roleta-grupo').forEach(setupRoletaGrupo);
 }
@@ -1573,43 +1643,227 @@ function atualizarTodasRoletas() {
 function setupRoletaGrupo(grupoEl) {
     const btns = Array.from(grupoEl.querySelectorAll('.servico-btn'));
     if (btns.length < 2) return;
-    let idx = 0;
+    let idx = -1;   // -1 = casa vazia (estado inicial de todo retangulo)
+    let aberto = false;
+    let ultimoWheel = 0;
+    let visiveis = [];
+    let selBusca = 0;
+    let emErro = false;
+    let tLimpa = null;
+    let tGira = null;
+    // codigo, nome e descricao lidos do proprio botao: o HTML segue sendo a fonte
+    const itens = btns.map(b => {
+        const desc = b.querySelector('.desc');
+        const nome = Array.from(b.childNodes).filter(n => n.nodeType === 3).map(n => n.textContent).join('').replace(/^\s*-\s*/, '').trim();
+        return { cod: b.getAttribute('data-cod'), nome: nome, desc: desc ? desc.textContent : '' };
+    });
 
     const nav = document.createElement('div');
     nav.className = 'roleta-nav';
     nav.innerHTML = '<button type="button" class="roleta-seta roleta-cima" aria-label="Servico anterior">&#9650;</button>'
                    + '<div class="roleta-dots"></div>'
-                   + '<button type="button" class="roleta-seta roleta-baixo" aria-label="Proximo servico">&#9660;</button>';
+                   + '<button type="button" class="roleta-seta roleta-baixo" aria-label="Proximo servico">&#9660;</button>'
+                   + '<button type="button" class="roleta-mini roleta-lupa" title="Digitar codigo" aria-label="Digitar codigo">&#128269;</button>'
+                   + '<button type="button" class="roleta-mini roleta-limpar" title="Deixar vazio" aria-label="Deixar vazio" hidden>&#10005;</button>';
     grupoEl.insertBefore(nav, btns[0]);
     const dotsWrap = nav.querySelector('.roleta-dots');
+    const dotVazio = document.createElement('span');
+    dotVazio.className = 'roleta-dot vazio';
+    dotsWrap.appendChild(dotVazio);
     btns.forEach(() => {
         const dot = document.createElement('span');
         dot.className = 'roleta-dot';
         dotsWrap.appendChild(dot);
     });
-    const dots = Array.from(dotsWrap.querySelectorAll('.roleta-dot'));
+    const dots = Array.from(dotsWrap.querySelectorAll('.roleta-dot:not(.vazio)'));
+    const lupa = nav.querySelector('.roleta-lupa');
+    const limpar = nav.querySelector('.roleta-limpar');
 
-    function armar() { grupoEl.classList.add('roleta-armada'); }
-    function desarmar() { grupoEl.classList.remove('roleta-armada'); }
-    function mover(dir) {
-        idx = (idx + dir + btns.length) % btns.length;
-        armar();
+    // palco: casa vazia + os botoes reais (continuam todos no HTML, so escondidos)
+    const palco = document.createElement('div');
+    palco.className = 'roleta-palco';
+    const vazio = document.createElement('button');
+    vazio.type = 'button';
+    vazio.className = 'roleta-vazio';
+    vazio.innerHTML = '<span>Vazio</span><span class="dica">clique para digitar</span>';
+    grupoEl.insertBefore(palco, btns[0]);
+    palco.appendChild(vazio);
+    btns.forEach(b => palco.appendChild(b));
+
+    const busca = document.createElement('div');
+    busca.className = 'roleta-busca';
+    busca.innerHTML = '<input type="text" autocomplete="off" spellcheck="false" placeholder="Digite o codigo ou o nome" aria-label="Buscar codigo">'
+                    + '<ul></ul><div class="rodape">Enter escolhe - Esc volta - setas descem a lista</div>';
+    grupoEl.appendChild(busca);
+    const input = busca.querySelector('input');
+    const lista = busca.querySelector('ul');
+
+    function atual() { return idx < 0 ? vazio : btns[idx]; }
+    function outrosFora() {
+        _roletaInstances.forEach(r => { if (r !== inst) { r.desarmar(); r.fecharBusca(); } });
+    }
+    function armar() {
+        outrosFora();
+        _roletaArmada = inst;
+        grupoEl.classList.add('roleta-armada');
+    }
+    function desarmar() {
+        grupoEl.classList.remove('roleta-armada');
+        if (_roletaArmada === inst) _roletaArmada = null;
+    }
+    function limparAnim() {
+        [vazio, palco].concat(btns).forEach(el => el.classList.remove('rl-entra-baixo', 'rl-entra-cima', 'rl-encaixe', 'rl-varre', 'rl-anel'));
+    }
+    // dir: +1 proximo (sobe), -1 anterior (desce), 0 sem giro. encaixe: codigo caiu na casa.
+    function mostrar(novo, dir, encaixe) {
+        const antigo = atual();
+        idx = novo;
+        const prox = atual();
+        clearTimeout(tLimpa);
+        limparAnim();
+        const efeito = _rolEfeito();
+        if (efeito && dir !== 0 && antigo !== prox) {
+            const f = document.createElement('div');
+            f.className = antigo.className.replace(/\brl-\S+/g, '').trim() + ' roleta-fantasma ' + (dir > 0 ? 'rl-sai-cima' : 'rl-sai-baixo');
+            f.innerHTML = antigo.innerHTML;
+            f.setAttribute('aria-hidden', 'true');
+            palco.appendChild(f);
+            palco.classList.add('girando');
+            clearTimeout(tGira);
+            tGira = setTimeout(() => {
+                palco.classList.remove('girando');
+                palco.querySelectorAll('.roleta-fantasma').forEach(x => x.remove());
+            }, 380);
+        }
         refresh();
+        if (!efeito) return;
+        void palco.offsetWidth;
+        if (encaixe) { prox.classList.add('rl-encaixe', 'rl-varre'); palco.classList.add('rl-anel'); }
+        else if (dir !== 0 && antigo !== prox) { prox.classList.add(dir > 0 ? 'rl-entra-baixo' : 'rl-entra-cima'); }
+        tLimpa = setTimeout(limparAnim, 700);
+    }
+    function mover(dir) {
+        if (aberto) fecharBusca();
+        const total = btns.length + 1;   // a casa vazia entra no giro
+        mostrar(((idx + 1 + dir + total) % total) - 1, dir, false);
+        armar();
+    }
+    function confirmar() {
+        const b = btns[idx];
+        if (b) b.click();   // grupo armado: o clique cai no onclick do botao, como hoje
     }
     function refresh() {
+        vazio.style.display = idx === -1 ? '' : 'none';
         btns.forEach((b, i) => { b.style.display = i === idx ? '' : 'none'; });
         const m = typeof getMatriculaAtiva === 'function' ? getMatriculaAtiva() : null;
+        dotVazio.classList.toggle('ativo', idx === -1);
         dots.forEach((d, i) => {
             d.classList.toggle('ativo', i === idx);
             const cod = btns[i].getAttribute('data-cod');
             d.classList.toggle('preenchido', !!(m && m.servicos.some(s => s.codigo === cod)));
         });
+        limpar.hidden = idx === -1;
     }
+
+    // ----- busca por codigo ou nome -----
+    function abrirBusca(prefill) {
+        outrosFora();
+        aberto = true;
+        grupoEl.classList.add('roleta-buscando');
+        emErro = false;
+        busca.classList.add('novo');   // as linhas so animam na abertura, nao a cada tecla
+        setTimeout(() => busca.classList.remove('novo'), 500);
+        input.value = prefill || '';
+        filtrar();
+        input.focus();
+        input.setSelectionRange(input.value.length, input.value.length);
+    }
+    function fecharBusca() {
+        aberto = false;
+        grupoEl.classList.remove('roleta-buscando');
+    }
+    function destacar(txt, q) {
+        const i = q ? _rolNorm(txt).indexOf(q) : -1;
+        if (i < 0) return _rolEsc(txt);
+        return _rolEsc(txt.slice(0, i)) + '<mark>' + _rolEsc(txt.slice(i, i + q.length)) + '</mark>' + _rolEsc(txt.slice(i + q.length));
+    }
+    function filtrar() {
+        const q = _rolNorm(input.value.trim());
+        visiveis = itens.map((it, i) => ({ it: it, i: i }))
+            .filter(x => !q || x.it.cod.indexOf(q) >= 0 || _rolNorm(x.it.nome).indexOf(q) >= 0);
+        // codigo que comeca igual ao digitado vem primeiro
+        visiveis.sort((a, b) => (b.it.cod.indexOf(q) === 0) - (a.it.cod.indexOf(q) === 0));
+        selBusca = 0;
+        let html = '';
+        visiveis.forEach((x, n) => {
+            html += '<li data-i="' + x.i + '"' + (n === 0 ? ' class="sel"' : '') + ' style="animation-delay:' + (n * 22) + 'ms">'
+                  + '<b>' + destacar(x.it.cod, q) + '</b><span>' + destacar(x.it.nome, q) + '</span><span class="d">' + _rolEsc(x.it.desc) + '</span></li>';
+        });
+        let msg = '';
+        let erro = false;
+        if (q && !visiveis.length) {
+            erro = true;
+            const so = q.replace(/\D/g, '');
+            const onde = so.length >= 3 ? _rolOnde(so) : [];
+            if (onde.length) msg = 'O ' + so + ' existe, mas fica em: ' + onde.join(' / ') + '. Aqui nao cabe.';
+            else if (so.length >= 4) msg = 'Codigo ' + so + ' nao existe.';
+            else { msg = 'Nada encontrado.'; erro = false; }
+        }
+        if (erro && !emErro) { _rolReflow(input, 'rl-treme'); }
+        emErro = erro;
+        lista.innerHTML = html + (msg ? '<div class="msg">' + _rolEsc(msg) + '</div>' : '');
+        // codigo completo e unico encaixa sozinho (so preenche a casa, nao registra nada)
+        if (/^\d{4}$/.test(q) && visiveis.length === 1 && visiveis[0].it.cod === q) {
+            const alvo = visiveis[0].i;
+            setTimeout(() => { if (aberto && input.value.trim() === q) escolher(alvo); }, 140);
+        }
+    }
+    function marcar(n) {
+        const lis = lista.querySelectorAll('li');
+        if (!lis.length) return;
+        selBusca = (n + lis.length) % lis.length;
+        lis.forEach((li, k) => li.classList.toggle('sel', k === selBusca));
+    }
+    function escolher(i) {
+        fecharBusca();
+        mostrar(i, 0, true);
+        armar();
+    }
+
+    input.addEventListener('input', filtrar);
+    input.addEventListener('keydown', e => {
+        if (e.key === 'ArrowDown') { e.preventDefault(); marcar(selBusca + 1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); marcar(selBusca - 1); }
+        else if (e.key === 'Enter') { e.preventDefault(); const x = visiveis[selBusca]; if (x) escolher(x.i); }
+        else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); fecharBusca(); if (idx >= 0) armar(); lupa.focus(); }
+    });
+    lista.addEventListener('mousedown', e => {
+        const li = e.target.closest('li');
+        if (!li) return;
+        e.preventDefault();
+        escolher(parseInt(li.getAttribute('data-i'), 10));
+    });
+    lista.addEventListener('mouseover', e => {
+        const li = e.target.closest('li');
+        if (li) marcar(Array.prototype.indexOf.call(lista.querySelectorAll('li'), li));
+    });
+    vazio.addEventListener('click', e => { e.stopPropagation(); abrirBusca(''); });
+    lupa.addEventListener('click', e => { e.stopPropagation(); abrirBusca(''); });
+    limpar.addEventListener('click', e => {
+        e.stopPropagation();
+        if (aberto) fecharBusca();
+        mostrar(-1, -1, false);
+        armar();
+    });
 
     nav.querySelector('.roleta-cima').addEventListener('click', e => { e.stopPropagation(); mover(-1); });
     nav.querySelector('.roleta-baixo').addEventListener('click', e => { e.stopPropagation(); mover(1); });
     grupoEl.addEventListener('wheel', e => {
+        if (aberto) return;
         e.preventDefault();
+        const agora = Date.now();
+        if (agora - ultimoWheel < 110) return;   // um passo por vez, controlavel
+        ultimoWheel = agora;
         mover(e.deltaY > 0 ? 1 : -1);
     }, { passive: false });
     grupoEl.addEventListener('click', function (e) {
@@ -1621,11 +1875,28 @@ function setupRoletaGrupo(grupoEl) {
             desarmar();
         }
     }, true);
-    document.addEventListener('click', e => { if (!grupoEl.contains(e.target)) desarmar(); });
+    document.addEventListener('click', e => { if (!grupoEl.contains(e.target)) { desarmar(); fecharBusca(); } });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') desarmar(); });
+    // Teclado com o grupo armado: digitar abre a busca, setas giram, Enter registra, Delete esvazia.
+    document.addEventListener('keydown', e => {
+        if (_roletaArmada !== inst || aberto) return;
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        const t = e.target;
+        if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable)) return;
+        const aba = document.getElementById('aba-fluxo');
+        if (!aba || !aba.classList.contains('active')) return;
+        const modal = document.getElementById('modalOverlay');
+        if (modal && modal.classList.contains('ativo')) return;
+        if (/^\d$/.test(e.key)) { e.preventDefault(); abrirBusca(e.key); }
+        else if (e.key === 'ArrowDown') { e.preventDefault(); mover(1); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); mover(-1); }
+        else if (e.key === 'Enter' && idx >= 0) { e.preventDefault(); confirmar(); }
+        else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); mostrar(-1, -1, false); }
+    });
 
+    const inst = { refresh: refresh, desarmar: desarmar, fecharBusca: fecharBusca };
     refresh();
-    _roletaInstances.push({ refresh });
+    _roletaInstances.push(inst);
 }
 
 // ===== CONTROLE DE VISUALIZACAO DO FLUXO =====
@@ -2681,7 +2952,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '4.4';
+const VERSAO_LOCAL = '4.5';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 const URL_INDEX_HTML = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/index.html';
 let VERSAO_REMOTA = null;
@@ -2817,6 +3088,14 @@ function prepararHtmlLimpo() {
     //    Sem apagar, as setas aparecem em dobro a cada exportar/reabrir.
     todos('.roleta-nav').forEach(el => el.remove());
     todos('.roleta-grupo').forEach(el => el.classList.remove('roleta-armada'));
+    //    A busca e o palco tambem sao gerados na tela: desembrulha os botoes reais
+    //    e apaga o resto, senao initRoletas() embrulha de novo por cima.
+    todos('.roleta-palco').forEach(p => {
+        p.querySelectorAll('.servico-btn:not(.roleta-fantasma)').forEach(b => { b.removeAttribute('style'); p.parentNode.insertBefore(b, p); });
+        p.remove();
+    });
+    todos('.roleta-busca').forEach(el => el.remove());
+    todos('.roleta-grupo').forEach(el => el.classList.remove('roleta-buscando'));
 
     // 5. Banner de nova versao
     const banner = um('#bannerVersao');
@@ -2913,7 +3192,7 @@ function gerarZipCompleto() {
     }
 
     if (!htmlAnon) {
-        alert('Nao foi possivel carregar o anonimizador. O arquivo pode estar corrompido.');
+        alert('Nao deu para carregar o anonimizador. O arquivo pode estar corrompido.');
         if (btn) btn.textContent = original;
         return;
     }
