@@ -517,3 +517,40 @@ preset Power Query (com preset, essas colunas viram Excluir de qualquer jeito).
 **Teste:** `_testa_seletor.py` ganhou as verificações 8f/8g
 (4 exceções nascem Manter, NOME-CLIENTE continua Simular) — 24 verificações OK.
 Base64 regerado (`embutir_anonimizador.py`).
+
+---
+
+## PARTE 15 — Pontinho de ajuda do Exportar ZIP (2026-10-08, v4.5)
+
+Um **"?" laranja pulsante** ao lado do botão Exportar ZIP, no header.
+Clica nele e abre um modal explicando, em linguagem simples:
+
+- o que é o ZIP (o programa inteiro num arquivo só);
+- como usar em outro computador (abrir o ZIP, 2 cliques no index.html, sem instalar nada);
+- como compartilhar com um colega (mandar o ZIP por e-mail ou WhatsApp);
+- que o ZIP sai limpo, sem as matrículas da tela.
+
+Texto passou pela lente de simplicidade e pelas regras da voz-do-vto
+(frases curtas, sem jargão, uma ideia por parágrafo).
+
+**Onde mexeu (3 inserções, zero remoções):**
+- CSS: `.btn-zip-info` + pulso (desliga com "reduzir movimento"), junto ao `.btn-zip`
+- HTML: botão `?` logo depois do Exportar ZIP no header
+- JS: `abrirAjudaZip()` — reusa o `#modalOverlay` da Ajuda, então Esc fecha
+  e o export limpo continua garantido pelo retrato
+
+**Teste:** `patches/_testa_ajuda_zip.py` — 8 verificações OK
+(pontinho visível, modal abre com o texto completo, Esc fecha e restaura,
+ajuda antiga intacta, export sem modal aberto, celular 375px, console zerado).
+Print: `propostas/2026-10-07/prints/11_ajuda_zip.png`.
+
+**Não mudou:** versão (v4.5), fluxo do export, nenhuma aba.
+
+---
+
+## PARTE 16 — Versao v4.6 (2026-10-08)
+
+Bump pedido pelo Rafa junto com o pontinho de ajuda do ZIP.
+Subiram juntos: title, badge, 4 rodapes, versao dinamica, VERSAO_LOCAL,
+sw.js (vto-cache-v4.6), version.json (4.6), README, package.json.
+Quem estiver na 4.5 vai ver o banner de nova versao.

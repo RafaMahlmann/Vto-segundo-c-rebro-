@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v4.5 — Prazos e Vistorias</title>
+<title>VTO v4.6 — Prazos e Vistorias</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007bff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,6 +25,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .btn-ajuda,.btn-config,.btn-zip{padding:10px 14px;font-size:.85rem;font-weight:700;color:#6c757d;background:white;border:2px solid #ced4da;border-radius:8px;cursor:pointer;transition:all .3s;font-family:inherit;white-space:nowrap}
 .btn-ajuda:hover,.btn-config:hover,.btn-zip:hover{background:#e9ecef;border-color:#adb5bd}
 .btn-zip:hover{background:#d4edda;border-color:#28a745;color:#155724}
+.btn-zip-info{width:22px;height:22px;border-radius:50%;border:none;background:#ff9500;color:#fff;font-size:.8rem;font-weight:800;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;flex-shrink:0;animation:zipInfoPulsa 2.5s ease-in-out infinite;box-shadow:0 2px 6px rgba(255,149,0,.4);font-family:inherit}
+.btn-zip-info:hover{transform:scale(1.15)}
+@keyframes zipInfoPulsa{0%,100%{box-shadow:0 2px 6px rgba(255,149,0,.4)}50%{box-shadow:0 2px 14px rgba(255,149,0,.85)}}
+@media (prefers-reduced-motion:reduce){.btn-zip-info{animation:none}}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
 .btn-ajuda:hover,.btn-config:hover{background:#e9ecef;border-color:#adb5bd}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
@@ -496,7 +500,8 @@ body.anon-aberto .timeline-panel{display:none}
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
     <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">&#128230; Exportar ZIP</button>
-    <span class="versao-badge" id="versaoBadge" data-versao>v4.5</span>
+    <button class="btn-zip-info" onclick="abrirAjudaZip()" title="O que e o Exportar ZIP?">?</button>
+    <span class="versao-badge" id="versaoBadge" data-versao>v4.6</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -518,7 +523,7 @@ body.anon-aberto .timeline-panel{display:none}
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v4.5</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v4.6</div>
     </div>
 </div>
 
@@ -597,7 +602,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
 
-        <div class="footer" data-versao>v4.5</div>
+        <div class="footer" data-versao>v4.6</div>
     </div>
 </div>
 
@@ -721,7 +726,7 @@ body.anon-aberto .timeline-panel{display:none}
             <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo &#10095;</button>
         </div>
     </div>
-    <div class="footer">v4.5 - IT OPE 1580</div>
+    <div class="footer">v4.6 - IT OPE 1580</div>
 </div>
 
 <!-- ABA 4: MATRICULAS -->
@@ -862,7 +867,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
     </div>
-    <div class="footer">v4.5 - Timeline Proporcional</div>
+    <div class="footer">v4.6 - Timeline Proporcional</div>
 </div>
 
 <!-- ABA 6: ANONIMIZADOR -->
@@ -918,7 +923,7 @@ function aplicarVersaoDinamica() {
     const agora = new Date();
     const pad = n => String(n).padStart(2, '0');
     const dataHora = agora.getFullYear() + '-' + pad(agora.getMonth()+1) + '-' + pad(agora.getDate()) + '.' + pad(agora.getHours()) + '-' + pad(agora.getMinutes());
-    const versao = 'v4.5.' + dataHora;
+    const versao = 'v4.6.' + dataHora;
     document.querySelectorAll('[data-versao]').forEach(el => { el.textContent = versao; });
 }
 
@@ -1170,6 +1175,16 @@ function fecharModalAjuda() {
     overlay.classList.remove('ativo');
     ajudaAberta = false;
     document.getElementById('btnAjuda').classList.remove('ativo');
+}
+
+// ===== AJUDA DO EXPORTAR ZIP =====
+function abrirAjudaZip() {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (!window._modalOriginal) { window._modalOriginal = box.innerHTML; }
+    box.innerHTML = '<h3>&#128230; Para que serve o Exportar ZIP?</h3><div style="font-size:.85rem;color:#495057;line-height:1.65"><p><strong>É o programa inteiro num arquivo só.</strong> O ZIP é um pacote compactado: dentro dele vai o VTO completo, com o Anonimizador junto.</p><p><strong>Para usar em outro computador:</strong> salve o ZIP, abra a pasta dele e clique duas vezes no arquivo <strong>index.html</strong>. O programa abre no navegador — não precisa instalar nada.</p><p><strong>Para compartilhar com um colega:</strong> é só mandar esse mesmo ZIP por e-mail ou WhatsApp. Quem recebe faz igual: abre o ZIP e clica no index.html.</p><p><strong>Fica tranquilo:</strong> o ZIP sai limpo, sem as matrículas e datas da sua tela. Seus dados ficam só no seu computador.</p></div><div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>';
+    overlay.classList.add('ativo');
+    ajudaAberta = true;
 }
 
 // Preenche data de hoje
@@ -3147,7 +3162,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '4.5';
+const VERSAO_LOCAL = '4.6';
 const URL_VERSAO = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/version.json';
 const URL_INDEX_HTML = 'https://raw.githubusercontent.com/RafaMahlmann/Vto-segundo-c-rebro-/main/index.html';
 let VERSAO_REMOTA = null;
