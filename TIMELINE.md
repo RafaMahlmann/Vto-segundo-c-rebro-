@@ -495,3 +495,25 @@ Backups: `patches/_backup_anonimizador_antes_seletor.html` e `_backup_index_ante
 `TERMOS_SENSIVEIS` marca por substring, então NOME-BAIRRO, NOME-FONTE etc. caem como
 "Anonimizar" por padrão no TXT. Está documentado em
 `propostas/2026-10-07/pesquisa-seletor-colunas.md`.
+
+---
+
+## PARTE 14 — Falsos positivos do detector de colunas (2026-10-07, v4.5 / anon v19.0.0)
+
+O detector de colunas sensíveis era por substring: qualquer coluna com "NOME"
+no nome nascia roxa (Anonimizar). Quatro colunas do SGCG não são nome de pessoa
+e caíam nessa por engano:
+
+- NOME-BAIRRO (127), NOME-FONTE (131), NOME-RESERVA (132), NOME-ENDER-ALT (150)
+
+**Correção cirúrgica (2 trechos no anonimizador.html):**
+- Lista nova `TERMOS_SENSIVEIS_EXCECOES` com as 4 colunas.
+- `verificarSensibilidade()` devolve `false` se o nome bate numa exceção.
+
+As 4 agora nascem azuis (Manter). NOME-CLIENTE continua Simular; o resto do
+detector não mudou. Nascimento correto importa para quem processa **sem** o
+preset Power Query (com preset, essas colunas viram Excluir de qualquer jeito).
+
+**Teste:** `_testa_seletor.py` ganhou as verificações 8f/8g
+(4 exceções nascem Manter, NOME-CLIENTE continua Simular) — 24 verificações OK.
+Base64 regerado (`embutir_anonimizador.py`).

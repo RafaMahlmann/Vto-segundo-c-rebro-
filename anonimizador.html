@@ -795,6 +795,8 @@
     }
 
     const TERMOS_SENSIVEIS = ["NOME", "CPF", "RG", "TELEFONE", "CELULAR", "EMAIL", "CONTATO", "NUMERO-IMOVEL", "CEP-USUARIO", "CEP-ENDERECO", "ENDERECO"];
+    // contem "NOME" no nome, mas NAO sao nome de pessoa (nao podem nascer roxas)
+    const TERMOS_SENSIVEIS_EXCECOES = ["NOME-BAIRRO", "NOME-FONTE", "NOME-RESERVA", "NOME-ENDER-ALT"];
     const TERMOS_MATRICULA = ["MATRICULA", "LIGACAO", "INSCRICAO"];
     const TERMOS_SIMULAVEIS = ["NOME-CLIENTE", "CPF", "RG", "TELEFONE", "CEL-SMS", "CONTATO-IMOVEL", "ENDERECO", "NUMERO-IMOVEL", "CEP", "INSC-LOTE", "EMAIL"];
 
@@ -956,6 +958,7 @@
 
     function verificarSensibilidade(nome) {
         const n = nome.toUpperCase();
+        if (TERMOS_SENSIVEIS_EXCECOES.some(t => n.includes(t))) return false;
         return TERMOS_SENSIVEIS.some(t => n.includes(t));
     }
     function verificarMatricula(nome) {

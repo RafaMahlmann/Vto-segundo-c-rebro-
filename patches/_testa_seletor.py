@@ -117,6 +117,15 @@ async def main():
         print("8b) amostra TXT col 3:", vals2[:2], "OK" if any("L0C3" in v for v in vals2) else "PROBLEMA")
         disp2 = await frame.locator("#chip-3 .selc-bol[data-estado='4']").evaluate("el => getComputedStyle(el).display")
         print("8c) TXT mostra Simular:", "OK" if disp2 != "none" else "PROBLEMA")
+        # 8f. falsos positivos (ANTES do preset): NOME-BAIRRO/FONTE/RESERVA/ENDER-ALT nascem "Manter"
+        ids_fp = {127: "NOME-BAIRRO", 131: "NOME-FONTE", 132: "NOME-RESERVA", 150: "NOME-ENDER-ALT"}
+        for cid, cnome in ids_fp.items():
+            cls_fp = await frame.locator(f"#chip-{cid}").get_attribute("class") or ""
+            ok_fp = "chip-normal" in cls_fp and "chip-anon" not in cls_fp
+            print(f"8f) {cnome} ({cid}) nasce Manter:", "OK" if ok_fp else f"PROBLEMA {cls_fp}")
+        # e o NOME-CLIENTE (id 2) continua protegido (simular)
+        cls_nc = await frame.locator("#chip-2").get_attribute("class") or ""
+        print("8g) NOME-CLIENTE continua Simular:", "OK" if "chip-simular" in cls_nc else f"PROBLEMA {cls_nc}")
         await frame.locator("#btnPowerQuery").click()
         await page.wait_for_timeout(800)
         cont2 = await frame.locator("#selcContador").text_content()
