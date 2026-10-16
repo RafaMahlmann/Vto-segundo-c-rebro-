@@ -98,6 +98,19 @@ h1{font-size:clamp(2rem,5vw,3rem);font-weight:900;letter-spacing:-.02em;line-hei
 .barra > i{display:block;height:100%;background:var(--agua);border-radius:99px;transition:width .35s ease}
 .criterio{font-family:"IBM Plex Mono",monospace;font-size:.75rem;color:var(--muted);margin:14px 0 0;max-width:76ch;line-height:1.7}
 
+/* ---------- o que falta para 100% ---------- */
+.falta{margin-top:28px;border:1px solid var(--line);border-radius:14px;padding:20px 22px;background:var(--surface)}
+.falta-tit{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin:0 0 6px}
+.falta-tit h2{font-size:1.15rem;font-weight:800;letter-spacing:-.01em;margin:0}
+.falta-tit .selo{font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:var(--alto);background:var(--alto-soft);border-radius:99px;padding:3px 10px}
+.falta > p{color:var(--ink-soft);font-size:.92rem;line-height:1.65;margin:0 0 14px;max-width:74ch}
+.falta ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.falta li{border-left:3px solid var(--agua);padding:10px 14px;background:var(--surface-2);border-radius:0 10px 10px 0}
+.falta li b{display:block;font-size:.92rem;margin:0 0 3px}
+.falta li span{color:var(--ink-soft);font-size:.86rem;line-height:1.6;display:block}
+.falta .quem{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--agua);display:block;margin-bottom:5px}
+.falta .fecha{margin:14px 0 0;padding:10px 14px;border-radius:10px;background:var(--agua-soft);color:var(--ink-soft);font-size:.88rem;line-height:1.6}
+
 /* ---------- regras ---------- */
 .regras{
   margin-top:30px;border:1px solid var(--line);border-left:3px solid var(--critico);
@@ -216,6 +229,23 @@ label.item input:checked ~ .txt{color:var(--muted);text-decoration:line-through;
     <div class="barra"><i id="barraGeral" style="width: 88%;"></i></div>
   </div>
   <p class="criterio">Estado reconstruído em 15/09/2026 a partir do código real do repositório (não do salvamento do artefato), com os testes de navegador da Etapa 2 rodados e gravados neste mesmo dia. Critério: só fica marcado o que está comprovado no código, em teste automatizado com saída gravada ou em validação manual reproduzida por automação de navegador. Visualização estática — marcar/desmarcar aqui não persiste nem altera o projeto.</p>
+
+  <section class="falta">
+    <div class="falta-tit">
+      <h2>O que falta para 100%</h2>
+      <span class="selo">42/48 · 6 itens abertos</span>
+    </div>
+    <p>Nenhum dos 6 é código. As etapas de trabalho — Export limpo (8/8), Arquivo único (10/10), Versão (7/7) e Regressão (9/9) — estão fechadas e testadas. O que segura os 12% restantes são 2 decisões suas e 4 limpezas de arquivos soltos na raiz. Cada item abaixo diz o que falta e quem fecha.</p>
+    <ul>
+      <li><span class="quem">você decide · etapa 0</span><b>Destino da pasta "Calculadora pós sanção/"</b><span>Está fora do escopo da fusão e continua untracked. Commitar, apagar ou mover para fora do repo é decisão sua — por isso ficou de fora do commit d3ccb19. Para fechar: me dizer o destino.</span></li>
+      <li><span class="quem">você faz · etapa 0</span><b>Cópia do index.html fora do repositório</b><span>Plano B manual (Drive ou rede) se tudo der errado. Leva um minuto: copiar o arquivo e colar no Drive. Eu não tenho como fazer isso por você.</span></li>
+      <li><span class="quem">só confirmar · etapa 4</span><b>Apagar _test_out.zip, _teste_e2e.zip e _test_unzip/</b><span>Restos de teste automatizado, sem uso. A regra da casa proíbe a IA de apagar arquivo sem confirmação — falta você dizer "pode apagar".</span></li>
+      <li><span class="quem">você decide · etapa 4</span><b>Destino do index.html.bak</b><span>Backup criado antes da fusão. O git já guarda o histórico do arquivo, então ele é redundante — mas apagar backup é decisão sua.</span></li>
+      <li><span class="quem">só confirmar · etapa 4</span><b>Apagar a pasta vazia "vto zip rep"</b><span>Pasta vazia, criada durante os testes de ZIP. Sem conteúdo nenhum; apagar é seguro.</span></li>
+      <li><span class="quem">você decide · etapa 4</span><b>.claude/ entra ou não no git</b><span>Hoje está ignorado. Se entrar, as skills (voz-do-vto e outras) acompanham o repositório; se continuar fora, se perdem ao trocar de máquina.</span></li>
+    </ul>
+    <p class="fecha">Quando esses 6 fecharem, o checklist vai a 48/48. O app em si não muda em nada — o trabalho de código já está 100% dentro das etapas 1, 2, 3 e R.</p>
+  </section>
 </header>
 
 <section class="regras">
