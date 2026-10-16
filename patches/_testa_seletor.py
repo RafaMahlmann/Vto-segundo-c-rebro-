@@ -64,7 +64,9 @@ async def main():
         n = await frame.locator(".selc-card").count()
         print("3) cartoes CSV:", n, "OK" if n == 6 else "PROBLEMA")
         vals = await frame.locator("#amostra-0 .selc-val").all_text_contents()
-        print("3b) amostras col 0:", vals[:3], "OK" if "12345678" in vals else "PROBLEMA")
+        # MATRICULA nasce em Duble: a previa ao vivo mostra a transformacao (8 digitos), nao o valor cru
+        duble_ok = all(v.isdigit() and len(v) == 8 for v in vals[:3]) and "12345678" not in vals
+        print("3b) amostras col 0 (previa em Duble):", vals[:3], "OK" if duble_ok else "PROBLEMA")
         await page.screenshot(path=str(PRINTS / "08_seletor_csv.png"))
 
         # 4. bolinha: 1 clique muda o estado (e nao seleciona o cartao)
@@ -114,7 +116,9 @@ async def main():
         n2 = await frame.locator(".selc-card").count()
         print("8) cartoes TXT:", n2, "OK" if n2 == 159 else "PROBLEMA")
         vals2 = await frame.locator("#amostra-3 .selc-val").all_text_contents()
-        print("8b) amostra TXT col 3:", vals2[:2], "OK" if any("L0C3" in v for v in vals2) else "PROBLEMA")
+        # MATRICULA tambem nasce em Duble no modo TXT: previa mostra 8 digitos, nao o valor cru
+        duble_ok2 = all(v.isdigit() and len(v) == 8 for v in vals2[:2])
+        print("8b) amostra TXT col 3 (previa em Duble):", vals2[:2], "OK" if duble_ok2 else "PROBLEMA")
         disp2 = await frame.locator("#chip-3 .selc-bol[data-estado='4']").evaluate("el => getComputedStyle(el).display")
         print("8c) TXT mostra Simular:", "OK" if disp2 != "none" else "PROBLEMA")
         # 8f. falsos positivos (ANTES do preset): NOME-BAIRRO/FONTE/RESERVA/ENDER-ALT nascem "Manter"
@@ -133,9 +137,10 @@ async def main():
         dub = await frame.locator(".selc-card.chip-duble").count()
         print("8d) preset SGCG:", "OK" if sim >= 10 and dub >= 1 else f"PROBLEMA {cont2}")
         print("    contador:", cont2)
-        # amostras sobrevivem ao preset (regressao do innerHTML antigo)
+        # previa da amostra continua coerente (Duble) depois do preset
         vals3 = await frame.locator("#amostra-3 .selc-val").all_text_contents()
-        print("8e) amostras sobrevivem ao preset:", "OK" if any("L0C3" in v for v in vals3) else f"PROBLEMA {vals3[:2]}")
+        duble_ok3 = all(v.isdigit() and len(v) == 8 for v in vals3[:2])
+        print("8e) amostra da previa continua em Duble apos o preset:", "OK" if duble_ok3 else f"PROBLEMA {vals3[:2]}")
         await page.screenshot(path=str(PRINTS / "10_seletor_txt_preset.png"), full_page=False)
 
         print("ERROS FINAIS:", erros if erros else "ZERO")

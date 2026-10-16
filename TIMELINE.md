@@ -663,7 +663,50 @@ digitada), editar preserva estado, trocar de arquivo zera tudo. Depois,
 `patches/_testa_seletor.py` (24) e `patches/_test_regressao_completa.py`
 (21) — nenhuma quebra no resto do app.
 
-**Falta (próxima etapa, já combinada com o Rafa):** prévia ao vivo nos
-cartões da galeria — clicar numa bolinha (Anonimizar/Dublê/Simular) deve
-mostrar na hora como os 3 valores de amostra ficariam, sem precisar
-processar o arquivo inteiro.
+---
+
+## PARTE 19 — Prévia ao vivo nos cartões (2026-10-16, anon v19.0.0)
+
+Clicar numa bolinha de estado (Manter/Anonimizar/Dublê/Simular/Excluir)
+agora atualiza na hora os 3 valores de amostra do cartão, mostrando como
+aquele dado ficaria — sem precisar rodar o processamento inteiro pra
+descobrir se "convence ou não" (motivação do Rafa: pegar erro antes).
+
+**Risco de segurança levado a sério:** as funções reais de hash/dublê/
+sintético (`gerarHash`, `formatarDubleMatricula`, `valorSintetico`) leem e
+escrevem em `SALT_HEX`, `MAPA_DUBLE`, `USADOS_DUBLE`, `CONSISTENCIA` — o
+sal e os mapas do **lote de verdade**. Se a prévia usasse essas mesmas
+funções, clicar numa bolinha pra só olhar poderia gastar um número de
+dublê que o processamento real precisava, ou prender o hash da prévia ao
+sal errado. Por isso nasceu um motor de prévia **isolado**: `PREVIA_SALT`,
+`PREVIA_MAPA_DUBLE`, `PREVIA_USADOS_DUBLE`, `PREVIA_CONSISTENCIA` — mesmas
+fórmulas (mesmo SHA-256 + sal + contador), memória própria, nunca toca no
+estado real. Testado e provado: depois de usar a prévia à vontade,
+`SALT_HEX` real continua `null` e `MAPA_DUBLE` real continua vazio.
+
+**Escopo reduzido conscientemente:** Simular em ENDERECO e LOTE depende de
+um mapeamento de ruas/lotes construído varrendo o arquivo inteiro (só
+acontece hoje no processamento de verdade). Replicar isso na prévia exigia
+ou escanear o arquivo de novo a cada clique, ou compartilhar os contadores
+de ocorrência do pool real (o que mudaria sutilmente o resultado do
+processamento real depois). Nenhuma das duas valia o risco — essas duas
+colunas mostram um aviso ("depende do arquivo inteiro — ver após
+processar") em vez de simular. Também não repliquei a sutileza de
+TELEFONE (remove hífen) e `DT-` (desloca data) em estado Manter — a
+prévia nesse estado mostra o valor cru.
+
+**Onde mexeu:** `carregarAmostras()` passou a chamar a prévia transformada
+em vez de mostrar sempre o cru; `selcDefinirEstado()` (clique individual)
+e `aplicarPresetSGCG()` (clique em massa) chamam a mesma função depois de
+mudar o estado. `selcRenderAmostra()` (função antiga, só mostrava o
+original) foi removida — nada mais a chamava.
+
+**Teste:** script Playwright fora do repo (scratchpad), com um TXT
+sintético (nome, CPF, matrícula reais) — confirma que a prévia muda
+com cada estado, é consistente entre cliques, e não toca no sal/mapas
+reais. `patches/_testa_seletor.py` precisou de 3 ajustes: a coluna
+MATRICULA sempre nasceu em Dublê, então a amostra dela nunca foi o valor
+cru — os testes antigos checavam o comportamento de antes da prévia
+existir, por coincidência passavam porque liam o index.html com o
+anonimizador velho ainda embutido. Corrigidos pra checar o dublê (8
+dígitos, ≠ original). 24 + 21 testes, tudo verde.
