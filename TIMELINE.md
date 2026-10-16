@@ -576,3 +576,33 @@ Bump pedido pelo Rafa junto com o pontinho de ajuda do ZIP.
 Subiram juntos: title, badge, 4 rodapes, versao dinamica, VERSAO_LOCAL,
 sw.js (vto-cache-v4.6), version.json (4.6), README, package.json.
 Quem estiver na 4.5 vai ver o banner de nova versao.
+
+---
+
+## PARTE 17 — Integra Etapa 5c com v4.5/v4.6 + versao v4.7 (2026-10-16)
+
+Duas frentes de trabalho tinham avancado separadas sem se cruzar: este
+checkout local tinha a Etapa 5c (correcoes de Ctrl+Z, roleta e aviso do
+reset — Parte 10) commitada só localmente sobre a v4.4, enquanto o GitHub
+já tinha avançado até a v4.6 (Partes 11 a 16) sem essas 3 correções.
+
+**Mesclagem:** a Etapa 5c virou commit próprio, o GitHub foi puxado, e os
+dois lados foram unidos com `git merge`. O `index.html` uniu sozinho, sem
+conflito — só o `TIMELINE.md` precisou de resolução manual (as duas Partes
+novas, cada lado tinha escrito a sua no fim do arquivo). Testado no
+navegador pós-merge: as 3 correções da Etapa 5c continuam valendo (Ctrl+Z
+num campo de texto não mexe mais em matrícula), zero erro de console,
+anonimizador carrega, 30 matrículas mock intactas. Enviado ao GitHub.
+
+**Bump para v4.7:** pedido pelo Rafa — mudança real (a integração acima)
+exige versão nova, mesmo sem funcionalidade visível nova. Subiram juntos:
+title, badge, 4 rodapes, versao dinamica, VERSAO_LOCAL, sw.js
+(vto-cache-v4.7), version.json (4.7), README, package.json.
+
+**Pasta "Calculadora pós sanção" (nunca foi do git):** investigada a
+pedido do Rafa. Confirmado que é o protótipo original e solto da
+calculadora de prazo — o `script.js` dela é linha a linha o mesmo
+algoritmo de `calcularPrazoSancao()`, que já está no `index.html` desde a
+v3.3 (Parte 6). Sem uso, sem referência em lugar nenhum do app. A exclusão
+pelo agente de IA foi bloqueada pela permissão do ambiente; o Rafa precisa
+apagar a pasta manualmente.
