@@ -362,3 +362,25 @@ De quebra, o `gerarMockData()` passou a chamar `limparHistorico()`: os dados de
 demonstração são ponto de partida, não alteração do usuário.
 
 Teste: `patches/_test_etapa5.py` (31 verificações).
+
+### Correções vindas do teste independente (5c)
+
+Um testador por fora achou três coisas, e a primeira era grave.
+
+**O `Ctrl+Z` sequestrava o teclado dentro dos campos.** Digitar uma data e apertar
+`Ctrl+Z` não desfazia o texto: desfazia uma **matrícula**, em silêncio, numa aba
+que a pessoa nem estava vendo — e o campo não mudava, então nada denunciava.
+Parte disso foi piora da própria Etapa 5: o `toLowerCase()` passou a capturar
+também o `Ctrl+Shift+Z`, que antes escapava com `Z` maiúsculo.
+Agora, dentro de `input`, `textarea` ou campo editável, o atalho é do texto.
+
+**As bolinhas da roleta ficavam defasadas** depois de desfazer: o `aplicarEstado()`
+redesenhava tabela e timeline, mas não as roletas do Fluxo.
+
+**O aviso do reset mentia.** Dizia *"Isso nao pode ser desfeito"*, mas o
+`resetarFluxo()` chama `salvarHistorico()` — o teste mediu: `Ctrl+Z` devolve os 56
+serviços. E o reset não apaga "todos os dados": as matrículas continuam na lista.
+O rótulo do botão dizia a mesma inverdade. Os dois foram reescritos pela
+`voz-do-vto` para contar a mesma história, e a verdadeira.
+
+Testes: `patches/_test_etapa5c.py` (18), `_test_etapa5.py` (31), `_test_etapa1.py` (24).

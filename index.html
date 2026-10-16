@@ -829,6 +829,8 @@ function aplicarEstado(texto) {
     atualizarMatriculaAtivaNosCards();
     renderMatriculas();
     atualizarTimeline();
+    // sem isto as bolinhas do Fluxo ficam marcando servico que ja foi desfeito
+    atualizarTodasRoletas();
     atualizarBotoesUndoRedo();
 }
 
@@ -872,10 +874,14 @@ function atualizarBotoesUndoRedo() {
 // Ctrl+Z / Ctrl+Shift+Z
 // e.key vem maiusculo em alguns navegadores quando o Shift esta pressionado.
 document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && String(e.key).toLowerCase() === 'z') {
-        e.preventDefault();
-        e.shiftKey ? redo() : undo();
-    }
+    if (!e.ctrlKey || String(e.key).toLowerCase() !== 'z') return;
+    // Dentro de um campo, o Ctrl+Z e do texto que a pessoa esta digitando.
+    // Sem esta linha ele desfazia uma MATRICULA, calado, numa aba que ela
+    // nem estava vendo - e o campo nao mudava, entao nada denunciava.
+    const alvo = e.target;
+    if (alvo && (alvo.tagName === 'INPUT' || alvo.tagName === 'TEXTAREA' || alvo.isContentEditable)) return;
+    e.preventDefault();
+    e.shiftKey ? redo() : undo();
 });
 
 // ===== CONFIGURACAO DE PRAZOS POR CODIGO =====
@@ -1007,7 +1013,7 @@ function abrirModalConfig() {
     });
     prazosHtml += '</tbody></table></div>';
 
-    box.innerHTML = '<h3>&#9881; Configuracoes</h3><p class="instrucao">Defina o prazo em dias para cada codigo de servico. Padrao: 30 dias.</p><div style="font-size:.8rem;color:#495057;margin-bottom:8px"><strong>Prazos por Codigo:</strong></div>' + prazosHtml + '<div style="border-top:1px solid #e9ecef;margin:12px 0;padding-top:12px"><button onclick="if(confirm(\'Restaurar 30 dias para TODOS os codigos?\')){CODIGOS_SERVICO.forEach(c=>salvarPrazoCodigo(c,30));abrirModalConfig();}" style="padding:6px 12px;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;margin-right:8px">&#8634; Restaurar Padrao</button><button onclick="resetarFluxo()" style="padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600">&#128465; Limpar Todos os Dados</button></div><div class="modal-botoes"><button class="modal-btn salvar" onclick="salvarConfigEFechar()">Salvar e Fechar</button><button class="modal-btn cancelar" onclick="fecharModalConfig()">Cancelar (Esc)</button></div><div class="modal-ajuda-teclas"><div class="modal-ajuda-teclas-title">Dica</div><div class="tecla-hint">Altere o prazo e clique "Salvar e Fechar" para atualizar estatisticas e status.</div></div>';
+    box.innerHTML = '<h3>&#9881; Configuracoes</h3><p class="instrucao">Defina o prazo em dias para cada codigo de servico. Padrao: 30 dias.</p><div style="font-size:.8rem;color:#495057;margin-bottom:8px"><strong>Prazos por Codigo:</strong></div>' + prazosHtml + '<div style="border-top:1px solid #e9ecef;margin:12px 0;padding-top:12px"><button onclick="if(confirm(\'Restaurar 30 dias para TODOS os codigos?\')){CODIGOS_SERVICO.forEach(c=>salvarPrazoCodigo(c,30));abrirModalConfig();}" style="padding:6px 12px;background:#6c757d;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;margin-right:8px">&#8634; Restaurar Padrao</button><button onclick="resetarFluxo()" style="padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600">&#128465; Apagar servicos</button></div><div class="modal-botoes"><button class="modal-btn salvar" onclick="salvarConfigEFechar()">Salvar e Fechar</button><button class="modal-btn cancelar" onclick="fecharModalConfig()">Cancelar (Esc)</button></div><div class="modal-ajuda-teclas"><div class="modal-ajuda-teclas-title">Dica</div><div class="tecla-hint">Altere o prazo e clique "Salvar e Fechar" para atualizar estatisticas e status.</div></div>';
     overlay.classList.add('ativo');
 }
 function salvarConfigEFechar() {
@@ -1728,7 +1734,9 @@ function atualizarMatriculaAtivaNosCards() {
 }
 
 function resetarFluxo() {
-    if (!confirm('Limpar TODOS os dados? Isso nao pode ser desfeito.')) return;
+    if (!confirm('Apagar os servicos de todas as matriculas?\n\n'
+        + 'As matriculas continuam na lista. Sai so o que foi registrado nelas.\n\n'
+        + 'Da para voltar atras com Ctrl+Z.')) return;
     salvarHistorico();
     matriculas.forEach(m => { m.servicos = []; m.ativa = false; });
     matriculaAtiva = null;
