@@ -606,3 +606,64 @@ algoritmo de `calcularPrazoSancao()`, que já está no `index.html` desde a
 v3.3 (Parte 6). Sem uso, sem referência em lugar nenhum do app. A exclusão
 pelo agente de IA foi bloqueada pela permissão do ambiente; o Rafa precisa
 apagar a pasta manualmente.
+
+---
+
+## PARTE 18 — Filtro de linhas no Anonimizador (2026-10-16, anon v19.0.0)
+
+O botão verde "Aplicar Padrão Power Query" escondia um filtro travado:
+só processava linhas onde a coluna LOCAL (posições fixas 3-6 do TXT) fosse
+exatamente "001". Sem jeito de trocar — toda cidade/unidade que não fosse
+a 001 ficava de fora, mesmo sendo uma decisão do Rafa, não do código.
+
+**Pesquisa primeiro:** antes de construir, procurei por bibliotecas prontas
+de filtro estilo Excel/Power Query (pedido do Rafa). Não existe nada de
+graça e sem dependência — as robustas são Syncfusion/Handsontable (pagas)
+ou presas a framework (React/jQuery). Incompatível com a regra de zero
+dependência do projeto. Ficaram 3 convenções validadas que foram copiadas
+pro design: busca dentro da lista de valores, limite de 1000 valores
+distintos pra colunas de alta cardinalidade, confirmar antes de aplicar.
+
+**O que entrou:** o filtro virou um painel próprio ("Filtrar linhas antes
+de processar"), separado da aplicação das regras de anonimização do botão
+verde. Cada filtro tem duas abas:
+- **Digitar valores** (padrão): cola ou digita uma lista (matrícula, por
+  exemplo) — não escaneia o arquivo, é instantâneo. Pensado pra colunas
+  de alta cardinalidade (160 mil matrículas não cabem em checklist).
+- **Marcar da lista**: varre o arquivo inteiro, lista os valores que
+  realmente aparecem naquela coluna (com contagem), com busca e
+  marcar/desmarcar tudo. Bom pra colunas com poucas variações (LOCAL,
+  UNIDADE, CATEG).
+
+Vários filtros empilham e combinam sempre com **E** — ex.: UNIDADE = 220
+e CATEG = 011, ou uma lista de matrículas e LOCAL = 001 ao mesmo tempo.
+Editar um filtro existente reabre na aba certa, com o estado anterior.
+Trocar de arquivo zera os filtros. O botão verde continua só com as
+regras de anonimização; quem quer restringir linhas usa o painel.
+
+**Onde mexeu (anonimizador.html, depois reembutido no index.html):**
+`FILTRAR_LOCAL_001` (flag binária) virou `FILTROS_LINHA` (lista de regras);
+`linhaPassaFiltros()` checa as duas pelos 2 pontos que já filtravam
+(`coletarPools()` e o laço principal); `PRESET_SGCG_APLICADO` assumiu o
+papel que a flag velha tinha na ordenação de colunas do preset.
+
+**Bug achado e corrigido durante o teste:** o botão "Aplicar filtro"
+reusava a classe `.btn-pq`, que é `display:none` por padrão (só o botão
+verde principal liga ela via JS) — o botão de confirmar ficava invisível
+e fora da viewport. Criada `.filtro-btn-aplicar` dedicada. Um segundo bug:
+reabrir um filtro do tipo "lista" pra editar caía sempre na aba "Digitar"
+em vez de "Marcar da lista" — `filtroEditar()` checava o tipo errado.
+
+**Teste:** arquivo TXT sintético de 20 linhas com 3 grupos controlados
+(UNIDADE/LOCAL/CATEG/MATRICULA), injetado via `DataTransfer` direto no
+`#fileInput` (sem precisar de diálogo). Confirmado: contagem por valor
+bate, os dois modos combinam com E de verdade (uma matrícula do grupo
+certo passa, uma do grupo errado é barrada mesmo estando na lista
+digitada), editar preserva estado, trocar de arquivo zera tudo. Depois,
+`patches/_testa_seletor.py` (24) e `patches/_test_regressao_completa.py`
+(21) — nenhuma quebra no resto do app.
+
+**Falta (próxima etapa, já combinada com o Rafa):** prévia ao vivo nos
+cartões da galeria — clicar numa bolinha (Anonimizar/Dublê/Simular) deve
+mostrar na hora como os 3 valores de amostra ficariam, sem precisar
+processar o arquivo inteiro.

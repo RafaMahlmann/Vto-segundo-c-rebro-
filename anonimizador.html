@@ -330,6 +330,73 @@
         @media (prefers-reduced-motion: reduce) {
             .selc-card, .selc-barra, .selc-bol, .selc-contador, .selc-btn-mini { animation: none !important; transition: none !important; }
         }
+
+        /* ===== FILTRAR LINHAS: chips + painel de escolha (lista ou digitar) ===== */
+        .filtro-linhas { margin: 16px 0 25px; }
+        body.selc-modo-csv .filtro-linhas { display: none; }
+        .filtro-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+        .filtro-vazio-msg { font-size: 13px; color: var(--text-secondary); }
+        .filtro-chip {
+            display: inline-flex; align-items: center; gap: 2px; background: #F2F8FD;
+            border: 1px solid rgba(0,122,255,0.2); border-radius: 100px; padding: 2px 2px 2px 14px;
+        }
+        .filtro-chip-editar {
+            width: auto; background: none; box-shadow: none; color: var(--ios-blue); border: none;
+            padding: 6px 4px; margin: 0; font-size: 12px; font-weight: 600; cursor: pointer;
+        }
+        .filtro-chip-x {
+            width: 22px; height: 22px; padding: 0; margin: 0; border-radius: 50%; border: none;
+            background: rgba(0,122,255,0.12); color: var(--ios-blue); font-size: 12px; font-weight: 700;
+            box-shadow: none; cursor: pointer; line-height: 1;
+        }
+        .filtro-chip-x:hover { background: var(--error-red); color: #fff; }
+
+        .filtro-overlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1000;
+            align-items: center; justify-content: center; padding: 20px;
+        }
+        .filtro-overlay.aberto { display: flex; }
+        .filtro-painel {
+            background: var(--ios-card); border-radius: 20px; padding: 26px; width: 100%; max-width: 440px;
+            max-height: 85vh; overflow-y: auto; box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+        .filtro-painel h3 { margin: 0 0 14px; font-size: 17px; font-weight: 700; }
+        .filtro-col-lista { max-height: 50vh; overflow-y: auto; margin: 12px 0; display: flex; flex-direction: column; gap: 4px; }
+        .filtro-col-opcao {
+            width: 100%; text-align: left; background: #FAFAFA; color: var(--text-primary); border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 10px 14px; margin: 0; font-size: 13px; font-weight: 500; box-shadow: none; cursor: pointer;
+        }
+        .filtro-col-opcao:hover { background: var(--ios-blue); color: #fff; border-color: var(--ios-blue); transform: none; box-shadow: none; }
+        .filtro-abas { display: flex; gap: 6px; margin-bottom: 14px; }
+        .filtro-aba {
+            width: auto; flex: 1; background: #F2F2F7; color: var(--text-secondary); border: none;
+            border-radius: 10px; padding: 9px; margin: 0; font-size: 12px; font-weight: 700; box-shadow: none; cursor: pointer;
+        }
+        .filtro-aba.ativa { background: var(--text-primary); color: #fff; }
+        .filtro-carregando { color: var(--text-secondary); font-size: 13px; text-align: center; padding: 20px 0; }
+        .filtro-aviso { background: #FFF6E5; color: #A15C00; border-radius: 10px; padding: 10px 12px; font-size: 12px; margin-bottom: 10px; }
+        .filtro-val-acoes { display: flex; gap: 8px; margin: 10px 0; }
+        .filtro-val-lista { max-height: 38vh; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 10px; }
+        .filtro-valor-item {
+            display: flex; align-items: center; gap: 10px; padding: 8px 12px; font-size: 13px;
+            border-bottom: 1px solid #F2F2F7; cursor: pointer;
+        }
+        .filtro-valor-item:last-child { border-bottom: none; }
+        .filtro-valor-item input { width: auto; padding: 0; margin: 0; box-shadow: none; }
+        .filtro-valor-item span:first-of-type { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'SF Mono', 'Menlo', monospace; }
+        .filtro-valor-n { color: var(--text-secondary); font-size: 11px; }
+        .filtro-digitar-area {
+            width: 100%; min-height: 110px; padding: 12px 14px; border: 1px solid var(--border-color);
+            border-radius: 12px; font-size: 13px; font-family: 'SF Mono', 'Menlo', monospace; resize: vertical;
+        }
+        .filtro-digitar-contagem { font-size: 12px; color: var(--text-secondary); margin: 8px 0 0; }
+        .filtro-val-rodape { display: flex; gap: 8px; margin-top: 16px; }
+        .filtro-val-rodape button { margin: 0; }
+        .filtro-btn-aplicar {
+            display: block; width: auto; flex: 1; padding: 10px 16px; font-size: 13px; margin: 0;
+            background: linear-gradient(135deg, #34C759 0%, #30B753 100%); box-shadow: none;
+        }
+        .filtro-btn-aplicar:hover { box-shadow: 0 4px 14px rgba(52, 199, 89, 0.35); }
     </style>
 </head>
 <body>
@@ -369,8 +436,21 @@
         <div class="column-manager" id="columnManager">
             <button id="btnPowerQuery" class="btn-pq" onclick="aplicarPresetSGCG()">
                 ⚡ Aplicar Padrão Power Query (SGCG) em Todos
-                <br><span style="font-size: 12px; font-weight: 400; opacity: 0.9">Filtra Local 001, Seleciona Colunas e Configura Simulação Realista</span>
+                <br><span style="font-size: 12px; font-weight: 400; opacity: 0.9">Seleciona Colunas e Configura Simulação Realista</span>
             </button>
+
+            <div class="filtro-linhas" id="filtroLinhasBox">
+                <label>
+                    Filtrar linhas antes de processar (opcional)
+                    <span class="instruction-note">Escolha uma coluna e os valores que quer manter. Mais de um filtro combina com E — ex.: UNIDADE = 220 e CATEG = 011.</span>
+                </label>
+                <div class="filtro-chips" id="filtroChips"></div>
+                <button type="button" class="selc-btn-mini" onclick="filtroAbrirEscolhaColuna()">+ Adicionar filtro</button>
+            </div>
+
+            <div class="filtro-overlay" id="filtroOverlay">
+                <div class="filtro-painel" id="filtroCorpo"></div>
+            </div>
 
             <label>
                 2. Configuração de Colunas (Aplicada a todos os arquivos)
@@ -832,7 +912,14 @@
     // ===========================================================================
     // ESTADO DA INTERFACE
     // ===========================================================================
-    let FILTRAR_LOCAL_001 = false;
+    // Filtro de linhas (Power Query): cada regra e {colId, nome, tipo:'lista'|'busca', valoresExcluidos|valoresIncluidos}
+    let FILTROS_LINHA = [];
+    let PRESET_SGCG_APLICADO = false;
+    const LIMITE_VALORES_FILTRO = 1000;
+    let FILTRO_EDITANDO = null;
+    let FILTRO_VALORES_TEMP = null;
+    let FILTRO_VALORES_ORDENADOS = [];
+    let FILTRO_EXCLUIDOS_TEMP = new Set();
     let ORDEM_PRESET = [];
     let MODO_ATUAL = "";
     let CSV_DELIMITADOR = ";";
@@ -892,7 +979,9 @@
         document.getElementById('btnProcess').disabled = !CRYPTO_DISPONIVEL;
         document.getElementById('btnCert').style.display = 'none';
 
-        FILTRAR_LOCAL_001 = false;
+        FILTROS_LINHA = [];
+        PRESET_SGCG_APLICADO = false;
+        filtroRenderChips();
         COLUNAS_DETECTADAS = [];
         document.getElementById('chipsContainer').innerHTML = "";
         SELECIONADAS.clear(); AMOSTRAS = {};
@@ -1139,6 +1228,230 @@
     }
 
     // ===========================================================================
+    // FILTRO DE LINHAS — qualquer coluna, marcar da lista ou digitar valores
+    // ===========================================================================
+    function linhaPassaFiltros(linha) {
+        for (const f of FILTROS_LINHA) {
+            const valor = extrairCampoTxt(linha, f.colId);
+            if (f.tipo === 'busca') {
+                if (!f.valoresIncluidos.has(valor)) return false;
+            } else if (f.valoresExcluidos.has(valor)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function filtroRenderChips() {
+        const box = document.getElementById('filtroChips');
+        if (!box) return;
+        if (!FILTROS_LINHA.length) { box.innerHTML = '<span class="filtro-vazio-msg">Nenhum filtro — processa todas as linhas.</span>'; return; }
+        box.innerHTML = FILTROS_LINHA.map(f => {
+            const resumo = f.tipo === 'busca'
+                ? `${f.valoresIncluidos.size} valor(es) digitado(s)`
+                : (f.valoresExcluidos.size === 0 ? 'todos os valores' : `exclui ${f.valoresExcluidos.size} valor(es)`);
+            return `<span class="filtro-chip">` +
+                `<button type="button" class="filtro-chip-editar" onclick="filtroEditar(${f.colId})">${selcEsc(f.nome)}: ${resumo}</button>` +
+                `<button type="button" class="filtro-chip-x" onclick="filtroRemover(${f.colId})" title="Remover filtro">✕</button>` +
+                `</span>`;
+        }).join('');
+    }
+
+    function filtroRemover(colId) {
+        FILTROS_LINHA = FILTROS_LINHA.filter(f => f.colId !== colId);
+        filtroRenderChips();
+    }
+
+    function filtroFechar() {
+        document.getElementById('filtroOverlay').classList.remove('aberto');
+        FILTRO_EDITANDO = null;
+        FILTRO_VALORES_TEMP = null;
+        FILTRO_VALORES_ORDENADOS = [];
+        FILTRO_EXCLUIDOS_TEMP = new Set();
+    }
+
+    function filtroAbrirEscolhaColuna() {
+        if (!COLUNAS_DETECTADAS.length) { alert("Carregue um arquivo TXT primeiro."); return; }
+        FILTRO_EDITANDO = null;
+        const corpo = document.getElementById('filtroCorpo');
+        const colunasJaUsadas = new Set(FILTROS_LINHA.map(f => f.colId));
+        const opcoes = Object.keys(MAPA_NOMES_TXT)
+            .filter(id => !colunasJaUsadas.has(Number(id)))
+            .map(id => `<button type="button" class="filtro-col-opcao" onclick="filtroEscolherColuna(${id})">${selcEsc(MAPA_NOMES_TXT[id])}</button>`)
+            .join('');
+        corpo.innerHTML =
+            `<h3>Filtrar por qual coluna?</h3>` +
+            `<input type="text" id="filtroColBusca" class="selc-busca" placeholder="🔍 Buscar coluna..." oninput="filtroFiltrarColunas()">` +
+            `<div class="filtro-col-lista" id="filtroColLista">${opcoes}</div>` +
+            `<button type="button" class="selc-btn-mini" onclick="filtroFechar()">Cancelar</button>`;
+        document.getElementById('filtroOverlay').classList.add('aberto');
+    }
+
+    function filtroFiltrarColunas() {
+        const q = selcNorm(document.getElementById('filtroColBusca').value.trim());
+        document.querySelectorAll('.filtro-col-opcao').forEach(btn => {
+            btn.style.display = !q || selcNorm(btn.textContent).includes(q) ? '' : 'none';
+        });
+    }
+
+    function filtroEditar(colId) {
+        document.getElementById('filtroOverlay').classList.add('aberto');
+        const existente = FILTROS_LINHA.find(f => f.colId === colId);
+        if (existente && existente.tipo === 'lista') filtroAbaLista(colId);
+        else filtroAbaDigitar(colId);
+    }
+
+    function filtroEscolherColuna(colId) {
+        colId = Number(colId);
+        FILTRO_EDITANDO = colId;
+        filtroAbaDigitar(colId);
+    }
+
+    function filtroAbas(colId, abaAtiva) {
+        return `<div class="filtro-abas">` +
+            `<button type="button" class="filtro-aba ${abaAtiva === 'digitar' ? 'ativa' : ''}" onclick="filtroAbaDigitar(${colId})">⌨️ Digitar valores</button>` +
+            `<button type="button" class="filtro-aba ${abaAtiva === 'lista' ? 'ativa' : ''}" onclick="filtroAbaLista(${colId})">📋 Marcar da lista</button>` +
+            `</div>`;
+    }
+
+    function filtroAbaDigitar(colId) {
+        FILTRO_EDITANDO = colId;
+        const nome = MAPA_NOMES_TXT[colId];
+        const existente = FILTROS_LINHA.find(f => f.colId === colId);
+        const textoInicial = (existente && existente.tipo === 'busca') ? Array.from(existente.valoresIncluidos).join('\n') : '';
+        const corpo = document.getElementById('filtroCorpo');
+        corpo.innerHTML =
+            `<h3>Filtrar por ${selcEsc(nome)}</h3>` +
+            filtroAbas(colId, 'digitar') +
+            `<textarea class="filtro-digitar-area" id="filtroDigitarValor" placeholder="Um valor por linha, ou separados por vírgula.&#10;Ex.: 10045213, 10045214" oninput="filtroAtualizarContagemDigitada()">${selcEsc(textoInicial)}</textarea>` +
+            `<p class="filtro-digitar-contagem" id="filtroDigitarContagem"></p>` +
+            `<div class="filtro-val-rodape">` +
+            `<button type="button" class="selc-btn-mini" onclick="filtroFechar()">Cancelar</button>` +
+            `<button type="button" class="filtro-btn-aplicar" onclick="filtroConfirmarDigitado(${colId})">Aplicar filtro</button>` +
+            `</div>`;
+        filtroAtualizarContagemDigitada();
+        document.getElementById('filtroDigitarValor').focus();
+    }
+
+    function filtroParsearValoresDigitados(texto) {
+        return new Set(texto.split(/[\n,;]+/).map(v => v.trim()).filter(v => v.length > 0));
+    }
+
+    function filtroAtualizarContagemDigitada() {
+        const texto = document.getElementById('filtroDigitarValor').value;
+        const n = filtroParsearValoresDigitados(texto).size;
+        document.getElementById('filtroDigitarContagem').textContent =
+            n === 0 ? 'Nenhum valor reconhecido ainda.' : (n === 1 ? '1 valor reconhecido.' : `${n} valores reconhecidos.`);
+    }
+
+    function filtroConfirmarDigitado(colId) {
+        const texto = document.getElementById('filtroDigitarValor').value;
+        const valoresIncluidos = filtroParsearValoresDigitados(texto);
+        if (!valoresIncluidos.size) { alert("Digite ao menos um valor."); return; }
+        const nome = MAPA_NOMES_TXT[colId];
+        const regra = { colId, nome, tipo: 'busca', valoresIncluidos };
+        const idx = FILTROS_LINHA.findIndex(f => f.colId === colId);
+        if (idx >= 0) FILTROS_LINHA[idx] = regra; else FILTROS_LINHA.push(regra);
+        filtroFechar();
+        filtroRenderChips();
+    }
+
+    async function filtroColetarValoresDistintos(colId) {
+        const contagem = new Map();
+        let truncado = false;
+        const reader = FILE_REF.stream().getReader();
+        const decoder = new TextDecoder(CSV_ENCODING);
+        let buffer = "";
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const linhas = buffer.split(/\r?\n/);
+            buffer = linhas.pop();
+            for (const linha of linhas) {
+                if (linha.length < 2) continue;
+                const val = extrairCampoTxt(linha, colId);
+                if (!contagem.has(val) && contagem.size >= LIMITE_VALORES_FILTRO) { truncado = true; continue; }
+                contagem.set(val, (contagem.get(val) || 0) + 1);
+            }
+        }
+        return { contagem, truncado };
+    }
+
+    async function filtroAbaLista(colId) {
+        FILTRO_EDITANDO = colId;
+        const nome = MAPA_NOMES_TXT[colId];
+        const corpo = document.getElementById('filtroCorpo');
+        corpo.innerHTML = `<h3>Filtrar por ${selcEsc(nome)}</h3>` + filtroAbas(colId, 'lista') +
+            `<p class="filtro-carregando">Lendo valores do arquivo…</p>`;
+
+        const existente = FILTROS_LINHA.find(f => f.colId === colId);
+        const { contagem, truncado } = await filtroColetarValoresDistintos(colId);
+        FILTRO_VALORES_TEMP = { contagem, truncado };
+        FILTRO_EXCLUIDOS_TEMP = (existente && existente.tipo === 'lista') ? new Set(existente.valoresExcluidos) : new Set();
+        filtroRenderValores(colId);
+    }
+
+    function filtroRenderValores(colId) {
+        const nome = MAPA_NOMES_TXT[colId];
+        const { contagem, truncado } = FILTRO_VALORES_TEMP;
+        FILTRO_VALORES_ORDENADOS = Array.from(contagem.entries())
+            .map(([valor, n]) => ({ valor, n }))
+            .sort((a, b) => a.valor.localeCompare(b.valor));
+
+        const linhas = FILTRO_VALORES_ORDENADOS.map((item, idx) => {
+            const marcado = !FILTRO_EXCLUIDOS_TEMP.has(item.valor);
+            const label = item.valor === '' ? '(vazio)' : selcEsc(item.valor);
+            return `<label class="filtro-valor-item" data-idx="${idx}">` +
+                `<input type="checkbox" ${marcado ? 'checked' : ''} onchange="filtroAlternarValor(${idx}, this.checked)">` +
+                `<span>${label}</span><span class="filtro-valor-n">${item.n}</span></label>`;
+        }).join('');
+
+        const corpo = document.getElementById('filtroCorpo');
+        corpo.innerHTML = `<h3>Filtrar por ${selcEsc(nome)}</h3>` + filtroAbas(colId, 'lista') +
+            (truncado ? `<p class="filtro-aviso">Mais de ${LIMITE_VALORES_FILTRO} valores diferentes — mostrando os ${LIMITE_VALORES_FILTRO} primeiros. Pra uma coluna assim (ex.: matrícula), use "Digitar valores".</p>` : '') +
+            `<input type="text" id="filtroValBusca" class="selc-busca" placeholder="🔍 Buscar valor..." oninput="filtroFiltrarValores()">` +
+            `<div class="filtro-val-acoes">` +
+            `<button type="button" class="selc-btn-mini" onclick="filtroMarcarTodos(${colId}, true)">Marcar todos</button>` +
+            `<button type="button" class="selc-btn-mini" onclick="filtroMarcarTodos(${colId}, false)">Desmarcar todos</button>` +
+            `</div>` +
+            `<div class="filtro-val-lista" id="filtroValLista">${linhas}</div>` +
+            `<div class="filtro-val-rodape">` +
+            `<button type="button" class="selc-btn-mini" onclick="filtroFechar()">Cancelar</button>` +
+            `<button type="button" class="filtro-btn-aplicar" onclick="filtroConfirmarLista(${colId})">Aplicar filtro</button>` +
+            `</div>`;
+    }
+
+    function filtroAlternarValor(idx, marcado) {
+        const valor = FILTRO_VALORES_ORDENADOS[idx].valor;
+        if (marcado) FILTRO_EXCLUIDOS_TEMP.delete(valor); else FILTRO_EXCLUIDOS_TEMP.add(valor);
+    }
+
+    function filtroFiltrarValores() {
+        const q = selcNorm(document.getElementById('filtroValBusca').value.trim());
+        document.querySelectorAll('#filtroValLista .filtro-valor-item').forEach(el => {
+            const idx = Number(el.dataset.idx);
+            el.style.display = !q || selcNorm(FILTRO_VALORES_ORDENADOS[idx].valor).includes(q) ? '' : 'none';
+        });
+    }
+
+    function filtroMarcarTodos(colId, marcar) {
+        FILTRO_VALORES_ORDENADOS.forEach(item => {
+            if (marcar) FILTRO_EXCLUIDOS_TEMP.delete(item.valor); else FILTRO_EXCLUIDOS_TEMP.add(item.valor);
+        });
+        filtroRenderValores(colId);
+    }
+
+    function filtroConfirmarLista(colId) {
+        const nome = MAPA_NOMES_TXT[colId];
+        const regra = { colId, nome, tipo: 'lista', valoresExcluidos: new Set(FILTRO_EXCLUIDOS_TEMP) };
+        const idx = FILTROS_LINHA.findIndex(f => f.colId === colId);
+        if (idx >= 0) FILTROS_LINHA[idx] = regra; else FILTROS_LINHA.push(regra);
+        filtroFechar();
+        filtroRenderChips();
+    }
+
+    // ===========================================================================
     // PRESET POWER QUERY (SGCG) — v19: identidade e endereço viram SIMULAÇÃO
     // ===========================================================================
     function aplicarPresetSGCG() {
@@ -1146,7 +1459,7 @@
             alert("Este padrão só funciona para arquivos TXT (SGCG).");
             return;
         }
-        FILTRAR_LOCAL_001 = true;
+        PRESET_SGCG_APLICADO = true;
 
         const CONFIG_PRESET = {
             3: 3,    // MATRICULA -> Dublê
@@ -1181,7 +1494,7 @@
         });
 
         log("⚡ Padrão Power Query v19 Aplicado:");
-        log("   -> Filtro Ativo: Apenas LOCAL = 001");
+        log("   -> Quer restringir a uma unidade/local/categoria? Use 'Filtrar linhas' acima.");
         log("   -> Identidade/Endereço: SIMULAÇÃO (mundo fictício geo-coerente)");
         log("   -> Matrícula: Dublê irreversível (sal efêmero)");
     }
@@ -1219,7 +1532,7 @@
             buffer = lines.pop();
             for (let linha of lines) {
                 if (linha.length < 2) continue;
-                if (FILTRAR_LOCAL_001 && linha.substring(3, 6) !== "001") continue;
+                if (!linhaPassaFiltros(linha)) continue;
                 if (usaRua) {
                     const bairro = normalizar(extrairCampoTxt(linha, 13));
                     const rua = extrairCampoTxt(linha, 5);
@@ -1251,7 +1564,7 @@
         if (!sufixoNome) { alert("Defina o sufixo ou nome do arquivo final."); return; }
 
         let colunasAtivas = COLUNAS_DETECTADAS.filter(c => c.estado !== 0);
-        if (FILTRAR_LOCAL_001 && ORDEM_PRESET.length > 0) {
+        if (PRESET_SGCG_APLICADO && ORDEM_PRESET.length > 0) {
             colunasAtivas.sort((a, b) => {
                 const iA = ORDEM_PRESET.indexOf(a.id), iB = ORDEM_PRESET.indexOf(b.id);
                 return (iA === -1 ? 999 : iA) - (iB === -1 ? 999 : iB);
@@ -1338,7 +1651,7 @@
 
                     for (let linha of lines) {
                         if (linha.length < 2) continue;
-                        if (MODO_ATUAL === "TXT" && FILTRAR_LOCAL_001 && linha.substring(3, 6) !== "001") {
+                        if (MODO_ATUAL === "TXT" && !linhaPassaFiltros(linha)) {
                             linhasIgnoradas++;
                             continue;
                         }
