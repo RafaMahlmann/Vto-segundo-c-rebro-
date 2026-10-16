@@ -399,6 +399,43 @@
             background: linear-gradient(135deg, #34C759 0%, #30B753 100%); box-shadow: none;
         }
         .filtro-btn-aplicar:hover { box-shadow: 0 4px 14px rgba(52, 199, 89, 0.35); }
+        .filtro-btn-aplicar:disabled { background: #E5E5EA; color: #AEAEB2; cursor: not-allowed; }
+
+        /* ---------- opcoes avancadas (agrupa preset + filtro + manual) ---------- */
+        .opcoes-avancadas { background: #FAFAFA; border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 18px 6px; margin-bottom: 20px; }
+        .opcoes-avancadas-titulo { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; }
+        .opcoes-avancadas .btn-pq { margin-bottom: 16px; }
+
+        /* ---------- estado Manual (6o) ---------- */
+        .selc-bol[data-estado="5"] { background: #5856D6; color: #5856D6; }
+        .chip-manual.selc-card { outline: 1px solid rgba(88,86,214,.3); }
+        .selc-val-manual { color: #5856D6; font-weight: 600; }
+
+        /* ---------- editor de edicao manual ---------- */
+        .manual-painel { max-width: 680px; }
+        .manual-aviso {
+            background: #FFF1F0; border: 1px solid rgba(255,59,48,.25); color: #B42318;
+            border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.5; margin: 4px 0 16px;
+        }
+        .manual-qtd-label { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+        .manual-qtd-label input {
+            display: inline-block !important; width: 80px !important; padding: 8px 10px !important;
+            border-radius: 10px !important; font-size: 13px;
+        }
+        .manual-lista { max-height: 44vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+        .manual-linha-input {
+            display: block !important; width: 100% !important; padding: 10px 12px !important;
+            border-radius: 10px !important; font-size: 13px; font-family: 'SF Mono', 'Menlo', monospace;
+            border-color: #5856D6 !important;
+        }
+        .manual-risco-check {
+            display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600;
+            color: #B42318; margin: 6px 0; cursor: pointer;
+        }
+        .manual-risco-check input { width: auto; margin-top: 2px; }
+        .manual-btn-aplicar { background: linear-gradient(135deg, #5856D6 0%, #4644b8 100%); }
+        .manual-btn-aplicar:not(:disabled):hover { box-shadow: 0 4px 14px rgba(88,86,214,.35); }
+        .manual-btn-aplicar:active:not(:disabled) { transform: scale(.97); }
     </style>
 </head>
 <body>
@@ -436,22 +473,33 @@
         </div>
 
         <div class="column-manager" id="columnManager">
-            <button id="btnPowerQuery" class="btn-pq" onclick="aplicarPresetSGCG()">
-                ⚡ Aplicar Padrão Power Query (SGCG) em Todos
-                <br><span style="font-size: 12px; font-weight: 400; opacity: 0.9">Seleciona Colunas e Configura Simulação Realista</span>
-            </button>
+            <div class="opcoes-avancadas">
+                <div class="opcoes-avancadas-titulo">⚙️ Opções avançadas de processamento</div>
+                <button id="btnPowerQuery" class="btn-pq" onclick="aplicarPresetSGCG()">
+                    ⚡ Aplicar Padrão Power Query (SGCG) em Todos
+                    <br><span style="font-size: 12px; font-weight: 400; opacity: 0.9">Seleciona Colunas e Configura Simulação Realista</span>
+                </button>
 
-            <div class="filtro-linhas" id="filtroLinhasBox">
-                <label>
-                    Filtrar linhas antes de processar (opcional)
-                    <span class="instruction-note">Escolha uma coluna e os valores que quer manter. Mais de um filtro combina com E — ex.: UNIDADE = 220 e CATEG = 011.</span>
-                </label>
-                <div class="filtro-chips" id="filtroChips"></div>
-                <button type="button" class="selc-btn-mini" onclick="filtroAbrirEscolhaColuna()">+ Adicionar filtro</button>
+                <div class="filtro-linhas" id="filtroLinhasBox">
+                    <label>
+                        Filtrar linhas antes de processar (opcional)
+                        <span class="instruction-note">Escolha uma coluna e os valores que quer manter. Mais de um filtro combina com E — ex.: UNIDADE = 220 e CATEG = 011.</span>
+                    </label>
+                    <div class="filtro-chips" id="filtroChips"></div>
+                    <button type="button" class="selc-btn-mini" onclick="filtroAbrirEscolhaColuna()">+ Adicionar filtro</button>
+                </div>
+
+                <div class="instruction-note" style="display:block;margin-top:10px">
+                    ✍️ Edição manual: clique na bolinha roxo-azulada de qualquer coluna, na lista abaixo.
+                </div>
             </div>
 
             <div class="filtro-overlay" id="filtroOverlay">
                 <div class="filtro-painel" id="filtroCorpo"></div>
+            </div>
+
+            <div class="filtro-overlay" id="manualOverlay">
+                <div class="filtro-painel manual-painel" id="manualCorpo"></div>
             </div>
 
             <label>
@@ -473,6 +521,11 @@
                     <span class="help-icon" data-tooltip="Simulação realista: ruas reais trocadas entre matrículas do mesmo bairro, números randomizados (nunca iguais ao original), CPF/RG/telefone sintéticos válidos, datas deslocadas mantendo a cronologia.&#10;O mapa funciona, a estatística é real, mas nada aponta para pessoas ou endereços verdadeiros.">?</span>
                 </div>
                 <div class="legend-item"><span class="dot" style="background:#C7C7CC"></span> Excluir</div>
+                <div class="legend-item" style="display:flex; align-items:center;">
+                    <span class="dot" style="background:#5856D6"></span>
+                    ✍️ Manual
+                    <span class="help-icon" data-tooltip="Voce digita o valor a mao, linha por linha (ate 50). O que nao for editado sai vazio nessa coluna. Bypassa o anonimizador automatico — risco e seu.">?</span>
+                </div>
             </div>
 
             <div class="selc-toolbar">
@@ -900,6 +953,16 @@
                 .map(v => `<span class="selc-val">${selcEsc(v === '' ? '—' : v)}</span>`).join('');
             return;
         }
+        if (col.estado === 5) {
+            const edicoes = EDICOES_MANUAIS.get(id);
+            box.innerHTML = [0, 1, 2].map(idx => {
+                const v = edicoes ? edicoes.get(idx) : undefined;
+                return v !== undefined
+                    ? `<span class="selc-val selc-val-manual">${selcEsc(v)}</span>`
+                    : `<span class="selc-val selc-val-excluida">(sem edição aqui)</span>`;
+            }).join('');
+            return;
+        }
         const transformados = await Promise.all(originais.slice(0, 3).map(v => previaTransformar(v, col.nome, col.estado)));
         box.innerHTML = transformados.map(v => {
             if (v === '' || v === undefined || v === null) return '<span class="selc-val">—</span>';
@@ -1057,6 +1120,11 @@
     // Filtro de linhas (Power Query): cada regra e {colId, nome, tipo:'lista'|'busca', valoresExcluidos|valoresIncluidos}
     let FILTROS_LINHA = [];
     let PRESET_SGCG_APLICADO = false;
+    // Edicao manual por coluna: colId -> Map(numeroLinhaAbsoluto -> valor digitado).
+    // Linha nao presente no Map sai vazia no arquivo final (e intencional, nao e bug).
+    const EDICOES_MANUAIS = new Map();
+    let MANUAL_EDITANDO = null;
+    let MANUAL_LINHAS_CARREGADAS = []; // [{idx, original}] da coluna em edicao agora
     const LIMITE_VALORES_FILTRO = 1000;
     let FILTRO_EDITANDO = null;
     let FILTRO_VALORES_TEMP = null;
@@ -1123,6 +1191,7 @@
 
         FILTROS_LINHA = [];
         PRESET_SGCG_APLICADO = false;
+        EDICOES_MANUAIS.clear();
         filtroRenderChips();
         COLUNAS_DETECTADAS = [];
         document.getElementById('chipsContainer').innerHTML = "";
@@ -1212,9 +1281,10 @@
             `<span class="selc-nome" title="${selcEsc(nome)}">${selcEsc(nome)}</span></div>` +
             `<div class="selc-amostras" id="amostra-${id}"><span class="selc-val">…</span></div>` +
             `<div class="selc-linha"><div class="selc-bolinhas">` +
-            [1, 2, 3, 4, 0].map(e =>
-                `<button type="button" class="selc-bol" data-estado="${e}" title="${selcNomeEstado(e)}" onclick="event.stopPropagation(); selcDefinirEstado(${id}, ${e})"></button>`
-            ).join('') +
+            [1, 2, 3, 4, 5, 0].map(e => {
+                const acao = e === 5 ? `manualAbrirEditor(${id})` : `selcDefinirEstado(${id}, ${e})`;
+                return `<button type="button" class="selc-bol" data-estado="${e}" title="${selcNomeEstado(e)}" onclick="event.stopPropagation(); ${acao}"></button>`;
+            }).join('') +
             `</div><span class="selc-estado-rotulo"></span></div>`;
         chip.onclick = () => selcAlternarSelecao(id);
         atualizarVisualChip(chip, nome, estadoInicial);
@@ -1233,8 +1303,8 @@
     }
 
     function atualizarVisualChip(el, nome, estado) {
-        el.classList.remove('chip-normal', 'chip-anon', 'chip-exclude', 'chip-duble', 'chip-simular');
-        const classe = { 1: 'chip-normal', 2: 'chip-anon', 3: 'chip-duble', 4: 'chip-simular', 0: 'chip-exclude' }[estado];
+        el.classList.remove('chip-normal', 'chip-anon', 'chip-exclude', 'chip-duble', 'chip-simular', 'chip-manual');
+        const classe = { 1: 'chip-normal', 2: 'chip-anon', 3: 'chip-duble', 4: 'chip-simular', 0: 'chip-exclude', 5: 'chip-manual' }[estado];
         el.classList.add(classe);
         const rotulo = el.querySelector('.selc-estado-rotulo');
         if (rotulo) rotulo.textContent = selcNomeEstado(estado);
@@ -1255,7 +1325,7 @@
         return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase();
     }
     function selcNomeEstado(e) {
-        return { 1: 'Manter', 2: 'Anonimizar', 3: 'Dublê', 4: 'Simular', 0: 'Excluir' }[e] || '';
+        return { 1: 'Manter', 2: 'Anonimizar', 3: 'Dublê', 4: 'Simular', 0: 'Excluir', 5: 'Manual' }[e] || '';
     }
 
     function selcAlternarSelecao(id) {
@@ -1588,6 +1658,106 @@
     }
 
     // ===========================================================================
+    // EDICAO MANUAL POR COLUNA — 6o estado. A bolinha nao aplica na hora (os
+    // outros 5 aplicam com 1 clique): abre o editor, porque precisa de dado
+    // digitado. Linha que o usuario nao editar sai vazia no arquivo final.
+    // ===========================================================================
+    function manualAbrirEditor(colId) {
+        if (!FILE_REF) { alert("Carregue um arquivo primeiro."); return; }
+        MANUAL_EDITANDO = colId;
+        MANUAL_LINHAS_CARREGADAS = [];
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        const nome = col ? col.nome : '';
+        const existente = EDICOES_MANUAIS.get(colId);
+        const qtdExistente = existente ? existente.size : 5;
+        const corpo = document.getElementById('manualCorpo');
+        corpo.innerHTML =
+            `<h3>✍️ Editar ${selcEsc(nome)} manualmente</h3>` +
+            `<div class="manual-aviso">⚠️ <strong>Risco assumido por você.</strong> O que estiver escrito aqui vai direto pro arquivo final, sem passar pelo anonimizador automático. Não digite CPF, nome, endereço ou qualquer outro dado real.</div>` +
+            `<label class="manual-qtd-label">Quantas linhas quer editar? (1 a 50)` +
+            `<input type="number" id="manualQtd" min="1" max="50" value="${Math.min(50, Math.max(1, qtdExistente))}"></label>` +
+            `<button type="button" class="selc-btn-mini" onclick="manualCarregarLinhas(${colId})">Carregar linhas do arquivo</button>` +
+            `<div id="manualListaArea"></div>`;
+        document.getElementById('manualOverlay').classList.add('aberto');
+    }
+
+    async function manualCarregarLinhas(colId) {
+        const qtd = Math.min(50, Math.max(1, Number(document.getElementById('manualQtd').value) || 5));
+        const area = document.getElementById('manualListaArea');
+        area.innerHTML = '<p class="filtro-carregando">Lendo o arquivo…</p>';
+
+        const linhas = [];
+        const reader = FILE_REF.stream().getReader();
+        const decoder = new TextDecoder(CSV_ENCODING);
+        let buffer = "", numeroLinhaAbsoluto = -1;
+        leitura: while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const partes = buffer.split(/\r?\n/);
+            buffer = partes.pop();
+            for (const linha of partes) {
+                if (linha.length < 2) continue;
+                numeroLinhaAbsoluto++;
+                if (MODO_ATUAL === 'TXT' && !linhaPassaFiltros(linha)) continue;
+                const original = MODO_ATUAL === 'TXT'
+                    ? extrairCampoTxt(linha, colId)
+                    : (linha.split(CSV_DELIMITADOR)[colId] || '').replace(/["']/g, '').trim();
+                linhas.push({ idx: numeroLinhaAbsoluto, original });
+                if (linhas.length >= qtd) break leitura;
+            }
+        }
+        MANUAL_LINHAS_CARREGADAS = linhas;
+        manualRenderLista(colId);
+    }
+
+    function manualRenderLista(colId) {
+        const existente = EDICOES_MANUAIS.get(colId);
+        const area = document.getElementById('manualListaArea');
+        if (!MANUAL_LINHAS_CARREGADAS.length) {
+            area.innerHTML = '<p class="filtro-carregando">Nenhuma linha encontrada (arquivo vazio ou filtro de linhas bloqueou tudo).</p>';
+            return;
+        }
+        const linhasHtml = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
+            const valorAtual = existente && existente.has(l.idx) ? existente.get(l.idx) : l.original;
+            return `<input type="text" class="manual-linha-input" id="manualInput${i}" value="${selcEsc(valorAtual)}">`;
+        }).join('');
+        area.innerHTML =
+            `<div class="manual-lista">${linhasHtml}</div>` +
+            `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotao()"> Entendi o risco: estou digitando o dado que vai pro arquivo final.</label>` +
+            `<div class="filtro-val-rodape">` +
+            `<button type="button" class="selc-btn-mini" onclick="manualFechar()">Cancelar</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmar(${colId})">Aplicar edição manual</button>` +
+            `</div>`;
+    }
+
+    function manualAtualizarBotao() {
+        const chk = document.getElementById('manualRiscoOk');
+        const btn = document.getElementById('manualBtnAplicar');
+        if (btn) btn.disabled = !chk?.checked;
+    }
+
+    function manualConfirmar(colId) {
+        const mapa = new Map();
+        MANUAL_LINHAS_CARREGADAS.forEach((l, i) => {
+            const input = document.getElementById(`manualInput${i}`);
+            if (input) mapa.set(l.idx, input.value);
+        });
+        EDICOES_MANUAIS.set(colId, mapa);
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        if (col) col.estado = 5;
+        const chip = document.getElementById(`chip-${colId}`);
+        if (chip && col) { atualizarVisualChip(chip, col.nome, 5); selcRenderAmostraTransformada(colId); }
+        manualFechar();
+    }
+
+    function manualFechar() {
+        document.getElementById('manualOverlay').classList.remove('aberto');
+        MANUAL_EDITANDO = null;
+        MANUAL_LINHAS_CARREGADAS = [];
+    }
+
+    // ===========================================================================
     // PRESET POWER QUERY (SGCG) — v19: identidade e endereço viram SIMULAÇÃO
     // ===========================================================================
     function aplicarPresetSGCG() {
@@ -1776,6 +1946,9 @@
                 const nomesCabecalho = colunasAtivas.map(c => c.nome).join(";");
                 let csvContent = ["\uFEFF" + nomesCabecalho];
                 let buffer = "", bytesLidos = 0, linhasProcessadas = 0, linhasIgnoradas = 0;
+                // Numera toda linha substantiva (mesmo criterio do editor manual), antes do
+                // filtro: e assim que a edicao manual por linha acha a mesma linha de novo.
+                let numeroLinhaAbsoluto = -1;
 
                 while (true) {
                     const { done, value } = await reader.read();
@@ -1787,6 +1960,7 @@
 
                     for (let linha of lines) {
                         if (linha.length < 2) continue;
+                        numeroLinhaAbsoluto++;
                         if (MODO_ATUAL === "TXT" && !linhaPassaFiltros(linha)) {
                             linhasIgnoradas++;
                             continue;
@@ -1795,13 +1969,13 @@
                         let valoresOriginais = [];
                         if (MODO_ATUAL === "TXT") {
                             colunasAtivas.forEach(col => {
-                                valoresOriginais.push({ val: extrairCampoTxt(linha, col.id), estado: col.estado, nome: col.nome, linha });
+                                valoresOriginais.push({ val: extrairCampoTxt(linha, col.id), estado: col.estado, nome: col.nome, linha, colId: col.id });
                             });
                         } else {
                             const colunasRaw = linha.split(CSV_DELIMITADOR);
                             colunasAtivas.forEach(col => {
                                 let val = colunasRaw[col.id] ? colunasRaw[col.id].replace(/^["']|["']$/g, "").trim() : "";
-                                valoresOriginais.push({ val, estado: col.estado, nome: col.nome });
+                                valoresOriginais.push({ val, estado: col.estado, nome: col.nome, colId: col.id });
                             });
                         }
 
@@ -1874,6 +2048,11 @@
                                     valor = await gerarHash(valor);
                                     relatorio.tecnicas.add("Hash SHA-256 + sal efêmero (128 bits)");
                                 }
+                            } else if (item.estado === 5) {
+                                const edicoes = EDICOES_MANUAIS.get(item.colId);
+                                const editado = edicoes ? edicoes.get(numeroLinhaAbsoluto) : undefined;
+                                valor = editado !== undefined ? editado : "";
+                                relatorio.tecnicas.add("Edição manual (risco assumido pelo usuário)");
                             } else if (item.nome.includes("TELEFONE")) {
                                 valor = valor.replace(/-/g, "");
                             } else if (item.nome.startsWith("DT-")) {

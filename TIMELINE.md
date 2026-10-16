@@ -710,3 +710,54 @@ cru — os testes antigos checavam o comportamento de antes da prévia
 existir, por coincidência passavam porque liam o index.html com o
 anonimizador velho ainda embutido. Corrigidos pra checar o dublê (8
 dígitos, ≠ original). 24 + 21 testes, tudo verde.
+
+---
+
+## PARTE 20 — Edição manual por coluna, 6º estado (2026-10-16, anon v19.0.0)
+
+Pedido do Rafa: às vezes ele quer controlar à mão o que sai numa coluna —
+poucas linhas, pra gerar uma amostra que "convence" antes de confiar no
+automático. Virou um 6º estado, cor índigo (nenhuma das 5 usava essa
+faixa), ✍️.
+
+**Como funciona:** clicar na 6ª bolinha de um cartão não aplica na hora
+(diferente dos outros 5 — Manter/Anonimizar/Dublê/Simular/Excluir são
+1 clique) porque precisa de dado digitado. Abre um painel: escolhe quantas
+linhas (1 a 50), carrega os valores originais do arquivo, cada um já
+editável — escreve por cima, sem coluna de comparação ao lado (o Rafa
+testou a primeira versão com "original ao lado + campo editável" e achou
+confuso, ter que ler uma coluna pra escrever na outra; a versão final é só
+o campo, já populado com o original, edita direto). Linha que não for
+editada sai **vazia** no arquivo final — é a regra que o Rafa pediu
+("o resto ele deleta").
+
+**Aviso de risco, sempre visível, não é popup que passa:** banner vermelho
+fixo no topo do painel + checkbox obrigatório ("Entendi o risco") que
+precisa estar marcado pro botão Aplicar habilitar. Mais forte que um
+`confirm()` nativo — o Rafa pediu insistentemente esse alerta, com razão:
+edição manual contorna o anonimizador automático, então um erro de
+digitação aqui pode vazar dado real sem a ferramenta perceber.
+
+**Reorganização do espaço (skill `game-feel-ui`, plano aprovado antes de
+codar):** o botão verde + o filtro de linhas + a entrada da edição manual
+viraram uma seção "⚙️ Opções avançadas de processamento", fundo cinza
+recuado, sem brilho (mundo visual continua o "iOS claro" do resto da
+ferramenta — a skill é clara que glow só funciona em fundo escuro).
+
+**Engenharia (onde mexeu):** `EDICOES_MANUAIS` (Map colId → Map
+numeroLinhaAbsoluto → valor digitado). `numeroLinhaAbsoluto` é um contador
+novo no laço principal de processamento, incrementado por linha
+substantiva **antes** do filtro de linhas — o editor usa a mesma contagem
+pra achar de novo a linha certa. Um ramo novo (`item.estado === 5`) no
+mesmo formato dos outros 4 ramos existentes. `colId` passou a viajar
+dentro de cada item do loop (não existia antes — precisei adicionar nos
+dois pontos, TXT e CSV, onde `valoresOriginais` é montado).
+
+**Teste:** script Playwright fora do repo — carrega 4 linhas num cartão,
+edita a 1ª, deixa a 2ª e a 4ª com o original, apaga a 3ª, roda o
+processamento de verdade (não só a prévia) e lê o CSV de saída linha por
+linha: edição aparece, original preservado aparece, linha apagada sai
+vazia, e a coluna MATRICULA (Dublê automático, nem tocada) continua
+funcionando do lado. 12 verificações, tudo OK. Depois,
+`patches/_testa_seletor.py` (24) e `patches/_test_regressao_completa.py`
+(21) de novo, sem quebra.
