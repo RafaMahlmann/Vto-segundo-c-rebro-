@@ -761,3 +761,30 @@ vazia, e a coluna MATRICULA (Dublê automático, nem tocada) continua
 funcionando do lado. 12 verificações, tudo OK. Depois,
 `patches/_testa_seletor.py` (24) e `patches/_test_regressao_completa.py`
 (21) de novo, sem quebra.
+
+---
+
+## PARTE 21 — Ajuste de UX na edição manual (2026-10-16, anon v19.0.0)
+
+Feedback do Rafa depois de testar a Parte 20: faltava clareza de "o que eu
+mudei" e faltava uma conferida antes de aplicar de verdade.
+
+- **Cor dinâmica:** campo nasce cinza (ainda igual ao original). Digitar
+  algo diferente vira preto e negrito na hora — fica óbvio o que foi
+  mexido sem comparar duas colunas.
+- **Etapa de revisão:** o botão "Revisar antes de aplicar" leva pra uma
+  tela que mostra as N linhas como vão sair ("3 de 4 alteradas, 1 sem
+  mudança"), com a original ao lado de quem mudou. De lá, "← Voltar e
+  editar" volta pra lista — **sem perder o que já foi digitado** — ou
+  "Confirmar e aplicar" (com o checkbox de risco, que migrou pra essa
+  etapa, já que é o momento real de decisão).
+
+**Onde mexeu:** `MANUAL_REVISAO_VALORES` guarda os valores digitados
+quando entra na revisão (os inputs da lista deixam de existir nessa tela,
+é só leitura). `manualRenderLista()` ganhou um parâmetro opcional pra
+reconstruir a lista de edição com esses valores preservados, em vez de
+voltar ao original. Teste Playwright (fora do repo) cobre cor dinâmica,
+contagem da revisão e "voltar preserva o digitado" — 16 verificações, e
+o processamento real linha a linha continua batendo.
+`patches/_testa_seletor.py` (24) e `_test_regressao_completa.py` (21),
+sem quebra.

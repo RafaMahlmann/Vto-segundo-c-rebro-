@@ -426,8 +426,18 @@
         .manual-linha-input {
             display: block !important; width: 100% !important; padding: 10px 12px !important;
             border-radius: 10px !important; font-size: 13px; font-family: 'SF Mono', 'Menlo', monospace;
-            border-color: #5856D6 !important;
+            border-color: #5856D6 !important; color: #AEAEB2 !important; transition: color .1s ease;
         }
+        .manual-linha-input.manual-alterado { color: #1D1D1F !important; font-weight: 700; }
+        .manual-revisao-resumo { font-size: 13px; color: var(--text-primary); font-weight: 600; margin: 4px 0 14px; }
+        .manual-revisao-linha {
+            display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+            padding: 10px 12px; border-radius: 10px; background: #F2F2F7; border-left: 3px solid #5856D6;
+        }
+        .manual-revisao-linha.manual-revisao-igual { border-left-color: #C7C7CC; }
+        .manual-revisao-valor { font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .manual-revisao-vazio { font-weight: 400; font-style: italic; color: var(--text-secondary); }
+        .manual-revisao-original { font-size: 11px; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; }
         .manual-risco-check {
             display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600;
             color: #B42318; margin: 6px 0; cursor: pointer;
@@ -1125,6 +1135,7 @@
     const EDICOES_MANUAIS = new Map();
     let MANUAL_EDITANDO = null;
     let MANUAL_LINHAS_CARREGADAS = []; // [{idx, original}] da coluna em edicao agora
+    let MANUAL_REVISAO_VALORES = []; // valores digitados, paralelo a MANUAL_LINHAS_CARREGADAS
     const LIMITE_VALORES_FILTRO = 1000;
     let FILTRO_EDITANDO = null;
     let FILTRO_VALORES_TEMP = null;
@@ -1711,7 +1722,7 @@
         manualRenderLista(colId);
     }
 
-    function manualRenderLista(colId) {
+    function manualRenderLista(colId, valoresOverride) {
         const existente = EDICOES_MANUAIS.get(colId);
         const area = document.getElementById('manualListaArea');
         if (!MANUAL_LINHAS_CARREGADAS.length) {
@@ -1719,16 +1730,64 @@
             return;
         }
         const linhasHtml = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
-            const valorAtual = existente && existente.has(l.idx) ? existente.get(l.idx) : l.original;
-            return `<input type="text" class="manual-linha-input" id="manualInput${i}" value="${selcEsc(valorAtual)}">`;
+            const valorAtual = valoresOverride ? valoresOverride[i]
+                : (existente && existente.has(l.idx) ? existente.get(l.idx) : l.original);
+            const alterado = valorAtual !== l.original;
+            return `<input type="text" class="manual-linha-input${alterado ? ' manual-alterado' : ''}" id="manualInput${i}" ` +
+                `data-original="${selcEsc(l.original)}" value="${selcEsc(valorAtual)}" oninput="manualAtualizarCorCampo(this)">`;
         }).join('');
         area.innerHTML =
             `<div class="manual-lista">${linhasHtml}</div>` +
-            `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotao()"> Entendi o risco: estou digitando o dado que vai pro arquivo final.</label>` +
             `<div class="filtro-val-rodape">` +
             `<button type="button" class="selc-btn-mini" onclick="manualFechar()">Cancelar</button>` +
-            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmar(${colId})">Aplicar edição manual</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualAbrirRevisao(${colId})">Revisar antes de aplicar</button>` +
             `</div>`;
+    }
+
+    function manualAtualizarCorCampo(el) {
+        el.classList.toggle('manual-alterado', el.value !== el.dataset.original);
+    }
+
+    // Etapa de revisao: mostra como cada linha vai sair antes de aplicar de
+    // verdade. "Voltar e editar" preserva o que foi digitado (nao reseta).
+    function manualAbrirRevisao(colId) {
+        MANUAL_REVISAO_VALORES = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
+            const input = document.getElementById(`manualInput${i}`);
+            return input ? input.value : l.original;
+        });
+        manualRenderRevisao(colId);
+    }
+
+    function manualRenderRevisao(colId) {
+        const area = document.getElementById('manualListaArea');
+        let alteradas = 0;
+        const linhasHtml = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
+            const valor = MANUAL_REVISAO_VALORES[i];
+            const mudou = valor !== l.original;
+            if (mudou) alteradas++;
+            const valorMostrado = valor === '' ? '<span class="manual-revisao-vazio">(vazio — sai em branco)</span>' : selcEsc(valor);
+            const legenda = mudou ? ('era: ' + selcEsc(l.original === '' ? '(vazio)' : l.original)) : 'sem alteração';
+            return `<div class="manual-revisao-linha${mudou ? '' : ' manual-revisao-igual'}">` +
+                `<div class="manual-revisao-valor">${valorMostrado}</div>` +
+                `<div class="manual-revisao-original">${legenda}</div>` +
+                `</div>`;
+        }).join('');
+        const total = MANUAL_LINHAS_CARREGADAS.length;
+        const resumo = alteradas === total
+            ? `${total} de ${total} linha(s) alterada(s).`
+            : `${alteradas} de ${total} linha(s) alterada(s), ${total - alteradas} sem mudança.`;
+        area.innerHTML =
+            `<p class="manual-revisao-resumo">${resumo} Confere se é isso mesmo que você quer deixar.</p>` +
+            `<div class="manual-lista">${linhasHtml}</div>` +
+            `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotao()"> Entendi o risco: estou digitando o dado que vai pro arquivo final.</label>` +
+            `<div class="filtro-val-rodape">` +
+            `<button type="button" class="selc-btn-mini" onclick="manualVoltarEditar(${colId})">← Voltar e editar</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmarRevisao(${colId})">Confirmar e aplicar</button>` +
+            `</div>`;
+    }
+
+    function manualVoltarEditar(colId) {
+        manualRenderLista(colId, MANUAL_REVISAO_VALORES);
     }
 
     function manualAtualizarBotao() {
@@ -1737,12 +1796,9 @@
         if (btn) btn.disabled = !chk?.checked;
     }
 
-    function manualConfirmar(colId) {
+    function manualConfirmarRevisao(colId) {
         const mapa = new Map();
-        MANUAL_LINHAS_CARREGADAS.forEach((l, i) => {
-            const input = document.getElementById(`manualInput${i}`);
-            if (input) mapa.set(l.idx, input.value);
-        });
+        MANUAL_LINHAS_CARREGADAS.forEach((l, i) => mapa.set(l.idx, MANUAL_REVISAO_VALORES[i]));
         EDICOES_MANUAIS.set(colId, mapa);
         const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
         if (col) col.estado = 5;
@@ -1755,6 +1811,7 @@
         document.getElementById('manualOverlay').classList.remove('aberto');
         MANUAL_EDITANDO = null;
         MANUAL_LINHAS_CARREGADAS = [];
+        MANUAL_REVISAO_VALORES = [];
     }
 
     // ===========================================================================
