@@ -1,0 +1,2142 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VTO — Propostas: Calculadora Rápida + Seletor de Colunas</title>
+<style>
+/* ==========================================================================
+   BASE — identidade copiada do app (index.html)
+   ========================================================================== */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0; background:#e9ecef; color:#212529;
+  font-family:-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+  line-height:1.55; font-size:16px;
+}
+h1,h2,h3,h4{line-height:1.25}
+button{font-family:inherit}
+:focus-visible{outline:3px solid #80bdff; outline-offset:2px; border-radius:6px}
+
+/* Navegação fixa no topo */
+.topo{
+  position:sticky; top:0; z-index:60;
+  background:rgba(255,255,255,.94); backdrop-filter:blur(8px);
+  border-bottom:1px solid #dee2e6; padding:8px 12px;
+}
+.topo nav{display:flex; flex-wrap:wrap; gap:6px; max-width:1080px; margin:0 auto}
+.topo a{
+  display:inline-block; padding:6px 12px; font-size:.8rem; font-weight:600;
+  color:#495057; text-decoration:none; background:#f1f3f5;
+  border:1px solid #dee2e6; border-radius:999px; transition:all .2s;
+}
+.topo a:hover{background:#007bff; color:#fff; border-color:#007bff; transform:translateY(-1px)}
+.topo a.destaque{background:#007bff; color:#fff; border-color:#007bff}
+
+.wrap{max-width:1080px; margin:0 auto; padding:24px 16px 90px}
+
+/* Capa */
+.capa{
+  background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
+  padding:32px 28px; margin-bottom:28px;
+}
+.capa h1{margin:0 0 6px; font-size:1.7rem}
+.capa .sub{color:#6c757d; margin:0 0 18px}
+.pedido{
+  background:#f8f9fa; border-left:4px solid #007bff; border-radius:0 10px 10px 0;
+  padding:14px 18px; margin:0;
+}
+.pedido p{margin:.35em 0}
+
+/* Cabeçalho de parte */
+.parte-head{
+  margin:44px 0 8px; padding:20px 24px; border-radius:16px; color:#fff;
+  background:linear-gradient(135deg,#007bff,#0056b3);
+  box-shadow:0 4px 20px rgba(0,123,255,.25);
+}
+.parte-head.verde{background:linear-gradient(135deg,#28a745,#1e7e34); box-shadow:0 4px 20px rgba(40,167,69,.25)}
+.parte-head h2{margin:0 0 4px; font-size:1.45rem}
+.parte-head p{margin:0; opacity:.92; font-size:.95rem}
+
+/* Diagnóstico */
+.diag{
+  background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
+  padding:22px 26px; margin:16px 0 8px; border-left:6px solid #ffc107;
+}
+.diag h3{margin:0 0 10px; font-size:1.1rem}
+.diag .nums{display:flex; flex-wrap:wrap; gap:12px; margin:14px 0}
+.numbox{
+  flex:1 1 140px; background:#f8f9fa; border:1px solid #e9ecef; border-radius:12px;
+  padding:12px 14px; text-align:center;
+}
+.numbox .n{display:block; font-size:1.6rem; font-weight:800; color:#dc3545}
+.numbox .n.bom{color:#28a745}
+.numbox .r{font-size:.78rem; color:#6c757d}
+.bug{
+  background:#fff5f5; border:1px solid #f5c2c7; border-radius:10px;
+  padding:10px 14px; margin:8px 0; font-size:.9rem;
+}
+.bug b{color:#b02a37}
+.aviso-achado{font-size:.82rem; color:#842029; background:#f8d7da; display:inline-block; padding:2px 10px; border-radius:999px; margin-left:6px}
+
+/* Cartão de proposta */
+.prop{
+  background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
+  padding:24px 26px; margin:22px 0;
+}
+.prop .etiqueta{
+  display:inline-block; font-size:.72rem; font-weight:800; letter-spacing:.06em;
+  padding:4px 12px; border-radius:999px; color:#fff; background:#007bff; margin-bottom:8px;
+}
+.prop .etiqueta.roxa{background:#6f42c1}
+.prop h3{margin:0 0 4px; font-size:1.25rem}
+.prop .onde{
+  font-size:.88rem; color:#6c757d; margin:0 0 14px;
+  background:#f8f9fa; border-radius:8px; padding:8px 12px;
+}
+.prop .onde b{color:#495057}
+.juice{
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:8px; margin:14px 0;
+}
+.juice .j{
+  background:#f1f8ff; border:1px solid #cfe4ff; border-radius:10px;
+  padding:8px 12px; font-size:.82rem;
+}
+.juice .j b{color:#0056b3}
+code.inl{
+  background:#f1f3f5; padding:1px 6px; border-radius:6px;
+  font-family:'SF Mono',Menlo,Consolas,monospace; font-size:.85em;
+}
+
+/* Rodapé da proposta */
+.rodape-prop{
+  margin-top:16px; border-top:1px dashed #ced4da; padding-top:12px;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px;
+}
+.rodape-prop .cel{font-size:.8rem}
+.rodape-prop .cel b{display:block; font-size:.72rem; text-transform:uppercase; letter-spacing:.05em; color:#6c757d; margin-bottom:2px}
+.esforco{display:inline-block; font-weight:800; padding:2px 10px; border-radius:999px; font-size:.8rem}
+.esforco.P{background:#d4edda; color:#155724}
+.esforco.M{background:#fff3cd; color:#856404}
+.esforco.G{background:#f8d7da; color:#842029}
+
+/* Palco da demo (moldura que simula a tela do app) */
+.palco{
+  position:relative; background:#f1f3f5; border:2px solid #dee2e6; border-radius:14px;
+  overflow:hidden; margin:14px 0 6px; min-height:480px;
+}
+.palco-alto{min-height:560px}
+.palco-titulo{
+  position:absolute; top:8px; left:12px; z-index:5; font-size:.7rem; font-weight:700;
+  color:#868e96; text-transform:uppercase; letter-spacing:.08em; pointer-events:none;
+}
+.demo-dica{font-size:.8rem; color:#6c757d; margin:4px 0 0}
+.demo-dica b{color:#495057}
+
+/* Mock de tela do app dentro do palco */
+.mock-toolbar{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  padding:34px 14px 10px;
+}
+.mock-btn{
+  padding:8px 14px; font-size:.85rem; font-weight:600; border:2px solid #ced4da;
+  border-radius:8px; background:#fff; color:#495057; cursor:default;
+}
+.mock-btn.ativo{background:#007bff; color:#fff; border-color:#007bff}
+.mock-corpo{padding:8px 14px 90px}
+.mock-card{
+  background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06);
+  padding:12px 14px; margin-bottom:8px; font-size:.85rem; color:#6c757d;
+}
+.mock-linha{
+  height:10px; border-radius:5px; background:#e9ecef; margin:6px 0;
+}
+.mock-linha.w60{width:60%} .mock-linha.w80{width:80%} .mock-linha.w40{width:40%}
+
+/* ==========================================================================
+   CALCULADORA — motor visual compartilhado
+   ========================================================================== */
+.calc{
+  background:#fff; border-radius:16px; box-shadow:0 12px 32px rgba(0,0,0,.18);
+  padding:14px; width:280px; max-width:100%;
+}
+.calc-visor{
+  background:#1c1c1e; color:#fff; border-radius:12px; padding:12px 14px;
+  text-align:right; margin-bottom:10px; min-height:74px;
+  display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden;
+}
+.calc-expressao{font-size:.78rem; color:#8e8e93; min-height:1.1em; word-break:break-all}
+.calc-resultado{
+  font-size:1.9rem; font-weight:700; word-break:break-all; line-height:1.2;
+  transform-origin:right bottom;
+}
+.calc-resultado.pula{animation:squash .28s cubic-bezier(.34,1.56,.64,1)}
+@keyframes squash{
+  0%{transform:scale(1.18,1.18)} 55%{transform:scale(.96,.96)} 100%{transform:scale(1,1)}
+}
+.calc-teclas{display:grid; grid-template-columns:repeat(4,1fr); gap:8px}
+.calc-teclas button{
+  border:none; border-radius:12px; padding:14px 0; font-size:1.1rem; font-weight:600;
+  cursor:pointer; background:#f1f3f5; color:#212529;
+  transition:transform .07s ease-out, background .15s, box-shadow .15s;
+  box-shadow:0 2px 0 rgba(0,0,0,.08);
+  touch-action:manipulation; user-select:none;
+}
+.calc-teclas button:hover{background:#e2e6ea}
+.calc-teclas button.pressionada{
+  transform:scale(.9); box-shadow:0 0 0 rgba(0,0,0,0);
+  transition:transform .05s ease-out;
+}
+.calc-teclas button{transition:transform .3s cubic-bezier(.34,1.56,.64,1), background .15s, box-shadow .15s}
+.calc-teclas button.op{background:#007bff; color:#fff}
+.calc-teclas button.op:hover{background:#0069d9}
+.calc-teclas button.op.acesa{background:#0056b3; box-shadow:0 0 0 3px rgba(0,123,255,.35) inset}
+.calc-teclas button.igual{background:#28a745; color:#fff}
+.calc-teclas button.igual:hover{background:#218838}
+.calc-teclas button.util{background:#dee2e6; color:#495057}
+.calc-teclas button.largo{grid-column:span 2}
+
+/* C1 — FAB + folha que sobe */
+.fab{
+  position:absolute; right:18px; bottom:18px; z-index:20;
+  width:60px; height:60px; border-radius:50%; border:none; cursor:pointer;
+  background:#007bff; color:#fff; font-size:1.5rem;
+  box-shadow:0 6px 18px rgba(0,123,255,.45);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+.fab:hover{transform:scale(1.1) rotate(-6deg)}
+.fab:active{transform:scale(.92)}
+.fab.chama{animation:chamada 2.4s ease-in-out 1s 2}
+@keyframes chamada{
+  0%,100%{box-shadow:0 6px 18px rgba(0,123,255,.45)}
+  50%{box-shadow:0 6px 18px rgba(0,123,255,.45), 0 0 0 14px rgba(0,123,255,0)}
+}
+.fab.fechado{transform:scale(0) rotate(90deg)}
+.sheet-fundo{
+  position:absolute; inset:0; z-index:18; background:rgba(33,37,41,.35);
+  opacity:0; pointer-events:none; transition:opacity .25s ease;
+}
+.sheet-fundo.aberto{opacity:1; pointer-events:auto}
+.sheet{
+  position:absolute; left:0; right:0; bottom:0; z-index:19;
+  display:flex; justify-content:center; padding:0 10px 10px;
+  transform:translateY(110%); transition:transform .42s cubic-bezier(.22,1.28,.32,1);
+}
+.sheet.aberto{transform:translateY(0)}
+.sheet .calc{width:300px}
+.sheet-alca{width:44px; height:5px; border-radius:3px; background:#ced4da; margin:0 auto 8px}
+
+/* C2 — popover ancorado */
+.btn-calc-toolbar{
+  padding:8px 14px; font-size:.85rem; font-weight:700; border:2px solid #007bff;
+  border-radius:8px; background:#fff; color:#007bff; cursor:pointer;
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.btn-calc-toolbar:hover{background:#007bff; color:#fff; transform:translateY(-2px)}
+.btn-calc-toolbar:active{transform:scale(.94)}
+.popover-calc{
+  position:absolute; z-index:19; top:78px; right:14px;
+  transform-origin:top right; transform:scale(.6) translateY(-12px); opacity:0;
+  pointer-events:none;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .2s ease;
+}
+.popover-calc.aberto{transform:scale(1) translateY(0); opacity:1; pointer-events:auto}
+.popover-calc::before{
+  content:''; position:absolute; top:-8px; right:34px; width:16px; height:16px;
+  background:#fff; transform:rotate(45deg); border-radius:3px;
+  box-shadow:-2px -2px 4px rgba(0,0,0,.04);
+}
+.digito-pop{display:inline-block; animation:digpop .18s cubic-bezier(.34,1.56,.64,1)}
+@keyframes digpop{0%{transform:translateY(-6px) scale(1.3); opacity:.3} 100%{transform:none; opacity:1}}
+.alvo-voo{
+  display:inline-block; background:#e7f1ff; color:#0056b3; font-weight:700;
+  border:1px dashed #80bdff; border-radius:8px; padding:4px 10px; min-width:70px; text-align:center;
+}
+.pilula-voadora{
+  position:absolute; z-index:40; background:#28a745; color:#fff; font-weight:700;
+  border-radius:999px; padding:6px 14px; pointer-events:none;
+  box-shadow:0 8px 20px rgba(40,167,69,.4);
+}
+
+/* C3 — gaveta lateral com fita */
+.aba-gaveta{
+  position:absolute; top:120px; right:0; z-index:17;
+  writing-mode:vertical-rl; border:none; cursor:pointer;
+  background:#007bff; color:#fff; font-weight:700; font-size:.8rem; letter-spacing:.1em;
+  padding:14px 8px; border-radius:10px 0 0 10px;
+  box-shadow:-4px 4px 12px rgba(0,123,255,.3);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), right .34s cubic-bezier(.2,.9,.25,1.1);
+}
+.aba-gaveta:hover{transform:translateX(-4px)}
+.gaveta{
+  position:absolute; top:0; right:0; bottom:0; z-index:18; width:320px; max-width:92%;
+  background:#fff; box-shadow:-8px 0 28px rgba(0,0,0,.15);
+  transform:translateX(105%); transition:transform .38s cubic-bezier(.2,.9,.25,1.12);
+  display:flex; flex-direction:column; padding:14px;
+}
+.gaveta.aberta{transform:translateX(0)}
+.gaveta-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px}
+.gaveta-head b{font-size:.95rem}
+.fita{
+  flex:1; overflow-y:auto; background:#f8f9fa; border:1px solid #e9ecef;
+  border-radius:10px; padding:8px; margin-bottom:10px; min-height:90px;
+}
+.fita-linha{
+  display:flex; justify-content:space-between; gap:8px; padding:6px 10px;
+  background:#fff; border-radius:8px; margin-bottom:6px; font-size:.85rem; cursor:pointer;
+  border:1px solid #e9ecef; animation:entalinha .3s cubic-bezier(.34,1.56,.64,1);
+  transition:transform .15s, border-color .15s;
+}
+.fita-linha:hover{transform:translateX(-3px); border-color:#80bdff}
+.fita-linha .res{font-weight:700; color:#28a745}
+.fita-vazia{font-size:.78rem; color:#adb5bd; text-align:center; padding:14px 6px}
+@keyframes entalinha{0%{transform:translateY(-14px) scale(.94); opacity:0} 100%{transform:none; opacity:1}}
+
+/* C4 — cartão embutido que estica */
+.cartao-calc{
+  margin:10px 14px; background:#fff; border-radius:14px;
+  box-shadow:0 4px 20px rgba(0,0,0,.08); overflow:hidden;
+}
+.cartao-calc-topo{
+  width:100%; border:none; background:#fff; cursor:pointer; text-align:left;
+  padding:14px 16px; font-size:.95rem; font-weight:700; color:#212529;
+  display:flex; justify-content:space-between; align-items:center;
+  transition:background .2s;
+}
+.cartao-calc-topo:hover{background:#f8f9fa}
+.cartao-calc-topo .seta{transition:transform .3s cubic-bezier(.34,1.56,.64,1); color:#6c757d}
+.cartao-calc.aberto .cartao-calc-topo .seta{transform:rotate(180deg)}
+.cartao-calc-corpo{
+  max-height:0; overflow:hidden;
+  transition:max-height .42s cubic-bezier(.22,1.15,.32,1);
+  display:flex; justify-content:center; padding:0 10px;
+}
+.cartao-calc.aberto .cartao-calc-corpo{max-height:460px; padding-bottom:12px}
+.cartao-calc .calc{box-shadow:none; border:1px solid #e9ecef; width:100%}
+.cartao-calc .calc-teclas button{animation:teclasobem .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes teclasobem{0%{transform:translateY(10px); opacity:0} 100%{transform:none; opacity:1}}
+
+/* C5 — janelinha arrastável */
+.janela-calc{
+  position:absolute; z-index:22; left:24px; top:60px; width:270px; max-width:86%;
+  background:#fff; border-radius:16px; box-shadow:0 14px 40px rgba(0,0,0,.22);
+  overflow:hidden; touch-action:none;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1);
+}
+.janela-calc.arrastando{transition:none; box-shadow:0 22px 50px rgba(0,0,0,.3)}
+.janela-calc-barra{
+  background:linear-gradient(135deg,#007bff,#0056b3); color:#fff;
+  padding:9px 14px; font-size:.82rem; font-weight:700; cursor:grab;
+  display:flex; justify-content:space-between; align-items:center; user-select:none;
+}
+.janela-calc-barra:active{cursor:grabbing}
+.janela-calc-barra button{
+  border:none; background:rgba(255,255,255,.2); color:#fff; width:24px; height:24px;
+  border-radius:50%; cursor:pointer; font-size:.8rem; line-height:1;
+}
+.janela-calc .calc{box-shadow:none; border-radius:0; width:100%}
+.janela-calc.minimizada .calc-corpo-janela{display:none}
+.janela-calc.minimizada{width:190px}
+.btn-mostrar-janela{
+  margin:10px 14px; padding:8px 16px; border:2px solid #007bff; background:#fff;
+  color:#007bff; border-radius:8px; font-weight:700; cursor:pointer; font-size:.85rem;
+  transition:all .2s;
+}
+.btn-mostrar-janela:hover{background:#007bff; color:#fff}
+
+/* ==========================================================================
+   SELETOR DE COLUNAS — estilos compartilhados (identidade do anonimizador)
+   ========================================================================== */
+.ios-azul{--c:#007AFF} .ios-roxo{--c:#AF52DE} .ios-laranja{--c:#FF9500}
+.ios-verde{--c:#34C759} .ios-cinza{--c:#8E8E93}
+.sel-painel{padding:36px 14px 14px; display:flex; flex-direction:column; gap:10px; height:100%}
+.sel-toolbar{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  background:#fff; border-radius:12px; padding:10px 12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+}
+.sel-busca{
+  flex:1 1 160px; padding:9px 12px; font-size:.9rem; border:1.5px solid #d2d2d7;
+  border-radius:10px; font-family:inherit; transition:border-color .2s, box-shadow .2s;
+}
+.sel-busca:focus{border-color:#007AFF; box-shadow:0 0 0 3px rgba(0,122,255,.15); outline:none}
+.btn-massa{
+  border:none; border-radius:9px; padding:8px 13px; font-size:.8rem; font-weight:700;
+  cursor:pointer; transition:transform .25s cubic-bezier(.34,1.56,.64,1), filter .15s;
+  color:#fff; touch-action:manipulation;
+}
+.btn-massa:hover{transform:translateY(-2px); filter:brightness(1.08)}
+.btn-massa:active{transform:scale(.93)}
+.btn-massa:disabled{opacity:.35; cursor:not-allowed; transform:none}
+.contador-estados{
+  display:flex; flex-wrap:wrap; gap:10px; font-size:.78rem; color:#86868b;
+  padding:4px 4px 0;
+}
+.contador-estados b{transition:color .2s}
+.contador-estados .pulsa{animation:pulsacor .5s ease}
+@keyframes pulsacor{0%{transform:scale(1)} 40%{transform:scale(1.25); color:#007AFF} 100%{transform:scale(1)}}
+.contador-estados b{display:inline-block}
+
+/* Grade de miniaturas (S1) */
+.grade-minis{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:10px;
+  overflow-y:auto; max-height:330px; padding:4px 2px 70px;
+}
+.mini-card{
+  position:relative; background:#fff; border-radius:14px; padding:10px 12px;
+  border-top:5px solid var(--c,#007AFF); cursor:pointer; user-select:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.06);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), box-shadow .2s;
+}
+.mini-card:hover{transform:translateY(-3px); box-shadow:0 8px 18px rgba(0,0,0,.1)}
+.mini-card:active{transform:scale(.96)}
+.mini-card .nome{font-size:.78rem; font-weight:800; word-break:break-all}
+.mini-card .amostra{font-size:.72rem; color:#86868b; margin-top:4px; line-height:1.5}
+.mini-card .amostra span{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mini-card .check{
+  position:absolute; top:8px; right:8px; width:22px; height:22px; border-radius:50%;
+  border:2px solid #d2d2d7; background:#fff; display:grid; place-items:center;
+  font-size:.7rem; color:#fff; transition:all .25s cubic-bezier(.34,1.56,.64,1);
+}
+.mini-card.selecionado{box-shadow:0 0 0 2.5px #007AFF, 0 6px 16px rgba(0,122,255,.18)}
+.mini-card.selecionado .check{background:#007AFF; border-color:#007AFF; transform:scale(1.15)}
+.mini-card.mudou{animation:mudouflash .4s ease}
+@keyframes mudouflash{0%{filter:brightness(1.25); transform:scale(1.04)} 100%{filter:none; transform:none}}
+.mini-card .flag-bug{
+  position:absolute; bottom:6px; right:8px; font-size:.62rem; background:#fff3cd;
+  color:#856404; border-radius:999px; padding:1px 7px; font-weight:700;
+}
+.barra-selecao{
+  position:absolute; left:10px; right:10px; bottom:10px; z-index:15;
+  background:#1c1c1e; color:#fff; border-radius:14px; padding:10px 14px;
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center;
+  box-shadow:0 12px 30px rgba(0,0,0,.3);
+  transform:translateY(140%); transition:transform .38s cubic-bezier(.22,1.25,.32,1);
+}
+.barra-selecao.visivel{transform:translateY(0)}
+.barra-selecao .n-sel{font-size:.85rem; font-weight:700; margin-right:auto}
+.barra-selecao .btn-massa{animation:botaoentra .3s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes botaoentra{0%{transform:translateY(10px) scale(.8); opacity:0} 100%{transform:none; opacity:1}}
+
+/* Lista densa (S2) */
+.lista-colunas{
+  overflow-y:auto; max-height:330px; background:#fff; border-radius:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,.06); padding:6px;
+}
+.linha-col{
+  display:flex; align-items:center; gap:10px; padding:7px 10px; border-radius:9px;
+  transition:background .15s, transform .15s;
+}
+.linha-col:hover{background:#f2f2f7}
+.linha-col .nome{font-size:.8rem; font-weight:700; flex:0 0 42%; word-break:break-all}
+.linha-col .amostra{flex:1; font-size:.72rem; color:#86868b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.linha-col input[type=checkbox]{width:17px; height:17px; accent-color:#007AFF; cursor:pointer}
+.pontinhos{display:flex; gap:5px; flex:0 0 auto}
+.pontinho{
+  width:18px; height:18px; border-radius:50%; border:2px solid transparent; cursor:pointer;
+  padding:0; opacity:.3; transition:all .22s cubic-bezier(.34,1.56,.64,1);
+}
+.pontinho:hover{opacity:.75; transform:scale(1.25)}
+.pontinho.ativo{opacity:1; transform:scale(1.18); border-color:#fff; box-shadow:0 0 0 2px currentColor}
+
+/* Gavetas por assunto (S3) */
+.grupo-col{border-radius:12px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.06); overflow:hidden}
+.grupo-col summary{
+  cursor:pointer; padding:12px 14px; font-size:.88rem; font-weight:800; list-style:none;
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+}
+.grupo-col summary::-webkit-details-marker{display:none}
+.grupo-col summary .seta{transition:transform .3s cubic-bezier(.34,1.56,.64,1); color:#86868b; font-size:.75rem}
+.grupo-col[open] summary .seta{transform:rotate(90deg)}
+.grupo-col .badge-n{font-size:.7rem; background:#f2f2f7; color:#86868b; border-radius:999px; padding:2px 9px; font-weight:700}
+.grupo-col .grupo-acoes{margin-left:auto; display:flex; gap:6px}
+.grupo-corpo{padding:4px 12px 12px; display:flex; flex-wrap:wrap; gap:7px}
+.grupo-col[open] .grupo-corpo{animation:abregrupo .28s cubic-bezier(.22,1.1,.32,1)}
+@keyframes abregrupo{0%{opacity:0; transform:translateY(-8px)} 100%{opacity:1; transform:none}}
+.pill-col{
+  border:none; border-radius:999px; padding:7px 13px; font-size:.74rem; font-weight:700;
+  cursor:pointer; color:var(--c); background:color-mix(in srgb, var(--c) 10%, #fff);
+  border:1.5px solid color-mix(in srgb, var(--c) 30%, #fff);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), filter .15s;
+}
+.pill-col:hover{transform:scale(1.07)}
+.pill-col:active{transform:scale(.92)}
+.pill-col.mudou{animation:mudouflash .4s ease}
+.grupos-wrap{overflow-y:auto; max-height:330px; display:flex; flex-direction:column; gap:8px; padding-bottom:8px}
+
+/* Kanban (S4) */
+.kanban{display:flex; gap:10px; align-items:flex-start; overflow-x:auto; padding-bottom:8px}
+.kanban-col{
+  flex:1 0 170px; background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06);
+  display:flex; flex-direction:column; max-height:340px; border-top:5px solid var(--c);
+  transition:box-shadow .2s, transform .2s;
+}
+.kanban-col.sobre{box-shadow:0 0 0 3px var(--c), 0 8px 20px rgba(0,0,0,.12); transform:scale(1.02)}
+.kanban-col h4{
+  margin:0; padding:10px 12px 6px; font-size:.8rem; color:var(--c);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.kanban-col h4 .conta{
+  background:var(--c); color:#fff; border-radius:999px; min-width:24px; text-align:center;
+  font-size:.72rem; padding:2px 6px;
+}
+.kanban-col h4 .conta.pulsa{animation:pulsacor .5s ease}
+.kanban-itens{overflow-y:auto; padding:4px 10px 12px; display:flex; flex-direction:column; gap:6px}
+.kanban-card{
+  background:#f8f9fa; border:1px solid #e9ecef; border-radius:9px; padding:7px 9px;
+  font-size:.72rem; font-weight:700; cursor:grab; user-select:none;
+  display:flex; align-items:center; gap:4px; justify-content:space-between;
+  animation:entalinha .25s cubic-bezier(.34,1.56,.64,1);
+}
+.kanban-card:active{cursor:grabbing}
+.kanban-card .setas{display:flex; gap:2px}
+.kanban-card .setas button{
+  border:none; background:#e9ecef; border-radius:6px; width:20px; height:20px;
+  cursor:pointer; font-size:.65rem; color:#495057; padding:0;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1), background .15s;
+}
+.kanban-card .setas button:hover{background:#007AFF; color:#fff; transform:scale(1.2)}
+.kanban-card.arrastando{opacity:.4}
+
+/* Triagem (S5) */
+.tria-palco{display:flex; flex-direction:column; align-items:center; gap:12px; padding:8px 0 4px}
+.tria-progresso{width:100%; max-width:420px}
+.tria-progresso .trilho{background:#e9ecef; border-radius:99px; height:10px; overflow:hidden}
+.tria-progresso .barra{
+  height:100%; border-radius:99px; background:linear-gradient(90deg,#007AFF,#5AC8FA);
+  transition:width .35s cubic-bezier(.22,1.1,.32,1); width:0%;
+}
+.tria-progresso .txt{font-size:.75rem; color:#86868b; text-align:center; margin-top:4px}
+.tria-card{
+  width:100%; max-width:420px; background:#fff; border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.12); padding:20px 22px; text-align:center;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1), opacity .25s;
+}
+.tria-card .nome{font-size:1.05rem; font-weight:800; word-break:break-all}
+.tria-card .amostra{
+  background:#f2f2f7; border-radius:12px; padding:12px; margin:12px 0 4px;
+  font-size:.95rem; line-height:1.9; color:#3a3a3c;
+}
+.tria-card.voa-esq{transform:translateX(-130%) rotate(-10deg); opacity:0}
+.tria-card.voa-dir{transform:translateX(130%) rotate(10deg); opacity:0}
+.tria-card.entra{animation:triaentra .32s cubic-bezier(.34,1.56,.64,1)}
+@keyframes triaentra{0%{transform:scale(.88) translateY(14px); opacity:0} 100%{transform:none; opacity:1}}
+.tria-botoes{display:flex; gap:14px}
+.tria-btn{
+  border:none; border-radius:14px; padding:14px 26px; font-size:1rem; font-weight:800;
+  cursor:pointer; color:#fff; transition:transform .25s cubic-bezier(.34,1.56,.64,1), filter .15s;
+  touch-action:manipulation;
+}
+.tria-btn:hover{transform:translateY(-3px) scale(1.04); filter:brightness(1.06)}
+.tria-btn:active{transform:scale(.9)}
+.tria-btn.sai{background:#8E8E93}
+.tria-btn.fica{background:#34C759}
+.tria-btn.desfaz{background:#fff; color:#007AFF; border:2px solid #007AFF; padding:10px 18px; font-size:.85rem}
+.tria-fim{width:100%; max-width:520px; max-height:250px; overflow-y:auto; background:#fff; border-radius:12px; padding:10px}
+
+/* Planilha viva (S6) */
+.plan-wrap{overflow:auto; max-height:340px; background:#fff; border-radius:12px; box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.plan{border-collapse:collapse; font-size:.74rem; min-width:100%}
+.plan th{
+  position:sticky; top:0; background:#f8f9fa; cursor:pointer; padding:9px 10px;
+  border-bottom:2px solid #dee2e6; white-space:nowrap; font-weight:800;
+  transition:background .3s, transform .15s; user-select:none;
+}
+.plan th:hover{background:#e7f1ff}
+.plan th:active{transform:scale(.95)}
+.plan td{padding:7px 10px; border-bottom:1px solid #f1f3f5; white-space:nowrap; color:#495057; transition:background .35s ease}
+.plan .colst1{background:rgba(0,122,255,.07)}
+.plan .colst2{background:rgba(175,82,222,.09)}
+.plan .colst3{background:rgba(255,149,0,.09)}
+.plan .colst4{background:rgba(52,199,89,.09)}
+.plan .colst0{background:rgba(142,142,147,.09); color:#adb5bd; text-decoration:line-through}
+.plan th .estado-txt{display:block; font-size:.62rem; font-weight:700; margin-top:2px}
+
+/* Recomendação */
+.reco{
+  background:#fff; border-radius:16px; box-shadow:0 4px 20px rgba(0,0,0,.08);
+  padding:26px 28px; margin:26px 0; border-left:6px solid #28a745;
+}
+.reco h3{margin-top:0}
+.fase{
+  background:#f8f9fa; border:1px solid #e9ecef; border-radius:12px;
+  padding:14px 18px; margin:10px 0;
+}
+.fase b.fase-n{
+  display:inline-block; background:#007bff; color:#fff; border-radius:999px;
+  padding:2px 12px; font-size:.78rem; margin-bottom:6px;
+}
+.refs{font-size:.85rem; color:#6c757d}
+.refs li{margin-bottom:6px}
+.refs a{color:#007bff}
+
+/* ==========================================================================
+   PAINEL 180 DIAS — compartilhado pelas demos C1 a C5
+   Cores = semáforo oficial do app: #28a745 / #fd7e14 / #dc3545
+   ========================================================================== */
+.p180-card{
+  background:#fff; border-radius:16px; box-shadow:0 12px 32px rgba(0,0,0,.18);
+  padding:16px; width:300px; max-width:100%;
+}
+.sheet .p180-card{width:320px}
+.cartao-calc .p180-card{box-shadow:none; border:1px solid #e9ecef; width:100%}
+.janela-calc .p180-card{box-shadow:none; border-radius:0; width:100%}
+.gaveta .p180-card{box-shadow:none; border:1px solid #e9ecef; width:100%}
+.cartao-calc.aberto .cartao-calc-corpo{max-height:560px}
+.p180-titulo{font-size:.95rem; font-weight:800; margin:0 0 10px}
+.p180-label{display:block; font-size:.75rem; font-weight:700; color:#6c757d; margin-bottom:4px}
+.p180-data{
+  width:100%; padding:10px 12px; font-size:1rem; font-family:inherit;
+  border:2px solid #ced4da; border-radius:10px; background:#fff;
+  transition:border-color .2s, box-shadow .2s;
+}
+.p180-data:focus{border-color:#007bff; box-shadow:0 0 0 3px rgba(0,123,255,.15); outline:none}
+.p180-rapidos{display:flex; flex-wrap:wrap; gap:6px; margin-top:10px}
+.p180-rapidos button{
+  border:1.5px solid #ced4da; background:#f8f9fa; border-radius:999px;
+  padding:6px 11px; font-size:.74rem; font-weight:700; color:#495057; cursor:pointer;
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1), background .15s, border-color .15s;
+}
+.p180-rapidos button:hover{background:#e7f1ff; border-color:#80bdff; transform:translateY(-2px)}
+.p180-rapidos button:active{transform:scale(.9)}
+.p180-resumo{
+  margin-top:12px; border-radius:12px; padding:12px; background:#f8f9fa;
+  border:2px solid transparent; transition:background .3s, border-color .3s;
+}
+.p180-resumo.fx-verde{background:#eaf7ee; border-color:rgba(40,167,69,.4)}
+.p180-resumo.fx-laranja{background:#fff4e8; border-color:rgba(253,126,20,.45)}
+.p180-resumo.fx-vermelho{background:#fdecea; border-color:rgba(220,53,69,.45)}
+.p180-numeros{display:flex; gap:10px}
+.p180-caixa{flex:1; text-align:center}
+.p180-num{
+  display:block; font-size:2rem; font-weight:800; line-height:1.15; color:#212529;
+  transition:color .3s; transform-origin:center;
+}
+.fx-verde .p180-num{color:#28a745}
+.fx-laranja .p180-num{color:#fd7e14}
+.fx-vermelho .p180-num{color:#dc3545}
+.p180-num.pula{animation:squash .3s cubic-bezier(.34,1.56,.64,1)}
+.p180-rot{font-size:.72rem; color:#6c757d; font-weight:600}
+.p180-trilho{margin-top:10px; height:12px; background:#e9ecef; border-radius:99px; overflow:hidden}
+.p180-barra{
+  height:100%; width:0%; border-radius:99px; background:#28a745;
+  transition:width .5s cubic-bezier(.22,1.2,.32,1), background .3s;
+}
+.fx-laranja .p180-barra{background:#fd7e14}
+.fx-vermelho .p180-barra{background:#dc3545}
+.p180-status{margin-top:8px; font-size:.82rem; font-weight:700; color:#495057; text-align:center}
+.p180-alerta{
+  margin-top:8px; background:#dc3545; color:#fff; border-radius:10px;
+  padding:10px 12px; font-size:.85rem; font-weight:800; text-align:center;
+  animation:alertapula .45s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes alertapula{0%{transform:scale(.85); opacity:0} 60%{transform:scale(1.04)} 100%{transform:scale(1); opacity:1}}
+.status-chip{
+  display:inline-block; border-radius:999px; padding:3px 12px; font-size:.72rem; font-weight:800;
+  background:#e9ecef; color:#6c757d; transition:background .3s, color .3s; vertical-align:middle;
+}
+.status-chip.pula{animation:squash .3s cubic-bezier(.34,1.56,.64,1)}
+
+/* Responsivo fino */
+@media (max-width:560px){
+  .wrap{padding:16px 10px 70px}
+  .capa,.prop,.diag,.reco{padding:18px 16px}
+  .linha-col .nome{flex-basis:38%}
+  .kanban{flex-direction:column}
+  .kanban-col{flex:1 1 auto; width:100%}
+  .popover-calc{right:8px; left:8px; display:flex; justify-content:center}
+  .popover-calc .calc{width:100%}
+}
+
+/* Movimento reduzido: versão calma (só fade rápido, sem mola nem voo) */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{
+    animation-duration:.01ms !important; animation-iteration-count:1 !important;
+    transition-duration:.12s !important; transition-timing-function:ease !important;
+  }
+  .sheet,.gaveta,.barra-selecao{transition-property:transform,opacity}
+}
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <nav>
+    <a href="#capa" class="destaque">Capa</a>
+    <a href="#parte1">1 · Calculadora</a>
+    <a href="#c1">C1</a><a href="#c2">C2</a><a href="#c3">C3</a><a href="#c4">C4</a><a href="#c5">C5</a>
+    <a href="#parte2">2 · Seletor de colunas</a>
+    <a href="#s1">S1</a><a href="#s2">S2</a><a href="#s3">S3</a><a href="#s4">S4</a><a href="#s5">S5</a><a href="#s6">S6</a>
+    <a href="#reco" class="destaque">Recomendação</a>
+  </nav>
+</div>
+
+<div class="wrap">
+
+<!-- ================= CAPA ================= -->
+<header class="capa" id="capa">
+  <h1>Duas melhorias para o VTO</h1>
+  <p class="sub">Propostas com demonstrações clicáveis — teste cada uma com o mouse e sinta a diferença.</p>
+  <div class="pedido">
+    <p><b>O pedido, em 3 linhas:</b></p>
+    <p>1. Um botão nas abas de vistorias e matrículas que abre um painel de prazo: você põe a data da 1ª vistoria e ele mostra na hora quantos dias correram e quantos faltam para os 180 — com semáforo de cores e alerta escrito quando o prazo estoura.</p>
+    <p>2. Um jeito melhor de escolher as 159 colunas do Anonimizador: ver miniaturas com amostra dos dados, selecionar tudo ou só algumas, sem clicar 4 vezes por coluna.</p>
+  </div>
+  <p style="margin-top:16px; font-size:.85rem; color:#6c757d">
+    São <b>5 propostas para o painel de prazo</b> (C1 a C5) e <b>6 para o seletor de colunas</b> (S1 a S6).
+    Cada uma tem uma <b>demonstração funcionando</b> dentro da moldura cinza. Nada aqui altera o aplicativo — é só para você decidir.
+  </p>
+</header>
+
+<!-- ================= PARTE 1 — PAINEL DE PRAZO 180 DIAS ================= -->
+<div class="parte-head" id="parte1">
+  <h2>Parte 1 · Painel de prazo dos 180 dias</h2>
+  <p>Um botão nas abas Fluxo de Vistorias e Matrículas. Você põe a data da 1ª vistoria — que conta sempre como início — e o painel mostra ao vivo, sem botão: quantos dias correram até hoje e quantos faltam para os 180. Perto de acabar, cor de atenção. Estourou, vermelho com alerta escrito.</p>
+</div>
+
+<div class="diag">
+  <h3>Diagnóstico — quanto pesa hoje saber o prazo de uma vistoria</h3>
+  <p><b>Para quem:</b> o Rafa, querendo responder em 10 segundos "quanto tempo já correu e quanto falta para os 180 dias" — de uma matrícula ou de qualquer data.</p>
+  <p><b>Hoje, passo a passo:</b> 1) ir até a aba Matrículas · 2) achar a matrícula certa no meio da tabela · 3) abrir a timeline dela · 4) procurar o contador pequeno dos 180 dias. E se a data não vem de uma matrícula cadastrada, hoje não há onde olhar.</p>
+  <div class="nums">
+    <div class="numbox"><span class="n">4</span><span class="r">passos hoje</span></div>
+    <div class="numbox"><span class="n">1</span><span class="r">matrícula por vez — só as cadastradas</span></div>
+    <div class="numbox"><span class="n">0</span><span class="r">jeito de consultar uma data solta</span></div>
+    <div class="numbox"><span class="n bom">2</span><span class="r">toques depois — para qualquer data</span></div>
+  </div>
+  <p style="font-size:.88rem; color:#6c757d">A ferramenta nova fala a <b>mesma língua do app</b>: os mesmos números (<code class="inl">diasPassados180</code>, <code class="inl">diasRestantes180</code>), o mesmo semáforo (mais de 60 dias = verde · 31 a 60 = laranja, atenção · 30 ou menos = vermelho, crítico · estourou = vermelho com alerta escrito) e datas ao meio-dia para não ter bug de fuso. Onde o botão mora faz parte de cada proposta: a <code class="inl">.fluxo-toolbar</code> do Fluxo ou a barra de ações das Matrículas.</p>
+  <div class="bug" style="background:#e7f1ff; border-color:#b3d7ff"><b>Extra, se o Rafa quiser:</b> quando houver uma matrícula ativa, o painel já abre com a data da 1ª vistoria dela preenchida — aí nem escolher a data precisa. Digitar a data à mão continua sendo o caminho principal; o preenchimento é só um atalho.</div>
+</div>
+
+<!-- ============ C1 ============ -->
+<section class="prop" id="c1">
+  <span class="etiqueta">PROPOSTA C1</span>
+  <h3>Botão flutuante + folha que sobe</h3>
+  <div class="onde">
+    <b>Onde vive:</b> um botão redondo azul com um ícone de calendário, flutuando no canto inferior direito das abas Fluxo e Matrículas. Um botão só serve as duas abas — não briga por espaço em nenhuma barra.
+    <b>Como navega:</b> tocou no botão, uma folha sobe do fundo da tela com o painel de prazo. Escolheu a data (ou tocou num atalho), os números e a cor aparecem ao vivo. Tocou fora ou apertou Esc, a folha desce.
+  </div>
+
+  <div class="palco" id="palcoC1">
+    <span class="palco-titulo">Simulação da aba Fluxo</span>
+    <div class="mock-toolbar">
+      <span class="mock-btn ativo">&#9783; Modo Grade</span>
+      <span class="mock-btn">&#9974; 1 card</span>
+      <span class="mock-btn">&#8722;</span>
+      <span class="mock-btn">&#43;</span>
+    </div>
+    <div class="mock-corpo">
+      <div class="mock-card"><b>1a VISTORIA</b><div class="mock-linha w80"></div><div class="mock-linha w60"></div></div>
+      <div class="mock-card"><b>2a VISTORIA</b><div class="mock-linha w40"></div><div class="mock-linha w80"></div></div>
+    </div>
+    <div class="sheet-fundo" id="fundoC1"></div>
+    <div class="sheet" id="sheetC1">
+      <div class="p180-card">
+        <div class="sheet-alca"></div>
+        <p class="p180-titulo">&#128197; Prazo dos 180 dias</p>
+        <label class="p180-label" for="dataC1">Data da 1ª vistoria (é sempre o início da contagem)</label>
+        <input type="date" class="p180-data" id="dataC1">
+        <div class="p180-rapidos" id="rapidosC1">
+          <button type="button" data-dias="30">há 30 dias</button>
+          <button type="button" data-dias="130">há 130 dias</button>
+          <button type="button" data-dias="150">há 150 dias</button>
+          <button type="button" data-dias="200">há 200 dias</button>
+        </div>
+        <div class="p180-resumo" id="resumoC1">
+          <div class="p180-numeros">
+            <div class="p180-caixa"><span class="p180-num" id="passC1">—</span><span class="p180-rot">dias corridos</span></div>
+            <div class="p180-caixa"><span class="p180-num" id="faltC1">—</span><span class="p180-rot">dias até os 180</span></div>
+          </div>
+          <div class="p180-trilho"><div class="p180-barra" id="barraC1"></div></div>
+          <div class="p180-status" id="statusC1">Escolha a data para ver o prazo.</div>
+          <div class="p180-alerta" id="alertaC1" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+    <button class="fab chama" id="fabC1" aria-label="Abrir painel de prazo">&#128197;</button>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique no botão azul redondo. Toque nos atalhos <b>há 30 / 130 / 150 / 200 dias</b> para sentir as três cores e o estouro do prazo — ou escolha uma data no campo. Clique fora para fechar (Esc também).</p>
+
+  <div class="juice">
+    <div class="j"><b>Folha sobe:</b> 420ms, mola <code class="inl">cubic-bezier(.22,1.28,.32,1)</code> — passa um pouquinho do ponto e assenta.</div>
+    <div class="j"><b>Número rola:</b> os dias sobem como odômetro em 380ms com freio suave — você vê o tempo correndo.</div>
+    <div class="j"><b>Barra dos 180:</b> enche com mola de 500ms <code class="inl">cubic-bezier(.22,1.2,.32,1)</code> e muda de cor junto com o semáforo.</div>
+    <div class="j"><b>Troca de faixa:</b> os números pulsam (squash de 300ms) já na cor nova; ao estourar, o alerta vermelho entra com pop de 450ms.</div>
+    <div class="j"><b>Botão flutuante:</b> pulsa um anel de luz 2 vezes na primeira vez que a aba abre, para ser descoberto sozinho.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco P">P</span> — folha + painel. A conta e as cores já existem no app: é reuso, não invenção.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixíssimo. A lógica (<code class="inl">diasPassados180</code> / <code class="inl">diasRestantes180</code>) e o semáforo são os mesmos de <code class="inl">calcularStatusMatricula</code> — zero mudança no que já funciona. Cuidado só com a posição do botão para não cobrir o Enviar. Desfazer/refazer e Exportar ZIP: intactos.</div>
+    <div class="cel"><b>Celular</b>Excelente — folha de baixo é o padrão de celular; o campo de data abre o calendário nativo. Vibração curta ao trocar de faixa.</div>
+    <div class="cel"><b>Acessibilidade</b>Esc fecha; cor nunca vem sozinha (sempre com texto: "10 dias restantes", "expirado há 20 dias"); versão calma sem mola com <code class="inl">prefers-reduced-motion</code>.</div>
+    <div class="cel"><b>Antes → depois</b>4 passos caçando o contador → <b>2 toques, para qualquer data</b>, com números grandes e cor na cara.</div>
+  </div>
+</section>
+
+<!-- ============ C2 ============ -->
+<section class="prop" id="c2">
+  <span class="etiqueta">PROPOSTA C2</span>
+  <h3>Botão na barra + balão grudado (e o status acende na matrícula)</h3>
+  <div class="onde">
+    <b>Onde vive:</b> botão <b>📅 Prazo</b> dentro da barra do Fluxo (<code class="inl">.fluxo-toolbar</code>), ao lado do zoom — e um igual na barra das Matrículas.
+    <b>Como navega:</b> clicou, um balão nasce do próprio botão, grudado nele. Ao escolher a data, o selinho de status da matrícula ativa acende na mesma cor — o painel e a tabela falam a mesma língua.
+  </div>
+
+  <div class="palco" id="palcoC2">
+    <span class="palco-titulo">Simulação da aba Fluxo</span>
+    <div class="mock-toolbar">
+      <span class="mock-btn ativo">&#9783; Modo Grade</span>
+      <span class="mock-btn">&#9974; 1 card</span>
+      <span class="mock-btn">&#8722;</span>
+      <span class="mock-btn">&#43;</span>
+      <button class="btn-calc-toolbar" id="btnC2">&#128197; Prazo</button>
+    </div>
+    <div class="mock-corpo">
+      <div class="mock-card">
+        Matrícula ativa: <b>12345678</b> <span class="status-chip" id="chipC2">sem data</span>
+        <div class="mock-linha w60"></div>
+      </div>
+      <div class="mock-card"><div class="mock-linha w80"></div><div class="mock-linha w40"></div></div>
+    </div>
+    <div class="popover-calc" id="popC2">
+      <div class="p180-card">
+        <p class="p180-titulo">&#128197; Prazo dos 180 dias</p>
+        <label class="p180-label" for="dataC2">Data da 1ª vistoria (é sempre o início da contagem)</label>
+        <input type="date" class="p180-data" id="dataC2">
+        <div class="p180-rapidos" id="rapidosC2">
+          <button type="button" data-dias="30">há 30 dias</button>
+          <button type="button" data-dias="130">há 130 dias</button>
+          <button type="button" data-dias="150">há 150 dias</button>
+          <button type="button" data-dias="200">há 200 dias</button>
+        </div>
+        <div class="p180-resumo" id="resumoC2">
+          <div class="p180-numeros">
+            <div class="p180-caixa"><span class="p180-num" id="passC2">—</span><span class="p180-rot">dias corridos</span></div>
+            <div class="p180-caixa"><span class="p180-num" id="faltC2">—</span><span class="p180-rot">dias até os 180</span></div>
+          </div>
+          <div class="p180-trilho"><div class="p180-barra" id="barraC2"></div></div>
+          <div class="p180-status" id="statusC2">Escolha a data para ver o prazo.</div>
+          <div class="p180-alerta" id="alertaC2" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique em <b>📅 Prazo</b>. Toque nos atalhos <b>há 30 / 130 / 150 / 200 dias</b> e veja o painel e o selinho da matrícula mudarem de cor juntos. Clique fora para fechar.</p>
+
+  <div class="juice">
+    <div class="j"><b>Balão nasce do botão:</b> escala 0.6 → 1 a partir do canto do botão, 300ms com mola. Você vê de onde ele veio.</div>
+    <div class="j"><b>Selo acende junto:</b> o status da matrícula pulsa (squash de 300ms) já na cor da faixa — reforço fora do painel.</div>
+    <div class="j"><b>Número rola e barra enche:</b> odômetro de 380ms + mola de 500ms, iguais em todas as propostas.</div>
+    <div class="j"><b>Fecha:</b> clique fora, Esc, ou no botão de novo — encolhe de volta para o botão, 200ms.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco P">P</span> — balão + painel + selinho que espelha a cor.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixíssimo. Só acrescenta um botão na barra (a barra já quebra linha em telas estreitas). A conta e as cores são as mesmas do app — zero mudança no que já funciona. O selinho só muda se a pessoa escolher uma data.</div>
+    <div class="cel"><b>Celular</b>Bom, mas o balão precisa virar folha de baixo em tela estreita (como na C1) para não cobrir a tabela.</div>
+    <div class="cel"><b>Acessibilidade</b>Foco vai para o balão ao abrir; Esc fecha; cor sempre acompanhada de texto ("No prazo", "Crítico", "Expirado").</div>
+    <div class="cel"><b>Antes → depois</b>4 passos → <b>2 cliques</b>, e o status fica visível na matrícula mesmo depois de fechar o balão.</div>
+  </div>
+</section>
+
+<!-- ============ C3 ============ -->
+<section class="prop" id="c3">
+  <span class="etiqueta">PROPOSTA C3</span>
+  <h3>Gaveta lateral com memória de consultas</h3>
+  <div class="onde">
+    <b>Onde vive:</b> uma aba fina na borda direita da tela, escrita PRAZO, sempre à mão nas duas abas.
+    <b>Como navega:</b> clicou, uma gaveta desliza da direita com o painel <b>e a memória das datas consultadas</b> — cada consulta vira uma linha na lista, já na cor da faixa. Tocar numa linha antiga mostra aquela data de novo.
+  </div>
+
+  <div class="palco" id="palcoC3">
+    <span class="palco-titulo">Simulação da aba Matrículas</span>
+    <div class="mock-toolbar">
+      <span class="mock-btn">&#8630;</span>
+      <span class="mock-btn">&#8631;</span>
+      <span class="mock-btn ativo">+ Adicionar</span>
+      <span class="mock-btn">&#128190; Exportar CSV</span>
+    </div>
+    <div class="mock-corpo">
+      <div class="mock-card"><b>12345678</b> — 2a vistoria<div class="mock-linha w60"></div></div>
+      <div class="mock-card"><b>87654321</b> — 1a vistoria<div class="mock-linha w80"></div></div>
+    </div>
+    <button class="aba-gaveta" id="abaC3">&#128197; PRAZO</button>
+    <div class="gaveta" id="gavetaC3">
+      <div class="gaveta-head">
+        <b>Prazo dos 180 dias</b>
+        <button class="btn-massa" id="fechaC3" style="background:#8e8e93; padding:5px 12px">Fechar</button>
+      </div>
+      <div class="fita" id="fitaC3">
+        <div class="fita-vazia" id="fitaVaziaC3">As datas consultadas aparecem aqui.<br>Toque numa linha para ver de novo.</div>
+      </div>
+      <div class="p180-card">
+        <label class="p180-label" for="dataC3">Data da 1ª vistoria (é sempre o início da contagem)</label>
+        <input type="date" class="p180-data" id="dataC3">
+        <div class="p180-rapidos" id="rapidosC3">
+          <button type="button" data-dias="30">há 30 dias</button>
+          <button type="button" data-dias="130">há 130 dias</button>
+          <button type="button" data-dias="150">há 150 dias</button>
+          <button type="button" data-dias="200">há 200 dias</button>
+        </div>
+        <div class="p180-resumo" id="resumoC3">
+          <div class="p180-numeros">
+            <div class="p180-caixa"><span class="p180-num" id="passC3">—</span><span class="p180-rot">dias corridos</span></div>
+            <div class="p180-caixa"><span class="p180-num" id="faltC3">—</span><span class="p180-rot">dias até os 180</span></div>
+          </div>
+          <div class="p180-trilho"><div class="p180-barra" id="barraC3"></div></div>
+          <div class="p180-status" id="statusC3">Escolha a data para ver o prazo.</div>
+          <div class="p180-alerta" id="alertaC3" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique na aba azul PRAZO na borda direita. Consulte duas ou três datas (atalhos ou campo) e veja a lista crescer, cada linha na cor da faixa. Toque numa linha para trazer aquela data de volta.</p>
+
+  <div class="juice">
+    <div class="j"><b>Gaveta desliza:</b> 380ms, <code class="inl">cubic-bezier(.2,.9,.25,1.12)</code> — entra rápido e freia macio.</div>
+    <div class="j"><b>Linha nova na lista:</b> cai de cima com mola de 300ms, já pintada na cor da faixa.</div>
+    <div class="j"><b>Aba na borda:</b> escorrega 4px para fora ao passar o mouse, convidando ao clique.</div>
+    <div class="j"><b>Reuso:</b> tocou na linha, a data volta ao campo e os números rolam de novo (odômetro de 380ms).</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — gaveta + lista de consultas (fica só na memória da sessão; nada é gravado em arquivo).</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixíssimo. Camada nova, não encosta em desfazer/refazer nem no ZIP. A conta e as cores são as mesmas do app — zero mudança no que já funciona.</div>
+    <div class="cel"><b>Celular</b>Boa, mas em tela estreita a gaveta vira folha de baixo (mesmo desenho da C1).</div>
+    <div class="cel"><b>Acessibilidade</b>Linhas da lista são botões com data e status por extenso; Esc fecha; cor sempre com texto.</div>
+    <div class="cel"><b>Antes → depois</b>4 passos por consulta → <b>2 cliques, e nenhuma consulta se perde</b> ("aquele prazo que eu vi de manhã" está a um toque).</div>
+  </div>
+</section>
+
+<!-- ============ C4 ============ -->
+<section class="prop" id="c4">
+  <span class="etiqueta">PROPOSTA C4</span>
+  <h3>Cartão embutido que estica</h3>
+  <div class="onde">
+    <b>Onde vive:</b> um cartão dentro da própria aba (Fluxo ou Matrículas), recolhido como uma linha: <b>📅 Prazo dos 180 dias</b>.
+    <b>Como navega:</b> clicou, o cartão estica e o painel aparece empurrando o conteúdo para baixo. Nada flutua, nada cobre nada.
+  </div>
+
+  <div class="palco" id="palcoC4" style="min-height:440px">
+    <span class="palco-titulo">Simulação da aba Matrículas</span>
+    <div class="mock-toolbar">
+      <span class="mock-btn">&#8630;</span>
+      <span class="mock-btn">&#8631;</span>
+      <span class="mock-btn ativo">+ Adicionar</span>
+    </div>
+    <div class="cartao-calc" id="cartaoC4">
+      <button class="cartao-calc-topo" id="topoC4" aria-expanded="false">
+        <span>&#128197; Prazo dos 180 dias</span>
+        <span class="seta">&#9660;</span>
+      </button>
+      <div class="cartao-calc-corpo">
+        <div class="p180-card">
+          <label class="p180-label" for="dataC4">Data da 1ª vistoria (é sempre o início da contagem)</label>
+          <input type="date" class="p180-data" id="dataC4">
+          <div class="p180-rapidos" id="rapidosC4">
+            <button type="button" data-dias="30">há 30 dias</button>
+            <button type="button" data-dias="130">há 130 dias</button>
+            <button type="button" data-dias="150">há 150 dias</button>
+            <button type="button" data-dias="200">há 200 dias</button>
+          </div>
+          <div class="p180-resumo" id="resumoC4">
+            <div class="p180-numeros">
+              <div class="p180-caixa"><span class="p180-num" id="passC4">—</span><span class="p180-rot">dias corridos</span></div>
+              <div class="p180-caixa"><span class="p180-num" id="faltC4">—</span><span class="p180-rot">dias até os 180</span></div>
+            </div>
+            <div class="p180-trilho"><div class="p180-barra" id="barraC4"></div></div>
+            <div class="p180-status" id="statusC4">Escolha a data para ver o prazo.</div>
+            <div class="p180-alerta" id="alertaC4" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mock-corpo" style="padding-top:0">
+      <div class="mock-card"><b>12345678</b><div class="mock-linha w60"></div></div>
+      <div class="mock-card"><b>87654321</b><div class="mock-linha w80"></div></div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique na faixa "Prazo dos 180 dias". O cartão estica e os botõezinhos sobem um a um. Toque em <b>há 150 dias</b> e <b>há 200 dias</b> para ver o vermelho. Clique de novo para recolher.</p>
+
+  <div class="juice">
+    <div class="j"><b>Estica:</b> altura 0 → completa em 420ms com mola suave <code class="inl">cubic-bezier(.22,1.15,.32,1)</code>; a seta gira 180°.</div>
+    <div class="j"><b>Conteúdo sobe em cascata:</b> atalhos e números entram um a um com 40ms de atraso, subindo com mola.</div>
+    <div class="j"><b>Empurra o conteúdo:</b> a tabela desce junto — você sente o espaço abrindo, nada some de vista.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco P">P</span> — é a mais simples de todas: um cartão que abre/fecha + o painel reusado.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo. Mexe só no layout da aba (o conteúdo desce). A conta e as cores são as mesmas do app — zero mudança no que já funciona.</div>
+    <div class="cel"><b>Celular</b>Perfeita — é nativa de qualquer tela, sem sobreposição.</div>
+    <div class="cel"><b>Acessibilidade</b>É um botão com <code class="inl">aria-expanded</code>; a ordem de tabulação natural já funciona.</div>
+    <div class="cel"><b>Antes → depois</b>4 passos → <b>2 cliques</b>. Sem descoberta: o painel está escrito por extenso na tela.</div>
+  </div>
+</section>
+
+<!-- ============ C5 ============ -->
+<section class="prop" id="c5">
+  <span class="etiqueta">PROPOSTA C5</span>
+  <h3>Janelinha flutuante que você arrasta</h3>
+  <div class="onde">
+    <b>Onde vive:</b> uma mini-janela com barra de título azul, como um widget de computador. Abre por um botão na barra e fica por cima da tela.
+    <b>Como navega:</b> arraste pela barra azul para onde atrapalhar menos. Ela inclina enquanto você arrasta e endireita com mola ao soltar. O botão <b>–</b> encolhe ela até virar só a barra.
+  </div>
+
+  <div class="palco" id="palcoC5" style="min-height:520px">
+    <span class="palco-titulo">Simulação da aba Fluxo</span>
+    <div class="mock-toolbar">
+      <span class="mock-btn ativo">&#9783; Modo Grade</span>
+      <span class="mock-btn">&#9974; 1 card</span>
+      <span class="mock-btn">&#8722;</span>
+      <span class="mock-btn">&#43;</span>
+    </div>
+    <button class="btn-mostrar-janela" id="mostraC5">&#128197; Abrir painel de prazo</button>
+    <div class="mock-corpo" style="padding-top:0">
+      <div class="mock-card"><b>1a VISTORIA</b><div class="mock-linha w80"></div></div>
+      <div class="mock-card"><b>2a VISTORIA</b><div class="mock-linha w60"></div><div class="mock-linha w40"></div></div>
+    </div>
+    <div class="janela-calc" id="janelaC5" style="display:none">
+      <div class="janela-calc-barra" id="barraC5">
+        <span>&#128197; Prazo 180 dias — arraste aqui</span>
+        <button id="minC5" aria-label="Minimizar">&#8722;</button>
+      </div>
+      <div class="calc-corpo-janela">
+        <div class="p180-card">
+          <label class="p180-label" for="dataC5">Data da 1ª vistoria (é sempre o início da contagem)</label>
+          <input type="date" class="p180-data" id="dataC5">
+          <div class="p180-rapidos" id="rapidosC5">
+            <button type="button" data-dias="30">há 30 dias</button>
+            <button type="button" data-dias="130">há 130 dias</button>
+            <button type="button" data-dias="150">há 150 dias</button>
+            <button type="button" data-dias="200">há 200 dias</button>
+          </div>
+          <div class="p180-resumo" id="resumoC5">
+            <div class="p180-numeros">
+              <div class="p180-caixa"><span class="p180-num" id="passC5">—</span><span class="p180-rot">dias corridos</span></div>
+              <div class="p180-caixa"><span class="p180-num" id="faltC5">—</span><span class="p180-rot">dias até os 180</span></div>
+            </div>
+            <div class="p180-trilho"><div class="p180-barra" id="progC5"></div></div>
+            <div class="p180-status" id="statusC5">Escolha a data para ver o prazo.</div>
+            <div class="p180-alerta" id="alertaC5" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> abra o painel e <b>arraste pela barra azul</b> bem rápido — ela inclina acompanhando a mão e endireita com mola. Toque nos atalhos de dias para ver as cores. O botão – encolhe.</p>
+
+  <div class="juice">
+    <div class="j"><b>Inclina no arrasto:</b> rotação proporcional à velocidade, até ±6°, em tempo real.</div>
+    <div class="j"><b>Ao soltar:</b> endireita com mola de 350ms <code class="inl">cubic-bezier(.34,1.56,.64,1)</code> — sensação de objeto físico.</div>
+    <div class="j"><b>Sombra cresce:</b> enquanto arrasta, a sombra aprofunda (de 14px para 22px) — ela "levanta" da tela.</div>
+    <div class="j"><b>Minimizar:</b> encolhe até a barra com mola de 300ms; outro clique restaura.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — arrasto com limites de tela, inclinação por velocidade e minimizar. O painel é o mesmo das outras.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo no código, médio no uso: janela solta pode cobrir um botão importante (por isso ela é arrastável e encolhe). A conta e as cores são as mesmas do app.</div>
+    <div class="cel"><b>Celular</b>Fraca — arrastar janela em tela pequena é chato. Em celular deveria cair no desenho da C1 (folha de baixo).</div>
+    <div class="cel"><b>Acessibilidade</b>Arrasto por mouse/touch; precisa de setas do teclado na barra para mover (foco visível já incluso).</div>
+    <div class="cel"><b>Antes → depois</b>4 passos → <b>2 cliques</b>, e o painel fica onde você quiser enquanto registra várias vistorias.</div>
+  </div>
+</section>
+
+<!-- ================= PARTE 2 — SELETOR DE COLUNAS ================= -->
+<div class="parte-head verde" id="parte2">
+  <h2>Parte 2 · Seletor de colunas do Anonimizador</h2>
+  <p>Hoje as colunas viram balõezinhos que trocam de cor a cada clique. As propostas mostram as colunas de verdade, com amostra dos dados, e deixam escolher tudo ou só algumas de uma vez.</p>
+</div>
+
+<div class="diag">
+  <h3>Diagnóstico — quanto pesa decidir 159 colunas hoje</h3>
+  <p><b>Para quem:</b> o Rafa, com um lote de arquivos do SGCG na mão, precisando decidir o destino de cada coluna sem destruir dado por engano.</p>
+  <p><b>Hoje:</b> cada balõezinho cicla 5 cores por clique (Manter → Anonimizar → Dublê → Simular → Excluir). Levar uma coluna de Manter até Excluir custa <b>4 cliques</b>. Um clique a mais e ela volta ao início — recomeça o ciclo.</p>
+  <div class="nums">
+    <div class="numbox"><span class="n">159</span><span class="r">colunas no modo TXT (uma decisão cada)</span></div>
+    <div class="numbox"><span class="n">~516</span><span class="r">cliques para excluir 129 colunas (129 × 4)</span></div>
+    <div class="numbox"><span class="n">23</span><span class="r">linhas de balõezinhos para rolar</span></div>
+    <div class="numbox"><span class="n">0</span><span class="r">amostras de dados para ajudar a decidir</span></div>
+  </div>
+
+  <h3 style="margin-top:18px">Bugs encontrados na pesquisa (só achados — a correção vem depois da sua decisão) <span class="aviso-achado">não consertado</span></h3>
+  <div class="bug"><b>1 · O mais grave — falso positivo "NOME":</b> o detector de dado sensível procura o texto "NOME" dentro do nome da coluna. Resultado: <b>NOME-BAIRRO, NOME-FONTE, NOME-RESERVA e NOME-ENDER-ALT</b> nascem marcadas como 👻 Anonimizar (hash). São nomes de lugares, não de pessoas — hashear destrói o mapa e a estatística sem ganho nenhum de LGPD. Nas demos abaixo, essas 4 colunas aparecem com uma etiqueta amarela de alerta.</div>
+  <div class="bug"><b>2 · O ciclo pune o erro:</b> passou um clique do que queria, a coluna volta para Manter e você clica tudo de novo.</div>
+  <div class="bug"><b>3 · Preset com efeito escondido:</b> o botão "Padrão Power Query" renomeia a coluna 24 (ECO-AGUA pop vira "pub") sem avisar.</div>
+  <div class="bug"><b>4 · Só o primeiro arquivo manda:</b> o app lê as colunas do arquivo 1 e aplica em todos. Se algum arquivo do lote tiver layout diferente, o corte erra em silêncio.</div>
+  <div class="bug"><b>5 · Encoding na fronteira:</b> um caractere cortado exatamente no byte 65536 faz o arquivo inteiro ser lido com a codificação errada.</div>
+  <p style="font-size:.85rem; color:#6c757d">Todas as propostas abaixo são uma <b>camada nova</b> que lê e escreve nos mesmos dados de hoje (<code class="inl">COLUNAS_DETECTADAS</code>) e redesenha com a função que já existe (<code class="inl">atualizarVisualChip</code>). Os balõezinhos atuais continuam existindo como segunda visão. Nas demos, os dados são fictícios e os nomes das colunas são os reais do SGCG (159 colunas, como no modo TXT).</p>
+</div>
+
+<!-- ============ S1 ============ -->
+<section class="prop" id="s1">
+  <span class="etiqueta roxa">PROPOSTA S1</span>
+  <h3>Galeria de miniaturas <span style="font-weight:400; font-size:.9rem; color:#6c757d">(como escolher fotos no celular)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> no lugar da grade de balõezinhos, com um botão para alternar entre "miniaturas" e "balõezinhos" (os dois mostram os mesmos dados).
+    <b>Como navega:</b> cada coluna é um cartão com o nome e 3 valores de amostra. <b>Clique seleciona</b> (como no Google Fotos). Ao selecionar, sobe uma barra escura com as 5 cores: tocou na cor, todas as selecionadas mudam juntas. Tem busca, "selecionar todas visíveis" e contador vivo no topo.
+  </div>
+
+  <div class="palco palco-alto" id="palcoS1">
+    <span class="palco-titulo">Demo com as 159 colunas reais (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="sel-toolbar">
+        <input class="sel-busca" id="buscaS1" type="search" placeholder="Buscar coluna... (ex: consmed)" aria-label="Buscar coluna">
+        <button class="btn-massa ios-azul" id="selTodasS1" style="background:#007AFF">Selecionar todas visíveis</button>
+        <button class="btn-massa" id="limpaS1" style="background:#8E8E93">Limpar seleção</button>
+      </div>
+      <div class="contador-estados" id="contS1"></div>
+      <div class="grade-minis" id="gradeS1"></div>
+    </div>
+    <div class="barra-selecao" id="barraS1">
+      <span class="n-sel" id="nselS1">0 selecionadas</span>
+      <button class="btn-massa" data-est="1" style="background:#007AFF">Manter</button>
+      <button class="btn-massa" data-est="2" style="background:#AF52DE">Anonimizar</button>
+      <button class="btn-massa" data-est="3" style="background:#FF9500">Dublê</button>
+      <button class="btn-massa" data-est="4" style="background:#34C759">Simular</button>
+      <button class="btn-massa" data-est="0" style="background:#8E8E93">Excluir</button>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique em alguns cartões (eles ganham borda azul). Na barra que sobe, toque numa cor — todos mudam juntos em cascata. Busque "consmed" e use "Selecionar todas visíveis". Dois cliques num cartão mudam só ele. Repare nas etiquetas amarelas: são as 4 colunas vítimas do bug do "NOME".</p>
+
+  <div class="juice">
+    <div class="j"><b>Selecionar:</b> bolinha de check escala 0 → 1.15 → 1 com mola de 250ms; borda azul desenha em 200ms.</div>
+    <div class="j"><b>Barra sobe:</b> 380ms com mola <code class="inl">cubic-bezier(.22,1.25,.32,1)</code>; botões entram um a um (40ms de atraso cada).</div>
+    <div class="j"><b>Aplicar em massa:</b> cartões piscam a cor nova em cascata (10ms entre cartões), como uma onda.</div>
+    <div class="j"><b>Contador pulsa:</b> "3 manter · 12 simular…" cresce 1.25× por 500ms a cada mudança.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco G">G</span> — nova renderização com amostras + seleção + barra contextual. É a mais completa.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo: lê/escreve <code class="inl">COLUNAS_DETECTADAS</code> e chama <code class="inl">atualizarVisualChip</code>; os chips de hoje ficam intactos como segunda visão. Ponto de atenção: desempenho com 159 cartões (renderizar uma vez, filtrar com <code class="inl">display:none</code>). Nomes de coluna no HTML sempre com escaping.</div>
+    <div class="cel"><b>Celular</b>Boa — grade de 2 colunas, toques grandes. Barra de seleção fica grudada embaixo.</div>
+    <div class="cel"><b>Acessibilidade</b>Cartões são botões com <code class="inl">aria-pressed</code>; seleção por teclado (Espaço); cor nunca é a única pista (rótulo escrito no rodapé do cartão).</div>
+    <div class="cel"><b>Antes → depois</b>~516 cliques → <b>1 busca + 1 "selecionar todas" + 1 toque na cor = 3 gestos</b>. Decisões: 159 cegas → 159 com amostra.</div>
+  </div>
+</section>
+
+<!-- ============ S2 ============ -->
+<section class="prop" id="s2">
+  <span class="etiqueta roxa">PROPOSTA S2</span>
+  <h3>Lista rápida com bolinhas de cor <span style="font-weight:400; font-size:.9rem; color:#6c757d">(estilo Power Query, um clique direto na cor)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> mesma região do gerenciador de colunas, como visão "lista".
+    <b>Como navega:</b> uma linha por coluna, com nome, amostra e <b>5 bolinhas coloridas</b>. Tocou na bolinha, a coluna vai <b>direto</b> para aquele estado — 1 clique, sem ciclo. Caixinha de seleção + busca para aplicar em massa.
+  </div>
+
+  <div class="palco palco-alto" id="palcoS2">
+    <span class="palco-titulo">Demo com as 159 colunas reais (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="sel-toolbar">
+        <input class="sel-busca" id="buscaS2" type="search" placeholder="Buscar coluna..." aria-label="Buscar coluna">
+        <button class="btn-massa ios-azul" id="selTodasS2" style="background:#007AFF">Marcar visíveis</button>
+        <button class="btn-massa" id="aplicaExcluirS2" style="background:#8E8E93">Excluir marcadas</button>
+        <button class="btn-massa" id="aplicaManterS2" style="background:#007AFF; filter:saturate(.7)">Manter marcadas</button>
+      </div>
+      <div class="contador-estados" id="contS2"></div>
+      <div class="lista-colunas" id="listaS2"></div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> toque nas bolinhas coloridas de qualquer linha — um clique leva direto ao estado. Marque caixinhas e use "Excluir marcadas". Busque "valor" e marque as visíveis de uma vez.</p>
+
+  <div class="juice">
+    <div class="j"><b>Bolinha ativa:</b> cresce 1.18× e ganha anel da cor em 220ms com mola; as apagadas ficam a 30% de opacidade.</div>
+    <div class="j"><b>Linha responde:</b> fundo cinza-claro instantâneo no hover (&lt;100ms), linha desliza 2px.</div>
+    <div class="j"><b>Massa:</b> linhas mudam em cascata de 8ms; contador pulsa como na S1.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — lista + bolinhas diretas + busca. Sem drag, sem grade pesada.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo. Mesma camada de dados da S1. É a que menos muda a cara do app — pode ser a primeira fase do seletor.</div>
+    <div class="cel"><b>Celular</b>Boa — linhas altas, bolinhas de 18px ficam no limite: em celular as bolinhas crescem para 24px.</div>
+    <div class="cel"><b>Acessibilidade</b>Cada bolinha é um botão com nome ("marcar CPF como Anonimizar"); tabela navegável por Tab.</div>
+    <div class="cel"><b>Antes → depois</b>4 cliques por coluna → <b>1 clique direto na cor</b>. Massa: ~516 cliques → 3 gestos.</div>
+  </div>
+</section>
+
+<!-- ============ S3 ============ -->
+<section class="prop" id="s3">
+  <span class="etiqueta roxa">PROPOSTA S3</span>
+  <h3>Gavetas por assunto <span style="font-weight:400; font-size:.9rem; color:#6c757d">(as 159 colunas dobradas em 9 gavetas)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> mesma região, como visão "por assunto". Pode combinar com S1 ou S2.
+    <b>Como navega:</b> as colunas vêm dobradas em gavetas com nome do mundo real: Identificação, Endereço e Contato, Economias, Consumo, Faturas, Hidrômetro, Datas… Abra só a que interessa. Cada gaveta tem botões próprios: "Manter todas daqui" / "Excluir todas daqui".
+  </div>
+
+  <div class="palco palco-alto" id="palcoS3">
+    <span class="palco-titulo">Demo com as 159 colunas reais (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="contador-estados" id="contS3" style="padding-top:0"></div>
+      <div class="grupos-wrap" id="gruposS3"></div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> abra a gaveta "Consumo" — 23 colunas de uma família só. Use "Excluir todas daqui" e veja a cascata. Clique num balãozinho para ciclar o estado dele (igual ao app de hoje, mas dentro da gaveta certa).</p>
+
+  <div class="juice">
+    <div class="j"><b>Gaveta abre:</b> conteúdo desce com fade + 8px em 280ms <code class="inl">cubic-bezier(.22,1.1,.32,1)</code>; seta gira 90° com mola.</div>
+    <div class="j"><b>Ação de grupo:</b> balõezinhos piscam em cascata de 12ms, como dominó.</div>
+    <div class="j"><b>Resumo na gaveta fechada:</b> selo com a contagem ("23") e pontinhos coloridos mostrando o destino atual de cada cor.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — agrupamento por prefixo do nome + <code class="inl">&lt;details&gt;</code> nativo, sem biblioteca.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo. Camada de organização sobre os mesmos dados. Risco pequeno: uma coluna cair na gaveta errada — por isso sempre existe a gaveta "Outras".</div>
+    <div class="cel"><b>Celular</b>Ótima — gavetas empilham e evitam rolagem infinita.</div>
+    <div class="cel"><b>Acessibilidade</b><code class="inl">&lt;details&gt;</code> já é acessível de fábrica (setas do teclado abrem/fecham).</div>
+    <div class="cel"><b>Antes → depois</b>159 itens soltos → <b>9 gavetas nomeadas</b>; decisão por família ("consumo eu nunca uso") vira 1 clique no grupo.</div>
+  </div>
+</section>
+
+<!-- ============ S4 ============ -->
+<section class="prop" id="s4">
+  <span class="etiqueta roxa">PROPOSTA S4</span>
+  <h3>Quadro de destinos <span style="font-weight:400; font-size:.9rem; color:#6c757d">(arraste a coluna para o destino dela)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> visão alternativa "quadro", melhor em tela larga.
+    <b>Como navega:</b> cinco pistas coloridas (Manter, Anonimizar, Dublê, Simular, Excluir). <b>Arraste</b> o cartão da coluna para a pista certa. No touch ou por botão, as setinhas ‹ › movem o cartão de pista em pista. O número de cada pista pulsa a cada mudança.
+  </div>
+
+  <div class="palco palco-alto" id="palcoS4">
+    <span class="palco-titulo">Demo com as 159 colunas reais (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="kanban" id="kanbanS4"></div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> arraste um cartão de uma pista para outra — a pista acende quando você passa por cima e o contador pulsa ao soltar. Sem mouse? Use as setinhas ‹ › dentro de cada cartão.</p>
+
+  <div class="juice">
+    <div class="j"><b>Pista acende:</b> anel da cor + escala 1.02 em 200ms quando o cartão sobrevoa.</div>
+    <div class="j"><b>Cartão pousa:</b> entra na pista nova descendo com mola de 250ms.</div>
+    <div class="j"><b>Contador pulsa:</b> selo numérico cresce 1.25× por 500ms a cada cartão que chega ou sai.</div>
+    <div class="j"><b>Visão do todo:</b> o destino de todas as colunas fica visível de relance — nenhuma decisão escondida.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco G">G</span> — arrastar-e-soltar em vanilla JS + alternativa por botões + 5 listas sincronizadas.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo nos dados; médio na interação (drag em touch é o ponto frágil — por isso as setinhas são caminho visível obrigatório, não opcional).</div>
+    <div class="cel"><b>Celular</b>Média — as pistas empilham na vertical; arrastar vira toque nas setinhas.</div>
+    <div class="cel"><b>Acessibilidade</b>Setinhas são botões nomeados ("mover CPF para Excluir"); drag nunca é o único caminho.</div>
+    <div class="cel"><b>Antes → depois</b>Estado invisível (só cor no balão) → <b>estado é lugar</b>: você vê as pilhas e confere antes de processar.</div>
+  </div>
+</section>
+
+<!-- ============ S5 ============ -->
+<section class="prop" id="s5">
+  <span class="etiqueta roxa">PROPOSTA S5</span>
+  <h3>Triagem Fica / Sai <span style="font-weight:400; font-size:.9rem; color:#6c757d">(uma coluna por vez, dois botões grandes)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> um modo "triagem" que abre em tela cheia antes da configuração fina.
+    <b>Como navega:</b> passo 1: uma coluna por vez, com a amostra grande, e só dois botões — <b>Fica</b> ou <b>Sai</b>. Errou? Botão desfazer. Passo 2: só as que ficaram recebem a cor fina (Anonimizar, Dublê, Simular ou Manter). Ninguém decide 5 coisas de uma vez.
+  </div>
+
+  <div class="palco palco-alto" id="palcoS5">
+    <span class="palco-titulo">Demo com as 159 colunas reais (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="tria-palco" id="triaPalcoS5">
+        <div class="tria-progresso">
+          <div class="trilho"><div class="barra" id="barraS5"></div></div>
+          <div class="txt" id="txtS5">Coluna 1 de 159 — Fica ou Sai?</div>
+        </div>
+        <div class="tria-card" id="cardS5">
+          <div class="nome" id="nomeS5"></div>
+          <div class="amostra" id="amostraS5"></div>
+          <div style="font-size:.75rem; color:#86868b" id="dicaS5"></div>
+        </div>
+        <div class="tria-botoes">
+          <button class="tria-btn sai" id="saiS5">&#10007; Sai</button>
+          <button class="tria-btn fica" id="ficaS5">&#10003; Fica</button>
+        </div>
+        <button class="tria-btn desfaz" id="desfazS5" disabled>&#8630; Desfazer última</button>
+      </div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> decida algumas colunas com Fica/Sai (setas ← → do teclado também funcionam quando o foco está na área). O cartão voa para o lado da decisão. Errou? Desfazer traz de volta. No final, as que ficaram aparecem numa lista para receber a cor fina.</p>
+
+  <div class="juice">
+    <div class="j"><b>Cartão voa:</b> sai girando ±10° para o lado da decisão em 300ms; o próximo entra com mola de 320ms vindo de 0.88 de escala.</div>
+    <div class="j"><b>Barra de progresso:</b> avança com mola de 350ms a cada decisão — sensação de jogo completando fase.</div>
+    <div class="j"><b>Botões:</b> afundam a 0.9 em 60ms e voltam com mola; Fica cresce 1.04 no hover.</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — fila + cartão + histórico para desfazer.</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo. É um assistente que só grava nos mesmos dados ao final. Risco de uso: 159 decisões seguidas cansam — por isso combina com S1 (triagem rápida do grosso, galeria para o resto).</div>
+    <div class="cel"><b>Celular</b>Excelente — dois botões grandes, polegar alcança. Vibração curta a cada decisão.</div>
+    <div class="cel"><b>Acessibilidade</b>Setas do teclado decididem; desfazer sempre visível; amostra lida pelo leitor de tela junto com o nome.</div>
+    <div class="cel"><b>Antes → depois</b>159 decisões de 5 opções → <b>159 decisões de 2 opções + poucas finas</b>. Errar custa 1 toque em Desfazer, não 4 cliques.</div>
+  </div>
+</section>
+
+<!-- ============ S6 ============ -->
+<section class="prop" id="s6">
+  <span class="etiqueta roxa">PROPOSTA S6</span>
+  <h3>Planilha viva <span style="font-weight:400; font-size:.9rem; color:#6c757d">(decida olhando o arquivo de verdade)</span></h3>
+  <div class="onde">
+    <b>Onde vive:</b> visão "prévia do arquivo", acima ou no lugar dos balõezinhos.
+    <b>Como navega:</b> o app mostra as primeiras linhas do arquivo como uma tabela. <b>Clicou no cabeçalho da coluna, ela cicla de cor</b> — e a coluna inteira se pinta da cor do destino. Você decide vendo o dado no contexto, não um nome solto. (Aqui cabem 14 colunas; no app real a tabela rola até as 159.)
+  </div>
+
+  <div class="palco palco-alto" id="palcoS6">
+    <span class="palco-titulo">Demo com 14 das 159 colunas (dados fictícios)</span>
+    <div class="sel-painel">
+      <div class="contador-estados" id="contS6" style="padding-top:0"></div>
+      <div class="plan-wrap">
+        <table class="plan" id="planS6"></table>
+      </div>
+    </div>
+  </div>
+  <p class="demo-dica"><b>Teste:</b> clique nos cabeçalhos (MATRICULA, NOME-CLIENTE…). A coluna inteira muda de cor junto, com o nome do estado embaixo do cabeçalho. Clique de novo para ciclar.</p>
+
+  <div class="juice">
+    <div class="j"><b>Coluna se pinta:</b> a cor nova lava a coluna de cima a baixo em 350ms (transição de fundo por célula).</div>
+    <div class="j"><b>Cabeçalho responde:</b> afunda a 0.95 no clique e volta com mola.</div>
+    <div class="j"><b>Contexto total:</b> nenhum passo de "abrir prévia" — decidir e ver são o mesmo lugar (lição da ferramenta Amnesia).</div>
+  </div>
+
+  <div class="rodape-prop">
+    <div class="cel"><b>Esforço</b><span class="esforco M">M</span> — tabela com as primeiras linhas (o app já tem os dados em memória no modo CSV; no TXT lê um pedaço pequeno).</div>
+    <div class="cel"><b>Riscos / regressão</b>Baixo-médio: mostra dado real na tela — os valores sensíveis precisam vir mascarados na prévia. Com 159 colunas, a tabela rola na horizontal dentro do próprio quadro.</div>
+    <div class="cel"><b>Celular</b>Fraca sozinha — tabela larga em tela pequena pede rolagem interna. Melhor como visão de conferência, combinada com S1/S2 para decidir.</div>
+    <div class="cel"><b>Acessibilidade</b>Cabeçalhos são botões com o estado falado ("CPF, Anonimizar"); cor acompanhada de texto em cada cabeçalho.</div>
+    <div class="cel"><b>Antes → depois</b>Decidir às cegas pelo nome técnico → <b>decidir vendo o dado</b>. Perguntas do tipo "CONSMED 7 é o quê?" somem.</div>
+  </div>
+</section>
+
+<!-- ================= RECOMENDAÇÃO ================= -->
+<div class="parte-head verde" id="reco" style="background:linear-gradient(135deg,#6f42c1,#5a32a3); box-shadow:0 4px 20px rgba(111,66,193,.25)">
+  <h2>Recomendação e fases</h2>
+  <p>Minha aposta como especialista — e a ordem segura de construir sem quebrar nada.</p>
+</div>
+
+<div class="reco">
+  <h3>Painel de prazo: aposte na <u>C1 (botão flutuante + folha que sobe)</u></h3>
+  <p><b>Por quê:</b> um botão só atende as duas abas, sem disputar espaço nas barras que já existem. É o desenho que todo celular já ensinou (folha que sobe do fundo). O juice é o mais gostoso pelo menor esforço: folha com mola, número que rola como odômetro, barra que enche, alerta que estoura com pop. E ela some da frente com um toque — nunca atrapalha o Enviar nem a tabela.</p>
+  <p>Se você gostar da <b>memória de consultas da C3</b>, ela entra depois como complemento da C1 (a folha ganha a lista embaixo). A C2 (selinho de status acendendo na matrícula) é um charme candidato à fase 3. O <b>extra da data preenchida pela matrícula ativa</b> entra na fase 1 só se você pedir.</p>
+
+  <h3>Seletor de colunas: combine <u>S1 + S2</u>, com S3 na sequência</h3>
+  <p><b>Por quê:</b> a S1 (galeria de miniaturas) entrega o que você pediu — ver as colunas com amostra, selecionar tudo ou algumas, aplicar a cor de uma vez. A S2 resolve o defeito mais dolorido de hoje: a bolinha colorida leva <b>direto</b> ao estado com 1 clique, sem ciclo. As duas moram na mesma tela: busca no topo, miniaturas no meio, bolinhas dentro de cada cartão, barra de ações quando há seleção.</p>
+  <p>A S3 (gavetas por assunto) é o complemento natural para 159 itens: entra na fase seguinte, dobrando a galeria em 9 famílias. S4, S5 e S6 ficam como inspiração — boas, mas mais caras ou menos caseiras.</p>
+
+  <h3>Ordem de implementação (fases cirúrgicas, uma aba por vez)</h3>
+  <div class="fase"><b class="fase-n">Fase 1</b><br><b>Painel de prazo C1 no app principal.</b> Só arquivos das abas Fluxo/Matrículas. Reusa a mesma conta e as mesmas cores do contador de 180 dias que já existe — zero mudança no que funciona. O Anonimizador não é tocado. Desfazer/refazer e Exportar ZIP seguem intactos. Você testa o painel sozinho antes de qualquer outra mudança.</div>
+  <div class="fase"><b class="fase-n">Fase 2</b><br><b>Barra de ferramentas nos balõezinhos de hoje</b> (busca + selecionar todos + aplicar cor em massa, lendo <code class="inl">COLUNAS_DETECTADAS</code>). Os balõezinhos continuam iguais — é a menor edição possível com o maior alívio imediato.</div>
+  <div class="fase"><b class="fase-n">Fase 3</b><br><b>Galeria de miniaturas (S1) com bolinhas diretas (S2)</b>, como visão alternativa com botão de alternar. Os balõezinhos seguem disponíveis. Amostras geradas pelas funções que já existem.</div>
+  <div class="fase"><b class="fase-n">Fase 4</b><br><b>Gavetas por assunto (S3)</b> dobrando a galeria em famílias.</div>
+  <div class="fase"><b class="fase-n">Fase 5</b><br><b>Correção dos 5 bugs</b>, um de cada vez, com teste entre cada — começando pelo falso positivo do "NOME". Só depois que as fases 1–4 estiverem aprovadas por você.</div>
+  <p style="font-size:.85rem; color:#6c757d">Regra de ouro em todas as fases: edição cirúrgica, uma aba por vez, e você testa cada fase antes da próxima começar. Se algo estranhar, a fase nova sai e o resto continua funcionando.</p>
+
+  <h3>Referências usadas</h3>
+  <ul class="refs">
+    <li>Talk "Juice it or lose it" (Martin Jonasson &amp; Petri Purho) — squash &amp; stretch, mola, antecipação aplicados a UI.</li>
+    <li>Painel de prazo: a própria lógica do app (<code class="inl">calcularStatusMatricula</code> e <code class="inl">#alerta180</code>, no <code class="inl">index.html</code>), Material Design 3 (bottom sheets e painéis), WCAG 1.4.1 (cor nunca como única pista — sempre com texto junto), padrão de semáforo com rótulo escrito.</li>
+    <li>Seletores de coluna: Power Query "Escolher Colunas" (lista + busca + seleção em massa), <a href="https://arx.deidentifier.org/anonymization-tool/configuration/">ARX</a> (papel por coluna + ação global), <a href="https://www.openaire.eu/discover-amnesia-anonymity-for-your-data">Amnesia</a> (decidir vendo a prévia), <a href="https://github.com/frappe/frappe/issues/36066">Frappe issue #36066</a> (dor real sem "selecionar tudo"), Google Fotos/Lightroom (miniatura + seleção + barra contextual), guias de data table de Pencil &amp; Paper e Setproduct (bulk actions).</li>
+    <li>Simplicidade: GOV.UK ("faça o trabalho duro"), NN/g (revelação progressiva), Laws of UX (Lei de Hick), Apple HIG.</li>
+    <li>Pesquisa completa do seletor: <code class="inl">propostas/2026-10-07/pesquisa-seletor-colunas.md</code> (neste repositório).</li>
+  </ul>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+/* ==========================================================================
+   COMPARTILHADO
+   ========================================================================== */
+var MOVIMENTO_CALMO = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function $(id){ return document.getElementById(id); }
+function vibrar(ms){ if (navigator.vibrate && !MOVIMENTO_CALMO) { try { navigator.vibrate(ms); } catch(e){} } }
+function escTxt(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function reanimar(el, cls){
+  el.classList.remove(cls);
+  void el.offsetWidth;
+  el.classList.add(cls);
+}
+
+/* ==========================================================================
+   PAINEL 180 DIAS (compartilhado por C1 a C5)
+   MESMA conta e MESMO semaforo do app (index.html ~1502-1518):
+   passados = round((hoje - diaZero) / 86400000) · restantes = max(0, 180 - passados)
+   >60 restantes = verde · 31-60 = laranja · <=30 = vermelho · estourou = vermelho + alerta
+   ========================================================================== */
+var CORES_180 = { verde: '#28a745', laranja: '#fd7e14', vermelho: '#dc3545' };
+function faixa180(passados){
+  if (passados > 180) return 'vermelho';
+  var restantes = Math.max(0, 180 - passados);
+  if (restantes > 60) return 'verde';
+  if (restantes >= 31) return 'laranja';
+  return 'vermelho';
+}
+function isoLocal(dt){
+  function p(n){ return (n < 10 ? '0' : '') + n; }
+  return dt.getFullYear() + '-' + p(dt.getMonth() + 1) + '-' + p(dt.getDate());
+}
+function dataBR(dtStr){ var p = dtStr.split('-'); return p[2] + '/' + p[1] + '/' + p[0]; }
+function animaNumero(el, de, para){
+  if (MOVIMENTO_CALMO || de === para){ el.textContent = para; return; }
+  var t0 = null, dur = 380;
+  function passo(ts){
+    if (!t0) t0 = ts;
+    var k = Math.min(1, (ts - t0) / dur);
+    var e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(de + (para - de) * e);
+    if (k < 1) requestAnimationFrame(passo);
+  }
+  requestAnimationFrame(passo);
+}
+function montarPainel180(cfg){
+  var elData = $(cfg.data), elResumo = $(cfg.resumo), elPass = $(cfg.pass),
+      elFalt = $(cfg.falt), elBarra = $(cfg.barra), elStatus = $(cfg.status), elAlerta = $(cfg.alerta);
+  var ultPass = null, ultFaixa = null;
+  function limparFx(){ elResumo.classList.remove('fx-verde', 'fx-laranja', 'fx-vermelho'); }
+  function neutro(msg){
+    limparFx();
+    elPass.textContent = '—'; elFalt.textContent = '—';
+    elBarra.style.width = '0%';
+    elAlerta.style.display = 'none';
+    elStatus.textContent = msg;
+    ultPass = null; ultFaixa = null;
+  }
+  function atualizar(dataStr, origem){
+    if (!dataStr){ neutro('Escolha a data para ver o prazo.'); return; }
+    /* meio-dia como no app: evita bug de fuso na virada do dia */
+    var diaZero = new Date(dataStr + 'T12:00:00');
+    var agora = new Date();
+    var passados = Math.round((agora - diaZero) / 86400000);
+    if (passados < 0){ neutro('Essa data ainda não chegou. Escolha uma data que já passou.'); return; }
+    var restantes = Math.max(0, 180 - passados);
+    var excedido = passados - 180;
+    var faixa = faixa180(passados);
+    limparFx();
+    elResumo.classList.add('fx-' + faixa);
+    animaNumero(elPass, ultPass === null ? passados : ultPass, passados);
+    elFalt.textContent = excedido > 0 ? '0' : String(restantes);
+    elBarra.style.width = Math.min(passados, 180) / 180 * 100 + '%';
+    if (excedido > 0){
+      elStatus.textContent = 'Limite excedido';
+      elAlerta.style.display = 'block';
+      elAlerta.textContent = '\u26a0 Prazo de 180 dias expirado há ' + excedido + (excedido === 1 ? ' dia' : ' dias');
+    } else {
+      elAlerta.style.display = 'none';
+      elStatus.textContent = restantes + (restantes === 1 ? ' dia restante' : ' dias restantes') + ' para fechar os 180';
+    }
+    if (faixa !== ultFaixa && ultFaixa !== null && !MOVIMENTO_CALMO){
+      reanimar(elPass, 'pula'); reanimar(elFalt, 'pula');
+      vibrar(12);
+    }
+    if (cfg.aoMudar) cfg.aoMudar({ passados: passados, restantes: restantes, excedido: excedido, faixa: faixa, dataStr: dataStr });
+    ultPass = passados; ultFaixa = faixa;
+    if (origem === 'botao') vibrar(10);
+  }
+  elData.addEventListener('input', function(){ atualizar(elData.value, 'data'); });
+  $(cfg.rapidos).querySelectorAll('button[data-dias]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var dt = new Date();
+      dt.setDate(dt.getDate() - parseInt(b.dataset.dias, 10));
+      elData.value = isoLocal(dt);
+      atualizar(elData.value, 'botao');
+    });
+  });
+  return {
+    definirData: function(v){ elData.value = v; atualizar(v, 'codigo'); }
+  };
+}
+
+/* ==========================================================================
+   C1 — FAB + folha que sobe
+   ========================================================================== */
+(function(){
+  montarPainel180({ data: 'dataC1', rapidos: 'rapidosC1', resumo: 'resumoC1', pass: 'passC1', falt: 'faltC1', barra: 'barraC1', status: 'statusC1', alerta: 'alertaC1' });
+  function fechar(){ $('sheetC1').classList.remove('aberto'); $('fundoC1').classList.remove('aberto'); $('fabC1').classList.remove('fechado'); }
+  $('fabC1').addEventListener('click', function(){
+    var aberto = $('sheetC1').classList.toggle('aberto');
+    $('fundoC1').classList.toggle('aberto', aberto);
+    $('fabC1').classList.toggle('fechado', aberto);
+    $('fabC1').classList.remove('chama');
+    if (aberto) $('dataC1').focus();
+    vibrar(12);
+  });
+  $('fundoC1').addEventListener('click', fechar);
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && $('sheetC1').classList.contains('aberto')) fechar();
+  });
+})();
+
+/* ==========================================================================
+   C2 — popover ancorado + selinho de status na matrícula
+   ========================================================================== */
+(function(){
+  var chip = $('chipC2');
+  montarPainel180({ data: 'dataC2', rapidos: 'rapidosC2', resumo: 'resumoC2', pass: 'passC2', falt: 'faltC2', barra: 'barraC2', status: 'statusC2', alerta: 'alertaC2',
+    aoMudar: function(r){
+      var txt, cor;
+      if (r.excedido > 0){ txt = 'Expirado'; cor = CORES_180.vermelho; }
+      else if (r.faixa === 'verde'){ txt = 'No prazo'; cor = CORES_180.verde; }
+      else if (r.faixa === 'laranja'){ txt = 'Aten\u00e7\u00e3o'; cor = CORES_180.laranja; }
+      else { txt = 'Cr\u00edtico'; cor = CORES_180.vermelho; }
+      chip.textContent = txt;
+      chip.style.background = cor; chip.style.color = '#fff';
+      if (!MOVIMENTO_CALMO) reanimar(chip, 'pula');
+    }
+  });
+  function fechar(){ $('popC2').classList.remove('aberto'); }
+  $('btnC2').addEventListener('click', function(e){
+    e.stopPropagation();
+    var aberto = $('popC2').classList.toggle('aberto');
+    if (aberto) $('dataC2').focus();
+    vibrar(12);
+  });
+  $('palcoC2').addEventListener('click', function(e){
+    if (!$('popC2').contains(e.target) && e.target !== $('btnC2')) fechar();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && $('popC2').classList.contains('aberto')) fechar();
+  });
+})();
+
+/* ==========================================================================
+   C3 — gaveta lateral com memória de consultas
+   ========================================================================== */
+(function(){
+  var fitaVazia = $('fitaVaziaC3');
+  var painel = montarPainel180({ data: 'dataC3', rapidos: 'rapidosC3', resumo: 'resumoC3', pass: 'passC3', falt: 'faltC3', barra: 'barraC3', status: 'statusC3', alerta: 'alertaC3',
+    aoMudar: function(r){
+      var fita = $('fitaC3');
+      fita.querySelectorAll('.fita-linha').forEach(function(l){
+        if (l.dataset.dataref === r.dataStr) l.remove();
+      });
+      if (fitaVazia) fitaVazia.style.display = 'none';
+      var linha = document.createElement('button');
+      linha.type = 'button';
+      linha.className = 'fita-linha';
+      linha.dataset.dataref = r.dataStr;
+      linha.style.width = '100%';
+      linha.style.textAlign = 'left';
+      var ex = document.createElement('span'); ex.textContent = dataBR(r.dataStr);
+      var rs = document.createElement('span'); rs.className = 'res';
+      rs.textContent = r.excedido > 0 ? ('expirado h\u00e1 ' + r.excedido + 'd') : ('faltam ' + r.restantes + 'd');
+      rs.style.color = CORES_180[r.faixa];
+      linha.appendChild(ex); linha.appendChild(rs);
+      linha.addEventListener('click', function(){
+        painel.definirData(r.dataStr);
+        vibrar(10);
+      });
+      fita.insertBefore(linha, fita.firstChild);
+      var linhas = fita.querySelectorAll('.fita-linha');
+      while (linhas.length > 8){
+        fita.removeChild(linhas[linhas.length - 1]);
+        linhas = fita.querySelectorAll('.fita-linha');
+      }
+    }
+  });
+  function fechar(){ $('gavetaC3').classList.remove('aberta'); }
+  $('abaC3').addEventListener('click', function(){
+    var aberta = $('gavetaC3').classList.toggle('aberta');
+    if (aberta) $('dataC3').focus();
+    vibrar(12);
+  });
+  $('fechaC3').addEventListener('click', fechar);
+})();
+
+/* ==========================================================================
+   C4 — cartão embutido que estica
+   ========================================================================== */
+(function(){
+  montarPainel180({ data: 'dataC4', rapidos: 'rapidosC4', resumo: 'resumoC4', pass: 'passC4', falt: 'faltC4', barra: 'barraC4', status: 'statusC4', alerta: 'alertaC4' });
+  $('topoC4').addEventListener('click', function(){
+    var aberto = $('cartaoC4').classList.toggle('aberto');
+    $('topoC4').setAttribute('aria-expanded', aberto ? 'true' : 'false');
+    if (aberto && !MOVIMENTO_CALMO){
+      var itens = $('cartaoC4').querySelectorAll('.p180-rapidos button, .p180-caixa');
+      itens.forEach(function(b, i){
+        b.style.animation = 'none';
+        void b.offsetWidth;
+        b.style.animation = 'teclasobem .3s cubic-bezier(.34,1.56,.64,1) both';
+        b.style.animationDelay = (i * 40) + 'ms';
+      });
+    }
+    vibrar(10);
+  });
+})();
+
+/* ==========================================================================
+   C5 — janelinha arrastável com inclinação
+   ========================================================================== */
+(function(){
+  montarPainel180({ data: 'dataC5', rapidos: 'rapidosC5', resumo: 'resumoC5', pass: 'passC5', falt: 'faltC5', barra: 'progC5', status: 'statusC5', alerta: 'alertaC5' });
+  var jan = $('janelaC5'), barra = $('barraC5'), palco = $('palcoC5');
+  $('mostraC5').addEventListener('click', function(){
+    var visivel = jan.style.display !== 'none';
+    jan.style.display = visivel ? 'none' : 'block';
+    $('mostraC5').textContent = visivel ? '\uD83D\uDCC5 Abrir painel de prazo' : '\uD83D\uDCC5 Fechar painel';
+    if (!visivel && !MOVIMENTO_CALMO) jan.animate([{ transform: 'scale(.7)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 300, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+    vibrar(12);
+  });
+  $('minC5').addEventListener('click', function(e){
+    e.stopPropagation();
+    jan.classList.toggle('minimizada');
+  });
+  var arrastando = false, ox = 0, oy = 0, ultX = 0, vel = 0;
+  barra.addEventListener('pointerdown', function(e){
+    if (e.target.tagName === 'BUTTON') return;
+    arrastando = true;
+    var r = jan.getBoundingClientRect();
+    ox = e.clientX - r.left; oy = e.clientY - r.top;
+    ultX = e.clientX; vel = 0;
+    jan.classList.add('arrastando');
+    barra.setPointerCapture(e.pointerId);
+  });
+  barra.addEventListener('pointermove', function(e){
+    if (!arrastando) return;
+    var pr = palco.getBoundingClientRect();
+    var nx = e.clientX - pr.left - ox;
+    var ny = e.clientY - pr.top - oy;
+    nx = Math.max(0, Math.min(nx, pr.width - jan.offsetWidth));
+    ny = Math.max(0, Math.min(ny, pr.height - jan.offsetHeight));
+    vel = vel * 0.7 + (e.clientX - ultX) * 0.3;
+    ultX = e.clientX;
+    var giro = Math.max(-6, Math.min(6, vel * 1.2));
+    jan.style.left = nx + 'px';
+    jan.style.top = ny + 'px';
+    jan.style.transform = MOVIMENTO_CALMO ? 'none' : 'rotate(' + giro + 'deg)';
+  });
+  function soltar(){
+    if (!arrastando) return;
+    arrastando = false;
+    jan.classList.remove('arrastando');
+    jan.style.transform = 'rotate(0deg)';
+    vibrar(8);
+  }
+  barra.addEventListener('pointerup', soltar);
+  barra.addEventListener('pointercancel', soltar);
+})();
+</script>
+
+<script>
+/* ==========================================================================
+   PARTE 2 — DADOS: as 159 colunas reais do SGCG (nomes do MAPA_NOMES_TXT)
+   Amostras são fictícias, geradas na hora.
+   ========================================================================== */
+var NOMES = ['UNIDADE','LOCAL','NOME-CLIENTE','MATRICULA','COD-LOGRADOURO','ENDERECO','NUMERO-IMOVEL','CEP-USUARIO','NUM-LADO','NUM-FRENTE','COMPLEMENTO','RUA1','RUA2','BAIRRO','COD-ORCAM','INSC-SETOR','INSC-QUADRA','INSC-LOTE','ROTEIRO','CATEG','ECO-AGUA res','ECO-AGUA com','ECO-AGUA ind','ECO-AGUA utp','ECO-AGUA pop','ECO-ESG res','ECO-ESG com','ECO-ESG ind','ECO-ESG utp','ECO-ESG pop','ORIGEM-A','ORIGEM-E','SIT-LIG-A','SIT-LIG-E','DT-LIGACAO-A','DT-LIGACAO-E','DT-INTERRUPCAO-A','DT-RELIGACAO-A','DT-ELIM-AG','MOT-ELIM-AG','DT-ELIM-ES','ISENTO','TIPO-CONS','MAT-CAVAL','FONTE','RESERVATORIO','LACRE-CAVALETE','PROTECAO-HD','TP-CLASSE-ESP-TAR','CX-INSPECAO-ESGOTO','HD-RETIRADA','DT-LEIT-RETIRADA-HD1','LEIT-RETIRADA','MOTI-RETIRADA','HIDROMETRO1','DT-TROCA-HD1','LEIT-VIRADA-HD1','VIRADA-HD1','TIPO-ENTREGA-CONTA'];
+function serie(base, de, ate){ for (var i = de; i <= ate; i++) NOMES.push(base + ' ' + i); }
+serie('ANORMALIDADES', 1, 11);
+serie('CONSMED', 1, 11);
+NOMES.push('MEDIA-MED-11');
+serie('CONSFAT', 1, 11);
+NOMES.push('MEDIA-FAT-11');
+['CODOPE RESERV','CODOPE GRAV/REC','CODOPE VALV/BOOSTER','CODOPE SETOR MANOB','DISTRITO','CLASSE-COLETA-LIXO','CLASSE-METROLOGIA','TAMANHO-HD','DESC-TAMANHO-HD','COD-COND-LIG-AGUA','COD-COND-LIG-ESGOTO','CAPAC-HD1','DT-VENC','VALOR-AGUA','VALOR-ESGOTO','VALOR-SERVICO','VALOR-FATURA','CPF','RG','CODOPE-ESGOTO','ID-HD','INTER'].forEach(function(n){ NOMES.push(n); });
+serie('SIT-FATURA', 1, 11);
+['NOME-BAIRRO','TELEFONE-CEL-SMS','BANCO-AGENCIA','CARACT-ABAST','NOME-FONTE','NOME-RESERVA'].forEach(function(n){ NOMES.push(n); });
+serie('DT-REAL-LEIT-EXEC', 1, 11);
+['CONTATO-IMOVEL','TELEFONE','COD-ORCAM-VELHO','LEITURA-REAL','INSC-IMOB-DIST-QUADRANTE','INSC-IMOB-ZONA-QUADRICULA','NOME-ENDER-ALT','NUM-LOGR-ENDERECO','CEP-ENDERECO','CARACT-HD-TAMNHO','CARACT-HD-DESC','LOGRADOURO-CODIGO','EMAIL-USUARIO','COD-ORCAM-NOVO','HABIT-IMOVEL'].forEach(function(n){ NOMES.push(n); });
+
+var ESTADOS = {
+  1: { rot: 'Manter', cor: '#007AFF' },
+  2: { rot: 'Anonimizar', cor: '#AF52DE' },
+  3: { rot: 'Dublê', cor: '#FF9500' },
+  4: { rot: 'Simular', cor: '#34C759' },
+  0: { rot: 'Excluir', cor: '#8E8E93' }
+};
+var ORDEM_EST = [1, 2, 3, 4, 0];
+/* Reproduz a classificação do app de hoje — inclusive o bug do "NOME" */
+var TERMOS_SENS = ['NOME','CPF','RG','TELEFONE','CELULAR','EMAIL','CONTATO','NUMERO-IMOVEL','CEP-USUARIO','CEP-ENDERECO','ENDERECO'];
+var BUG_NOME = { 'NOME-BAIRRO': 1, 'NOME-FONTE': 1, 'NOME-RESERVA': 1, 'NOME-ENDER-ALT': 1 };
+function estadoInicial(nome){
+  var n = nome.toUpperCase();
+  if (n.indexOf('MATRICULA') >= 0) return 3;
+  for (var i = 0; i < TERMOS_SENS.length; i++) if (n.indexOf(TERMOS_SENS[i]) >= 0) return 2;
+  return 1;
+}
+function estadosPadrao(){ var e = {}; NOMES.forEach(function(n, i){ e[i] = estadoInicial(n); }); return e; }
+function proxEstado(a){ return a === 1 ? 2 : a === 2 ? 3 : a === 3 ? 4 : a === 4 ? 0 : 1; }
+
+var PESSOAS = ['Ana Souza','Bruno Lima','Carla Reis','Diego Melo','Elisa Ramos','Fabio Nunes','Gabi Prates','Heitor Vaz'];
+var RUAS_F = ['Rua das Palmeiras','Av. Sete de Setembro','Rua XV de Novembro','Rua das Araucarias','Rua Voluntarios da Patria'];
+var BAIRROS_F = ['Centro','Batel','Portao','Boqueirao','Agua Verde'];
+function pick(arr, i){ return arr[i % arr.length]; }
+function matFake(i){ return String(10000000 + ((i * 137 + 51) % 89999999)).slice(0, 8); }
+function amostras(nome, i){
+  var n = nome.toUpperCase();
+  if (n.indexOf('MATRICULA') === 0) return [matFake(i), matFake(i + 3), matFake(i + 7)];
+  if (n.indexOf('NOME-CLIENTE') === 0) return [pick(PESSOAS, i), pick(PESSOAS, i + 2), pick(PESSOAS, i + 5)];
+  if (n === 'CPF') return ['123.456.789-00','987.654.321-00','456.123.789-00'];
+  if (n === 'RG') return ['9.123.456-7','8.765.432-1','7.654.321-0'];
+  if (n.indexOf('TELEFONE') === 0 || n.indexOf('CONTATO') === 0) return ['(41) 99988-7766','(41) 3222-1100','(41) 98877-6655'];
+  if (n.indexOf('EMAIL') === 0) return ['ana@exemplo.com','bruno@exemplo.com','carla@exemplo.com'];
+  if (n === 'ENDERECO' || n.indexOf('RUA') === 0 || n.indexOf('LOGRADOURO') === 0) return [pick(RUAS_F, i), pick(RUAS_F, i + 1), pick(RUAS_F, i + 3)];
+  if (n === 'BAIRRO' || n === 'NOME-BAIRRO') return [pick(BAIRROS_F, i), pick(BAIRROS_F, i + 1), pick(BAIRROS_F, i + 2)];
+  if (n.indexOf('CEP') === 0) return ['80010-000','80240-120','81530-450'];
+  if (n.indexOf('DT-') === 0) return ['05/2019','11/2021','02/2024'];
+  if (n.indexOf('CONSMED') === 0 || n.indexOf('CONSFAT') === 0) return [String(18 + i % 9), String(22 + (i * 3) % 11), String(19 + (i * 5) % 7)];
+  if (n.indexOf('SIT-FATURA') === 0) return ['P','F','P'];
+  if (n.indexOf('VALOR') === 0) return ['89,90','132,45','57,10'];
+  if (n.indexOf('ECO-') === 0) return ['1','1','2'];
+  if (n.indexOf('HIDROMETRO') === 0 || n.indexOf('HD') === 0) return ['HD-7741','HD-9021','HD-3355'];
+  if (n.indexOf('SIT-LIG') === 0) return ['LIGADO','LIGADO','CORTADO'];
+  if (n.indexOf('COMPLEMENTO') === 0) return ['Casa 2','Apto 31','Fundos'];
+  return [pick(['A','001','S','0','-'], i), pick(['B','002','N','1','-'], i), pick(['A','003','S','2','-'], i + 1)];
+}
+
+function renderContador(el, est, animar){
+  var c = { 1: 0, 2: 0, 3: 0, 4: 0, 0: 0 };
+  Object.keys(est).forEach(function(k){ c[est[k]]++; });
+  el.innerHTML = ORDEM_EST.map(function(e){
+    return '<b style="color:' + ESTADOS[e].cor + '">' + c[e] + ' ' + ESTADOS[e].rot + '</b>';
+  }).join(' \u00b7 ');
+  if (animar && !MOVIMENTO_CALMO){
+    el.querySelectorAll('b').forEach(function(b){ reanimar(b, 'pulsa'); });
+  }
+}
+
+/* ==========================================================================
+   S1 — Galeria de miniaturas
+   ========================================================================== */
+(function(){
+  var est = estadosPadrao();
+  var sel = {};
+  var nSel = 0;
+  var grade = $('gradeS1'), barra = $('barraS1'), nsel = $('nselS1'), cont = $('contS1');
+  var cards = [];
+  NOMES.forEach(function(nome, i){
+    var c = document.createElement('div');
+    c.className = 'mini-card'; c.tabIndex = 0;
+    c.setAttribute('role', 'button');
+    c.setAttribute('aria-pressed', 'false');
+    c.setAttribute('aria-label', 'Coluna ' + nome);
+    c.style.setProperty('--c', ESTADOS[est[i]].cor);
+    var nm = document.createElement('div'); nm.className = 'nome'; nm.textContent = nome; c.appendChild(nm);
+    var am = document.createElement('div'); am.className = 'amostra';
+    amostras(nome, i).forEach(function(v){ var s = document.createElement('span'); s.textContent = v; am.appendChild(s); });
+    c.appendChild(am);
+    var ck = document.createElement('span'); ck.className = 'check'; ck.textContent = '\u2713'; c.appendChild(ck);
+    if (BUG_NOME[nome.toUpperCase()]){
+      var f = document.createElement('span'); f.className = 'flag-bug'; f.textContent = '\u26a0 bug NOME'; c.appendChild(f);
+    }
+    c.addEventListener('click', function(){ alternaSel(i); });
+    c.addEventListener('dblclick', function(e){ e.preventDefault(); mudaEstado(i, proxEstado(est[i])); });
+    c.addEventListener('keydown', function(e){
+      if (e.key === ' ' || e.key === 'Enter'){ e.preventDefault(); alternaSel(i); }
+    });
+    grade.appendChild(c); cards.push(c);
+  });
+  function alternaSel(i){
+    if (sel[i]){ delete sel[i]; nSel--; } else { sel[i] = true; nSel++; }
+    cards[i].classList.toggle('selecionado', !!sel[i]);
+    cards[i].setAttribute('aria-pressed', sel[i] ? 'true' : 'false');
+    vibrar(8); atualizaBarra();
+  }
+  function atualizaBarra(){
+    nsel.textContent = nSel + (nSel === 1 ? ' selecionada' : ' selecionadas');
+    barra.classList.toggle('visivel', nSel > 0);
+  }
+  function mudaEstado(i, novo){
+    est[i] = novo;
+    cards[i].style.setProperty('--c', ESTADOS[novo].cor);
+    if (!MOVIMENTO_CALMO) reanimar(cards[i], 'mudou');
+  }
+  function visiveis(){
+    var r = [];
+    for (var i = 0; i < NOMES.length; i++) if (cards[i].style.display !== 'none') r.push(i);
+    return r;
+  }
+  $('buscaS1').addEventListener('input', function(){
+    var t = this.value.toUpperCase();
+    NOMES.forEach(function(n, i){ cards[i].style.display = n.toUpperCase().indexOf(t) >= 0 ? '' : 'none'; });
+  });
+  $('selTodasS1').addEventListener('click', function(){
+    visiveis().forEach(function(i){
+      if (!sel[i]){ sel[i] = true; nSel++; }
+      cards[i].classList.add('selecionado');
+      cards[i].setAttribute('aria-pressed', 'true');
+    });
+    vibrar(10); atualizaBarra();
+  });
+  $('limpaS1').addEventListener('click', function(){
+    Object.keys(sel).forEach(function(i){
+      cards[i].classList.remove('selecionado');
+      cards[i].setAttribute('aria-pressed', 'false');
+    });
+    sel = {}; nSel = 0; atualizaBarra();
+  });
+  barra.querySelectorAll('button[data-est]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var novo = parseInt(b.dataset.est, 10);
+      var alvos = Object.keys(sel).map(Number);
+      alvos.forEach(function(i, ord){
+        if (MOVIMENTO_CALMO) mudaEstado(i, novo);
+        else setTimeout(function(){ mudaEstado(i, novo); }, ord * 12);
+      });
+      setTimeout(function(){
+        alvos.forEach(function(i){
+          cards[i].classList.remove('selecionado');
+          cards[i].setAttribute('aria-pressed', 'false');
+        });
+        sel = {}; nSel = 0;
+        atualizaBarra(); renderContador(cont, est, true);
+        vibrar(14);
+      }, MOVIMENTO_CALMO ? 0 : alvos.length * 12 + 160);
+    });
+  });
+  renderContador(cont, est, false);
+})();
+
+/* ==========================================================================
+   S2 — Lista rápida com bolinhas de cor
+   ========================================================================== */
+(function(){
+  var est = estadosPadrao();
+  var marc = {};
+  var lista = $('listaS2'), cont = $('contS2');
+  var linhas = [], pontos = [];
+  NOMES.forEach(function(nome, i){
+    var ln = document.createElement('div'); ln.className = 'linha-col';
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.setAttribute('aria-label', 'Selecionar ' + nome);
+    cb.addEventListener('change', function(){
+      if (cb.checked) marc[i] = true; else delete marc[i];
+    });
+    var nm = document.createElement('span'); nm.className = 'nome'; nm.textContent = nome;
+    var am = document.createElement('span'); am.className = 'amostra';
+    am.textContent = amostras(nome, i).join(' \u00b7 ');
+    var pd = document.createElement('div'); pd.className = 'pontinhos';
+    var pts = [];
+    ORDEM_EST.forEach(function(e){
+      var p = document.createElement('button');
+      p.type = 'button'; p.className = 'pontinho';
+      p.style.background = ESTADOS[e].cor; p.style.color = ESTADOS[e].cor;
+      p.title = ESTADOS[e].rot;
+      p.setAttribute('aria-label', 'Marcar ' + nome + ' como ' + ESTADOS[e].rot);
+      if (est[i] === e) p.classList.add('ativo');
+      p.addEventListener('click', function(){
+        est[i] = e;
+        pts.forEach(function(q){ q.classList.remove('ativo'); });
+        p.classList.add('ativo');
+        vibrar(8); renderContador(cont, est, true);
+      });
+      pd.appendChild(p); pts.push(p);
+    });
+    ln.appendChild(cb); ln.appendChild(nm); ln.appendChild(am); ln.appendChild(pd);
+    lista.appendChild(ln); linhas.push(ln); pontos.push({ pts: pts, cb: cb });
+  });
+  function visiveis(){
+    var r = [];
+    linhas.forEach(function(l, i){ if (l.style.display !== 'none') r.push(i); });
+    return r;
+  }
+  $('buscaS2').addEventListener('input', function(){
+    var t = this.value.toUpperCase();
+    NOMES.forEach(function(n, i){ linhas[i].style.display = n.toUpperCase().indexOf(t) >= 0 ? '' : 'none'; });
+  });
+  $('selTodasS2').addEventListener('click', function(){
+    visiveis().forEach(function(i){ marc[i] = true; pontos[i].cb.checked = true; });
+    vibrar(10);
+  });
+  function aplicarMarcadas(novo){
+    var alvos = Object.keys(marc).map(Number);
+    alvos.forEach(function(i, ord){
+      var f = function(){
+        est[i] = novo;
+        pontos[i].pts.forEach(function(q, qi){ q.classList.toggle('ativo', ORDEM_EST[qi] === novo); });
+      };
+      if (MOVIMENTO_CALMO) f(); else setTimeout(f, ord * 8);
+    });
+    setTimeout(function(){ renderContador(cont, est, true); }, MOVIMENTO_CALMO ? 0 : alvos.length * 8 + 120);
+  }
+  $('aplicaExcluirS2').addEventListener('click', function(){ aplicarMarcadas(0); });
+  $('aplicaManterS2').addEventListener('click', function(){ aplicarMarcadas(1); });
+  renderContador(cont, est, false);
+})();
+
+/* ==========================================================================
+   S3 — Gavetas por assunto
+   ========================================================================== */
+(function(){
+  var est = estadosPadrao();
+  var cont = $('contS3'), wrap = $('gruposS3');
+  function grupoDe(nome){
+    var n = nome.toUpperCase();
+    if (n.indexOf('DT-') === 0) return 'Datas';
+    if (n.indexOf('ECO-') === 0) return 'Economias';
+    if (n.indexOf('CONSMED') === 0 || n.indexOf('CONSFAT') === 0 || n.indexOf('MEDIA-') === 0) return 'Consumo';
+    if (n.indexOf('SIT-FATURA') === 0 || n.indexOf('VALOR') === 0 || n.indexOf('ANORMALIDADES') === 0 || n.indexOf('TIPO-ENTREGA') === 0) return 'Faturas e valores';
+    if (n.indexOf('HIDROMETRO') === 0 || n.indexOf('HD') === 0 || n.indexOf('LEIT') === 0 || n.indexOf('VIRADA') === 0 || n.indexOf('LACRE') === 0 || n.indexOf('PROTECAO') === 0 || n.indexOf('ID-HD') === 0) return 'Hidr\u00f4metro';
+    if (['UNIDADE','LOCAL','MATRICULA','NOME-CLIENTE','CPF','RG'].indexOf(n) >= 0 || n.indexOf('INSC') === 0) return 'Identifica\u00e7\u00e3o';
+    if (n.indexOf('CEP') === 0 || n === 'ENDERECO' || n === 'BAIRRO' || n === 'NOME-BAIRRO' || n.indexOf('RUA') === 0 || n.indexOf('NUM') === 0 || n.indexOf('COMPLEMENTO') === 0 || n.indexOf('TELEFONE') === 0 || n.indexOf('CONTATO') === 0 || n.indexOf('EMAIL') === 0 || n.indexOf('LOGRADOURO') === 0 || n.indexOf('NOME-ENDER') === 0) return 'Endere\u00e7o e contato';
+    if (n.indexOf('ORIGEM') === 0 || n.indexOf('SIT-LIG') === 0 || n === 'FONTE' || n === 'RESERVATORIO' || n === 'NOME-FONTE' || n === 'NOME-RESERVA' || n === 'CARACT-ABAST') return 'Liga\u00e7\u00f5es e rede';
+    return 'Outras';
+  }
+  var ORDEM_GRUPOS = ['Identifica\u00e7\u00e3o','Endere\u00e7o e contato','Liga\u00e7\u00f5es e rede','Economias','Hidr\u00f4metro','Consumo','Faturas e valores','Datas','Outras'];
+  var grupos = {};
+  ORDEM_GRUPOS.forEach(function(g){ grupos[g] = []; });
+  NOMES.forEach(function(n, i){ grupos[grupoDe(n)].push(i); });
+  var pills = [];
+  function aplicarGrupo(ids, novo){
+    ids.forEach(function(i, ord){
+      var f = function(){
+        est[i] = novo;
+        if (pills[i]){
+          pills[i].style.setProperty('--c', ESTADOS[novo].cor);
+          if (!MOVIMENTO_CALMO) reanimar(pills[i], 'mudou');
+        }
+      };
+      if (MOVIMENTO_CALMO) f(); else setTimeout(f, ord * 12);
+    });
+    vibrar(12);
+    setTimeout(function(){ renderContador(cont, est, true); }, MOVIMENTO_CALMO ? 0 : ids.length * 12 + 120);
+  }
+  ORDEM_GRUPOS.forEach(function(g){
+    var ids = grupos[g];
+    if (!ids.length) return;
+    var det = document.createElement('details'); det.className = 'grupo-col';
+    var sum = document.createElement('summary');
+    var seta = document.createElement('span'); seta.className = 'seta'; seta.textContent = '\u25b6'; sum.appendChild(seta);
+    var tt = document.createElement('span'); tt.textContent = ' ' + g; sum.appendChild(tt);
+    var bd = document.createElement('span'); bd.className = 'badge-n'; bd.textContent = ids.length + ' colunas'; sum.appendChild(bd);
+    var ac = document.createElement('span'); ac.className = 'grupo-acoes';
+    var bM = document.createElement('button'); bM.type = 'button'; bM.className = 'btn-massa'; bM.style.background = '#007AFF'; bM.textContent = 'Manter todas';
+    var bX = document.createElement('button'); bX.type = 'button'; bX.className = 'btn-massa'; bX.style.background = '#8E8E93'; bX.textContent = 'Excluir todas';
+    bM.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); aplicarGrupo(ids, 1); });
+    bX.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); aplicarGrupo(ids, 0); });
+    ac.appendChild(bM); ac.appendChild(bX); sum.appendChild(ac);
+    det.appendChild(sum);
+    var corpo = document.createElement('div'); corpo.className = 'grupo-corpo';
+    ids.forEach(function(i){
+      var p = document.createElement('button');
+      p.type = 'button'; p.className = 'pill-col';
+      p.textContent = NOMES[i];
+      p.style.setProperty('--c', ESTADOS[est[i]].cor);
+      p.setAttribute('aria-label', 'Coluna ' + NOMES[i] + ', estado ' + ESTADOS[est[i]].rot);
+      p.addEventListener('click', function(){
+        est[i] = proxEstado(est[i]);
+        p.style.setProperty('--c', ESTADOS[est[i]].cor);
+        p.setAttribute('aria-label', 'Coluna ' + NOMES[i] + ', estado ' + ESTADOS[est[i]].rot);
+        if (!MOVIMENTO_CALMO) reanimar(p, 'mudou');
+        vibrar(8); renderContador(cont, est, true);
+      });
+      corpo.appendChild(p); pills[i] = p;
+    });
+    det.appendChild(corpo); wrap.appendChild(det);
+  });
+  renderContador(cont, est, false);
+})();
+
+/* ==========================================================================
+   S4 — Quadro de destinos (kanban)
+   ========================================================================== */
+(function(){
+  var est = estadosPadrao();
+  var kb = $('kanbanS4');
+  var colEls = {}, contEls = {};
+  ORDEM_EST.forEach(function(e){
+    var col = document.createElement('div');
+    col.className = 'kanban-col'; col.style.setProperty('--c', ESTADOS[e].cor);
+    var h = document.createElement('h4');
+    var t = document.createElement('span'); t.textContent = ESTADOS[e].rot;
+    var cn = document.createElement('span'); cn.className = 'conta'; cn.textContent = '0';
+    h.appendChild(t); h.appendChild(cn); col.appendChild(h);
+    var itens = document.createElement('div'); itens.className = 'kanban-itens';
+    col.appendChild(itens); kb.appendChild(col);
+    colEls[e] = itens; contEls[e] = cn;
+    col.addEventListener('dragover', function(ev){ ev.preventDefault(); col.classList.add('sobre'); });
+    col.addEventListener('dragleave', function(){ col.classList.remove('sobre'); });
+    col.addEventListener('drop', function(ev){
+      ev.preventDefault(); col.classList.remove('sobre');
+      var id = parseInt(ev.dataTransfer.getData('text/plain'), 10);
+      if (!isNaN(id)) mover(id, e);
+    });
+  });
+  var cards = [];
+  NOMES.forEach(function(nome, i){
+    var c = document.createElement('div');
+    c.className = 'kanban-card'; c.draggable = true;
+    var nm = document.createElement('span'); nm.textContent = nome; c.appendChild(nm);
+    var st = document.createElement('span'); st.className = 'setas';
+    var bE = document.createElement('button'); bE.type = 'button'; bE.textContent = '\u2039';
+    bE.setAttribute('aria-label', 'Mover ' + nome + ' para a pista anterior');
+    var bD = document.createElement('button'); bD.type = 'button'; bD.textContent = '\u203a';
+    bD.setAttribute('aria-label', 'Mover ' + nome + ' para a proxima pista');
+    bE.addEventListener('click', function(){ passo(i, -1); });
+    bD.addEventListener('click', function(){ passo(i, 1); });
+    st.appendChild(bE); st.appendChild(bD); c.appendChild(st);
+    c.addEventListener('dragstart', function(ev){
+      ev.dataTransfer.setData('text/plain', String(i));
+      c.classList.add('arrastando');
+    });
+    c.addEventListener('dragend', function(){ c.classList.remove('arrastando'); });
+    cards[i] = c; colEls[est[i]].appendChild(c);
+  });
+  function passo(i, dir){
+    var pos = ORDEM_EST.indexOf(est[i]);
+    var np = (pos + dir + ORDEM_EST.length) % ORDEM_EST.length;
+    mover(i, ORDEM_EST[np]);
+  }
+  function mover(i, novo){
+    if (est[i] === novo) return;
+    est[i] = novo;
+    colEls[novo].appendChild(cards[i]);
+    if (!MOVIMENTO_CALMO){ reanimar(cards[i], 'mudou'); reanimar(contEls[novo], 'pulsa'); }
+    vibrar(10); atualizaContas();
+  }
+  function atualizaContas(){
+    ORDEM_EST.forEach(function(e){
+      var n = 0;
+      NOMES.forEach(function(_, i){ if (est[i] === e) n++; });
+      contEls[e].textContent = n;
+    });
+  }
+  atualizaContas();
+})();
+
+/* ==========================================================================
+   S5 — Triagem Fica / Sai
+   ========================================================================== */
+(function(){
+  var est = estadosPadrao();
+  var fila = NOMES.map(function(_, i){ return i; });
+  var pos = 0, hist = [];
+  var card = $('cardS5'), nomeEl = $('nomeS5'), amEl = $('amostraS5'), dicaEl = $('dicaS5');
+  var barra = $('barraS5'), txt = $('txtS5'), btnDes = $('desfazS5');
+  var total = fila.length;
+  function mostra(){
+    if (pos >= fila.length){ fim(); return; }
+    var i = fila[pos], nome = NOMES[i];
+    nomeEl.textContent = nome;
+    amEl.innerHTML = '';
+    amostras(nome, i).forEach(function(v){
+      var d = document.createElement('div'); d.textContent = v; amEl.appendChild(d);
+    });
+    if (BUG_NOME[nome.toUpperCase()]) dicaEl.textContent = '\u26a0 O app de hoje marca esta como sensível por causa do texto NOME — mas é nome de lugar (bug 1).';
+    else dicaEl.textContent = '';
+    barra.style.width = (pos / total * 100) + '%';
+    txt.textContent = 'Coluna ' + (pos + 1) + ' de ' + total + ' — Fica ou Sai?';
+    btnDes.disabled = hist.length === 0;
+    if (!MOVIMENTO_CALMO) reanimar(card, 'entra');
+  }
+  function decide(fica, lado){
+    if (pos >= fila.length) return;
+    var i = fila[pos];
+    hist.push({ i: i, antes: est[i] });
+    if (!fica) est[i] = 0;
+    if (!MOVIMENTO_CALMO){
+      card.classList.add(lado);
+      setTimeout(function(){ card.classList.remove(lado); pos++; mostra(); }, 290);
+    } else { pos++; mostra(); }
+    vibrar(10);
+  }
+  $('ficaS5').addEventListener('click', function(){ decide(true, 'voa-dir'); });
+  $('saiS5').addEventListener('click', function(){ decide(false, 'voa-esq'); });
+  btnDes.addEventListener('click', function(){
+    var u = hist.pop();
+    if (!u) return;
+    est[u.i] = u.antes; pos--; mostra();
+    vibrar(8);
+  });
+  var palco = $('palcoS5');
+  palco.tabIndex = 0;
+  palco.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight'){ e.preventDefault(); decide(true, 'voa-dir'); }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); decide(false, 'voa-esq'); }
+  });
+  function fim(){
+    card.style.display = 'none';
+    var ficam = fila.filter(function(i){ return est[i] !== 0; });
+    txt.textContent = 'Fim! ' + ficam.length + ' colunas ficaram. Agora ajuste a cor fina delas:';
+    barra.style.width = '100%';
+    var area = $('triaPalcoS5');
+    var caixa = document.createElement('div'); caixa.className = 'tria-fim';
+    ficam.slice(0, 60).forEach(function(i){
+      var ln = document.createElement('div'); ln.className = 'linha-col';
+      var nm = document.createElement('span'); nm.className = 'nome'; nm.textContent = NOMES[i];
+      var pd = document.createElement('div'); pd.className = 'pontinhos';
+      [1, 2, 3, 4].forEach(function(e){
+        var p = document.createElement('button');
+        p.type = 'button'; p.className = 'pontinho';
+        p.style.background = ESTADOS[e].cor; p.style.color = ESTADOS[e].cor;
+        p.title = ESTADOS[e].rot;
+        p.setAttribute('aria-label', 'Marcar ' + NOMES[i] + ' como ' + ESTADOS[e].rot);
+        if (est[i] === e) p.classList.add('ativo');
+        p.addEventListener('click', function(){
+          est[i] = e;
+          pd.querySelectorAll('.pontinho').forEach(function(q){ q.classList.remove('ativo'); });
+          p.classList.add('ativo');
+        });
+        pd.appendChild(p);
+      });
+      ln.appendChild(nm); ln.appendChild(pd); caixa.appendChild(ln);
+    });
+    area.appendChild(caixa);
+    $('saiS5').style.display = 'none';
+    $('ficaS5').style.display = 'none';
+    btnDes.style.display = 'none';
+  }
+  mostra();
+})();
+
+/* ==========================================================================
+   S6 — Planilha viva (14 das 159 colunas)
+   ========================================================================== */
+(function(){
+  var COLS6 = ['MATRICULA','NOME-CLIENTE','ENDERECO','NUMERO-IMOVEL','BAIRRO','CEP-USUARIO','CPF','RG','TELEFONE','EMAIL-USUARIO','ECO-AGUA res','CONSMED 1','VALOR-FATURA','NOME-BAIRRO'];
+  var idx6 = COLS6.map(function(n){ return NOMES.indexOf(n); });
+  var est = {};
+  COLS6.forEach(function(n, k){ est[k] = estadoInicial(n); });
+  var cont = $('contS6');
+  var tab = $('planS6');
+  var thead = document.createElement('thead');
+  var trh = document.createElement('tr');
+  var ths = [], tdsPorCol = [];
+  COLS6.forEach(function(n, k){
+    var th = document.createElement('th');
+    th.tabIndex = 0; th.setAttribute('role', 'button');
+    th.setAttribute('aria-label', 'Coluna ' + n + ' — clique para mudar o destino');
+    var s1 = document.createElement('span'); s1.textContent = n;
+    var s2 = document.createElement('span'); s2.className = 'estado-txt';
+    th.appendChild(s1); th.appendChild(s2);
+    th.addEventListener('click', function(){ cicla(k); });
+    th.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); cicla(k); }
+    });
+    trh.appendChild(th); ths.push({ th: th, rot: s2 });
+  });
+  thead.appendChild(trh); tab.appendChild(thead);
+  var tbody = document.createElement('tbody');
+  for (var r = 0; r < 4; r++){
+    var tr = document.createElement('tr');
+    COLS6.forEach(function(n, k){
+      var td = document.createElement('td');
+      td.textContent = amostras(n, idx6[k] + r * 3)[r % 3];
+      tr.appendChild(td);
+      if (!tdsPorCol[k]) tdsPorCol[k] = [];
+      tdsPorCol[k].push(td);
+    });
+    tbody.appendChild(tr);
+  }
+  tab.appendChild(tbody);
+  function pinta(k){
+    var e = est[k], cls = 'colst' + e;
+    ths[k].th.className = cls;
+    ths[k].rot.textContent = ESTADOS[e].rot;
+    ths[k].rot.style.color = ESTADOS[e].cor;
+    tdsPorCol[k].forEach(function(td){ td.className = cls; });
+  }
+  function cicla(k){
+    est[k] = proxEstado(est[k]);
+    pinta(k); vibrar(8); renderCont6(true);
+  }
+  function renderCont6(animar){
+    var c = { 1: 0, 2: 0, 3: 0, 4: 0, 0: 0 };
+    Object.keys(est).forEach(function(k){ c[est[k]]++; });
+    cont.innerHTML = ORDEM_EST.map(function(e){
+      return '<b style="color:' + ESTADOS[e].cor + '">' + c[e] + ' ' + ESTADOS[e].rot + '</b>';
+    }).join(' \u00b7 ');
+    if (animar && !MOVIMENTO_CALMO) cont.querySelectorAll('b').forEach(function(b){ reanimar(b, 'pulsa'); });
+  }
+  COLS6.forEach(function(_, k){ pinta(k); });
+  renderCont6(false);
+})();
+</script>
+
+</body>
+</html>

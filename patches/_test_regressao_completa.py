@@ -65,7 +65,7 @@ def main():
             # (resultados de calculo ficam display:none ate calcular; ancora em conteudo estavel)
             abas = [("Calculadora de Prazo", "Lançamento da Sanção"),
                     ("Calculadora de Dilacao", "Dilacao Simples"),
-                    ("Fluxo de Vistorias VTO", "1a Vistoria"),
+                    ("Fluxo de Vistorias VTO", "1a VISTORIA"),
                     ("Matriculas", "Adicionar"),
                     ("Estatisticas", None),
                     ("Anonimizador", None)]
@@ -111,6 +111,10 @@ def main():
                                   " return m ? m.servicos.length : -1; }")
             pg.evaluate("() => mostrarAba('fluxo')")
             pg.wait_for_timeout(200)
+            # a roleta agora comeca vazia: escolhe o 8403 pela busca, como o usuario faz
+            pg.locator("#coluna1 .roleta-vazio").first.click()
+            pg.keyboard.type("8403")
+            pg.wait_for_timeout(500)
             # tenta clique real num botao visivel fora da roleta
             handle = pg.evaluate_handle("""() => {
                 const b = [...document.querySelectorAll('button.servico-btn')]

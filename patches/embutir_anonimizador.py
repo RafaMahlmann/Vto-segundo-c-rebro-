@@ -38,12 +38,14 @@ def main():
 
     anon_b64 = base64.b64encode(anon_html.encode("utf-8")).decode("ascii")
 
+    # tolera CRLF e LF ao redor das marcas (o index.html ja teve finais mistos)
+    NL = "\r\n" if "\r\n" in index_html else "\n"
     bloco = (
-        "\n" + MARCA_ABRE + "\n"
-        '<script id="anonimizadorFonte" type="application/octet-stream">'
+        NL + MARCA_ABRE + NL
+        + '<script id="anonimizadorFonte" type="application/octet-stream">'
         + anon_b64 +
-        "</script>\n"
-        + MARCA_FECHA + "\n"
+        "</script>" + NL
+        + MARCA_FECHA + NL
     )
 
     antes = index_html
@@ -51,7 +53,7 @@ def main():
     if MARCA_ABRE in index_html:
         # troca o bloco existente, sem mexer em mais nada
         novo = re.sub(
-            r"\n" + re.escape(MARCA_ABRE) + r".*?" + re.escape(MARCA_FECHA) + r"\n",
+            r"\r?\n[ \t]*" + re.escape(MARCA_ABRE) + r".*?" + re.escape(MARCA_FECHA) + r"[ \t]*\r?\n",
             lambda _m: bloco,
             index_html,
             count=1,
