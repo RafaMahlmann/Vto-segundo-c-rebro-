@@ -788,3 +788,30 @@ contagem da revisão e "voltar preserva o digitado" — 16 verificações, e
 o processamento real linha a linha continua batendo.
 `patches/_testa_seletor.py` (24) e `_test_regressao_completa.py` (21),
 sem quebra.
+
+---
+
+## PARTE 22 — Carimbo de versão deixava de mentir (2026-10-19)
+
+O Rafa abriu um arquivo velho na Sanepar, viu "v4.7.2026-10-19.11-43" e
+achou que era o de hoje — não era. Investigado: o GitHub estava certo
+(confirmado lendo o `raw.githubusercontent.com` direto, decodificando o
+Base64 do anonimizador embutido — as 4 entregas estavam lá, batendo byte
+a byte com o `embutir_anonimizador.py` local). O arquivo que ele abriu é
+que não era este.
+
+**A causa raiz do mal-entendido:** `aplicarVersaoDinamica()` carimbava a
+**hora em que o arquivo foi aberto**, não a versão do código. Um arquivo
+de semanas atrás, aberto hoje, carimbava a data de hoje do mesmo jeito —
+by design, o carimbo nunca poderia provar "isso é a entrega mais
+recente". Virou `DATA_ENTREGA`, uma constante fixa (`'19/10/2026'`) que
+só muda quando sobe código novo, igual o `VERSAO_LOCAL`. Badge e os 4
+rodapés agora mostram "v4.7 · 19/10/2026" — a data da entrega, não da
+abertura. Gerei um ZIP novo na hora e mandei pro Rafa, confirmando antes
+(decodificando o Base64 de dentro do ZIP) que as 4 entregas estavam lá.
+
+**Regra para a próxima sessão:** atualizar `DATA_ENTREGA` junto com
+`VERSAO_LOCAL` a cada entrega relevante — os dois ficam logo depois um do
+outro no código, perto da linha 3173.
+
+Teste: `patches/_test_regressao_completa.py` (21), sem quebra.
