@@ -321,6 +321,7 @@
         .selc-bol-grande[data-estado="3"] { background: #FF9500; }
         .selc-bol-grande[data-estado="4"] { background: #34C759; }
         .selc-bol-grande[data-estado="0"] { background: #8E8E93; }
+        .selc-bol-grande[data-estado="5"] { background: #5856D6; }
         .selc-barra .selc-limpar {
             display: inline-block; width: auto; margin-top: 0; box-shadow: none;
             background: rgba(255,255,255,0.15); color: #fff; border: none; border-radius: 100px;
@@ -446,6 +447,14 @@
         .manual-btn-aplicar { background: linear-gradient(135deg, #5856D6 0%, #4644b8 100%); }
         .manual-btn-aplicar:not(:disabled):hover { box-shadow: 0 4px 14px rgba(88,86,214,.35); }
         .manual-btn-aplicar:active:not(:disabled) { transform: scale(.97); }
+        .manual-fila-badge {
+            display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
+            color: #5856D6; background: #F0F0FB; border-radius: 100px; padding: 6px 14px; margin-bottom: 14px; width: fit-content;
+        }
+        .manual-fila-cancelar {
+            width: auto; background: none; box-shadow: none; border: none; padding: 0; margin: 0;
+            color: var(--text-secondary); font-size: 12px; font-weight: 600; text-decoration: underline; cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -555,6 +564,7 @@
                 <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
                 <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT)" onclick="selcAplicarEmMassa(4)"></button>
                 <button class="selc-bol-grande" data-estado="0" title="Excluir" onclick="selcAplicarEmMassa(0)"></button>
+                <button class="selc-bol-grande" data-estado="5" title="✍️ Manual (abre uma fila, uma coluna de cada vez)" onclick="manualIniciarFila()"></button>
                 <button class="selc-limpar" onclick="selcLimparSelecao()">Limpar</button>
             </div>
 
@@ -1148,6 +1158,8 @@
     let MANUAL_EDITANDO = null;
     let MANUAL_LINHAS_CARREGADAS = []; // [{idx, original}] da coluna em edicao agora
     let MANUAL_REVISAO_VALORES = []; // valores digitados, paralelo a MANUAL_LINHAS_CARREGADAS
+    let MANUAL_FILA = []; // colIds restantes, quando a edicao manual comecou da barra preta
+    let MANUAL_FILA_TOTAL = 0; // tamanho original da fila (0 = nao esta numa fila)
     const LIMITE_VALORES_FILTRO = 1000;
     let FILTRO_EDITANDO = null;
     let FILTRO_VALORES_TEMP = null;
@@ -1694,14 +1706,52 @@
         const existente = EDICOES_MANUAIS.get(colId);
         const qtdExistente = existente ? existente.size : 5;
         const corpo = document.getElementById('manualCorpo');
+        const emFila = MANUAL_FILA_TOTAL > 0;
+        const posFila = MANUAL_FILA_TOTAL - MANUAL_FILA.length;
         corpo.innerHTML =
+            (emFila ? `<div class="manual-fila-badge">Coluna ${posFila} de ${MANUAL_FILA_TOTAL} selecionadas · <button type="button" class="manual-fila-cancelar" onclick="manualCancelarFila()">cancelar fila</button></div>` : '') +
             `<h3>✍️ Editar ${selcEsc(nome)} manualmente</h3>` +
             `<div class="manual-aviso">⚠️ <strong>Risco assumido por você.</strong> O que estiver escrito aqui vai direto pro arquivo final, sem passar pelo anonimizador automático. Não digite CPF, nome, endereço ou qualquer outro dado real.</div>` +
             `<label class="manual-qtd-label">Quantas linhas quer editar? (1 a 50)` +
             `<input type="number" id="manualQtd" min="1" max="50" value="${Math.min(50, Math.max(1, qtdExistente))}"></label>` +
+            `<div class="filtro-val-rodape">` +
             `<button type="button" class="selc-btn-mini" onclick="manualCarregarLinhas(${colId})">Carregar linhas do arquivo</button>` +
+            (emFila ? `<button type="button" class="selc-btn-mini" onclick="manualPularFila()">Pular esta coluna →</button>` : '') +
+            `</div>` +
             `<div id="manualListaArea"></div>`;
         document.getElementById('manualOverlay').classList.add('aberto');
+    }
+
+    // Fila de edicao manual, iniciada pela barra preta de acao em massa.
+    // Cada coluna da fila passa pelo editor completo, uma de cada vez -
+    // a seguranca (revisar + checkbox de risco) nao muda, so o clique inicial.
+    function manualIniciarFila() {
+        if (!SELECIONADAS.size) return;
+        if (!FILE_REF) { alert("Carregue um arquivo primeiro."); return; }
+        MANUAL_FILA = Array.from(SELECIONADAS);
+        MANUAL_FILA_TOTAL = MANUAL_FILA.length;
+        manualProximoDaFila();
+    }
+
+    function manualProximoDaFila() {
+        if (!MANUAL_FILA.length) { MANUAL_FILA_TOTAL = 0; return; }
+        const colId = MANUAL_FILA.shift();
+        manualAbrirEditor(colId);
+    }
+
+    function manualAvancarFila() {
+        if (MANUAL_FILA.length > 0) manualProximoDaFila();
+        else { MANUAL_FILA_TOTAL = 0; manualFechar(); }
+    }
+
+    function manualPularFila() {
+        manualAvancarFila();
+    }
+
+    function manualCancelarFila() {
+        MANUAL_FILA = [];
+        MANUAL_FILA_TOTAL = 0;
+        manualFechar();
     }
 
     async function manualCarregarLinhas(colId) {
@@ -1748,10 +1798,11 @@
             return `<input type="text" class="manual-linha-input${alterado ? ' manual-alterado' : ''}" id="manualInput${i}" ` +
                 `data-original="${selcEsc(l.original)}" value="${selcEsc(valorAtual)}" oninput="manualAtualizarCorCampo(this)">`;
         }).join('');
+        const emFila = MANUAL_FILA_TOTAL > 0;
         area.innerHTML =
             `<div class="manual-lista">${linhasHtml}</div>` +
             `<div class="filtro-val-rodape">` +
-            `<button type="button" class="selc-btn-mini" onclick="manualFechar()">Cancelar</button>` +
+            `<button type="button" class="selc-btn-mini" onclick="${emFila ? 'manualPularFila()' : 'manualFechar()'}">${emFila ? 'Pular esta coluna →' : 'Cancelar'}</button>` +
             `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualAbrirRevisao(${colId})">Revisar antes de aplicar</button>` +
             `</div>`;
     }
@@ -1816,7 +1867,7 @@
         if (col) col.estado = 5;
         const chip = document.getElementById(`chip-${colId}`);
         if (chip && col) { atualizarVisualChip(chip, col.nome, 5); selcRenderAmostraTransformada(colId); }
-        manualFechar();
+        manualAvancarFila();
     }
 
     function manualFechar() {
@@ -1824,6 +1875,8 @@
         MANUAL_EDITANDO = null;
         MANUAL_LINHAS_CARREGADAS = [];
         MANUAL_REVISAO_VALORES = [];
+        MANUAL_FILA = [];
+        MANUAL_FILA_TOTAL = 0;
     }
 
     // ===========================================================================

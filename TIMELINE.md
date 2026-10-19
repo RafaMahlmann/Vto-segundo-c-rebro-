@@ -854,3 +854,43 @@ mudar. Subiram juntos: title, badge, 4 rodapés, `VERSAO_LOCAL`, `sw.js`
 Quem estiver na v4.7 vai ver o banner de nova versão.
 
 Teste: `patches/_test_regressao_completa.py` (21), sem quebra.
+
+---
+
+## PARTE 25 — Fila de edição manual na barra preta + versão v4.9 (2026-10-19)
+
+Pedido do Rafa: a barra preta de ação em massa (aparece ao selecionar
+várias colunas) tinha as 5 cores automáticas, mas não o Manual — porque
+"aplicar em massa" não faz sentido pra digitar dado à mão em 10 colunas
+de uma vez. Só que sumir de vez também não fazia sentido pra ele, que
+queria velocidade pra começar a editar várias colunas sem caçar cartão
+por cartão.
+
+**Virou fila.** Bolinha índigo na barra preta abre o editor da primeira
+coluna selecionada, igual já funcionava num cartão avulso. Ao confirmar,
+abre sozinho o editor da próxima — sem precisar clicar de novo. Um
+badge "Coluna 2 de 10 · cancelar fila" mostra onde você está. Pode
+"Pular esta coluna →" a qualquer momento (não mexe nela, só avança) ou
+cancelar a fila inteira (as colunas já confirmadas antes de cancelar
+continuam valendo — só as que faltavam ficam de fora).
+
+**Nada mudou na segurança:** cada coluna da fila passa pelo editor
+completo — carregar linhas, editar, revisar, marcar "Entendi o risco" —
+um de cada vez. A fila só automatiza o clique inicial, não pula etapa
+nenhuma de revisão.
+
+**Onde mexeu:** `MANUAL_FILA` (array de colIds restantes) e
+`MANUAL_FILA_TOTAL` (tamanho original, 0 = fora de fila).
+`manualAbrirEditor()` mostra o badge só quando `MANUAL_FILA_TOTAL > 0`;
+fora de fila (clique num cartão avulso) continua exatamente como antes.
+`manualConfirmarRevisao()` passou a chamar `manualAvancarFila()` em vez
+de fechar direto.
+
+**Teste:** script Playwright fora do repo — seleciona 3 colunas, confirma
+a 1ª de verdade, pula a 2ª, cancela na 3ª, confirma que só a 1ª mudou de
+estado e que o editor avulso (sem fila) continua sem o badge. 14
+verificações OK. `patches/_testa_seletor.py` (24) e
+`_test_regressao_completa.py` (21), sem quebra.
+
+**Versão v4.9** (pedido do Rafa): subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
