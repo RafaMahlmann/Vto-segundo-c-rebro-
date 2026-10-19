@@ -1025,3 +1025,47 @@ valores exatamente como revisados). `patches/_testa_seletor.py` (24) e
 
 **Versão v4.11:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
 `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 28 — Nada some, nada sobra, nada cruza (2026-10-19, v4.12)
+
+**Pedido do Rafa:** corrigir os 3 achados fora do escopo da PARTE 27.
+Na correção apareceram mais 2 defeitos no mesmo código; entraram juntos.
+
+**1. Datas não cruzam mais entre lotes.** `destruirSalEfemero()` agora
+limpa `MAPA_DELTA_DATA`. Antes, dois lotes seguidos na mesma aba
+reaproveitavam o deslocamento de data de cada matrícula — dava pra
+cruzar os dois arquivos.
+
+**2. Cabeçalho do CSV não vira registro.** A linha 0 do CSV é pulada no
+processamento: o arquivo final já escreve o cabeçalho dele.
+
+**3. A última linha não some.** Arquivo sem quebra de linha no fim
+perdia o último registro (ficava no `buffer`). Corrigido nos 5 lugares
+que leem o arquivo: processamento, coleta dos pools de troca, valores
+distintos do filtro, carga da edição manual e detecção de tipo.
+
+**4. Troca de rua e de lote alinhada por posição.** O recorte da v4.11
+(e rua vazia no meio do bairro) desalinhava o contador de ocorrências:
+uma linha podia receber a própria rua de volta, e rua vazia ganhava rua.
+Agora a coleta grava a posição de cada linha no pool (`POOL.posRua`,
+`POOL.posLote`, com a mesma numeração do processamento) e a troca usa
+essa posição. Rua vazia continua vazia.
+
+**5. Lote sozinho na quadra não vaza mais.** Sem ninguém pra trocar, o
+número REAL do lote passava direto (setor + quadra + lote identificam o
+imóvel). Agora vira um lote inventado no mesmo formato.
+
+**Teste:** script Playwright fora do repo com 17 verificações, rodado
+nas duas versões. Na v4.11: 9 falhas (datas 20 de 20 iguais, cabeçalho
+virando linha, última linha sumindo no CSV, no TXT e na edição manual,
+8 a 12 linhas com a própria rua em 6 lotes, rua vazia preenchida, 1 a 3
+com a própria rua no recorte, 4 lotes reais vazando — os números variam
+porque o sal muda a cada rodada). Na v4.12: 17 de 17, em toda rodada.
+As 4 suítes anteriores (15 + 14 + 27 + 35), `_testa_seletor.py` e
+`_test_regressao_completa.py` passaram sem mudança. Aba Auditoria
+ganhou a linha "Nada some, nada sobra, nada cruza".
+
+**Versão v4.12:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
+`sw.js`, `version.json`, README, `package.json`.

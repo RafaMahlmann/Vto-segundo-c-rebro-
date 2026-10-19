@@ -746,6 +746,7 @@
                 <li><strong>Vazamento de dado importado por CSV (rodado em 19/10):</strong> importa uma matrícula-armadilha via CSV, exporta o ZIP, procura a armadilha dentro do pacote. <span class="seal-ok">Resultado: 0 ocorrências</span> — dado importado não vai junto no arquivo exportado.</li>
                 <li><strong>Filtro de linhas, prévia ao vivo e edição manual (16/10):</strong> confirma que os filtros combinam com <strong>E</strong> de verdade (uma linha do grupo errado é barrada mesmo batendo com um dos filtros), que a prévia nos cartões nunca usa o sal do lote real — sal e mapas isolados, testados e confirmados vazios depois de usar a prévia à vontade — e que o processamento real grava exatamente o que foi editado à mão, linha por linha. 15 + 16 verificações.</li>
                 <li><strong>Detecção de tipo e edição manual em lote (19/10):</strong> num arquivo de teste com CPF, CNPJ, CEP, data, telefone, e-mail e valor, cada coluna foi reconhecida pelo padrão e pela validação (dígito verificador, data que existe no calendário, DDD que existe) — inclusive um CPF guardado numa coluna de nome errado. Na edição manual, todo valor inventado é conferido contra os valores reais carregados e trocado se bater; valor real digitado à mão só passa com confirmação explícita, linha por linha. 27 + 35 verificações, com o arquivo final conferido linha a linha.</li>
+                <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
         </div>
@@ -811,6 +812,10 @@
         MAPA_DUBLE.clear();
         USADOS_DUBLE.clear();
         CONSISTENCIA.clear();
+        // O deslocamento de data por matricula e derivado do sal: se sobrevivesse,
+        // o lote seguinte (mesma aba) repetiria o mesmo deslocamento e os dois
+        // lotes poderiam ser cruzados - quebrando a promessa da aba Auditoria.
+        MAPA_DELTA_DATA.clear();
     }
 
     async function sha256Hex(str) {
@@ -1415,9 +1420,9 @@
     const POOL = { ruasPorBairro: new Map(), lotesPorQuadra: new Map() };
 
     function poolAdd(mapa, chave, valor) {
-        if (!valor) return;
+        if (!valor) return undefined;
         if (!mapa.has(chave)) mapa.set(chave, []);
-        mapa.get(chave).push(valor);
+        return mapa.get(chave).push(valor) - 1; // posicao de quem acabou de entrar
     }
 
     // Derangement: permutação garantindo que nenhum item fica na posição original
@@ -1799,7 +1804,7 @@
         try {
             while (lidas < LIMITE_LINHAS_DETECCAO) {
                 const { done, value } = await reader.read();
-                if (done) { if (buffer) processar(buffer); break; }
+                if (done) { buffer += decoder.decode(); if (buffer) processar(buffer.replace(/\r$/, '')); break; }
                 buffer += decoder.decode(value, { stream: true });
                 const partes = buffer.split(/\r?\n/);
                 buffer = partes.pop();
@@ -2066,18 +2071,23 @@
         const reader = FILE_REF.stream().getReader();
         const decoder = new TextDecoder(CSV_ENCODING);
         let buffer = "";
+        const contar = (linha) => {
+            if (linha.length < 2) return;
+            const val = extrairCampoTxt(linha, colId);
+            if (!contagem.has(val) && contagem.size >= LIMITE_VALORES_FILTRO) { truncado = true; return; }
+            contagem.set(val, (contagem.get(val) || 0) + 1);
+        };
         while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+            if (done) {
+                buffer += decoder.decode();
+                if (buffer) contar(buffer.replace(/\r$/, '')); // ultima linha sem quebra no fim
+                break;
+            }
             buffer += decoder.decode(value, { stream: true });
             const linhas = buffer.split(/\r?\n/);
             buffer = linhas.pop();
-            for (const linha of linhas) {
-                if (linha.length < 2) continue;
-                const val = extrairCampoTxt(linha, colId);
-                if (!contagem.has(val) && contagem.size >= LIMITE_VALORES_FILTRO) { truncado = true; continue; }
-                contagem.set(val, (contagem.get(val) || 0) + 1);
-            }
+            for (const linha of linhas) contar(linha);
         }
         return { contagem, truncado };
     }
@@ -2304,7 +2314,11 @@
         };
         leitura: while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+            if (done) {
+                buffer += decoder.decode();
+                if (buffer) pega(buffer.replace(/\r$/, '')); // ultima linha sem quebra: o processamento tambem a le
+                break;
+            }
             buffer += decoder.decode(value, { stream: true });
             const partes = buffer.split(/\r?\n/);
             buffer = partes.pop();
@@ -2612,29 +2626,41 @@
         const usaLote = colunasAtivas.some(c => c.estado === 4 && tipoSimulacao(c.nome) === "LOTE");
         if (!usaRua && !usaLote) return;
 
+        // Cada linha guarda a POSICAO da propria rua/lote na lista do bairro/quadra.
+        // A troca usa essa posicao (nao "a k-esima vez que o bairro apareceu"):
+        // com recorte ou linha de rua vazia a contagem desencaixava e a permutacao
+        // podia devolver a uma linha a propria rua dela.
+        POOL.posRua = new Map();  // numeroLinhaAbsoluto -> posicao em ruasPorBairro[bairro]
+        POOL.posLote = new Map(); // numeroLinhaAbsoluto -> posicao em lotesPorQuadra[quadra]
         const reader = file.stream().getReader();
         const decoder = new TextDecoder(CSV_ENCODING);
-        let buffer = "";
+        let buffer = "", numero = -1; // mesma numeracao do laco de processamento
+        const processar = (linha) => {
+            if (linha.length < 2) return;
+            numero++;
+            if (!linhaPassaFiltros(linha)) return;
+            if (usaRua) {
+                const bairro = normalizar(extrairCampoTxt(linha, 13));
+                const rua = extrairCampoTxt(linha, 5);
+                if (bairro && rua) POOL.posRua.set(numero, poolAdd(POOL.ruasPorBairro, bairro, rua));
+            }
+            if (usaLote) {
+                const quadraKey = normalizar(extrairCampoTxt(linha, 15)) + "|" + normalizar(extrairCampoTxt(linha, 16));
+                const lote = extrairCampoTxt(linha, 17);
+                if (lote) POOL.posLote.set(numero, poolAdd(POOL.lotesPorQuadra, quadraKey, lote));
+            }
+        };
         while (true) {
             const { done, value } = await reader.read();
-            if (done) break;
+            if (done) {
+                buffer += decoder.decode();
+                if (buffer) processar(buffer.replace(/\r$/, '')); // ultima linha sem quebra no fim
+                break;
+            }
             buffer += decoder.decode(value, { stream: true });
             const lines = buffer.split(/\r?\n/);
             buffer = lines.pop();
-            for (let linha of lines) {
-                if (linha.length < 2) continue;
-                if (!linhaPassaFiltros(linha)) continue;
-                if (usaRua) {
-                    const bairro = normalizar(extrairCampoTxt(linha, 13));
-                    const rua = extrairCampoTxt(linha, 5);
-                    if (bairro && rua) poolAdd(POOL.ruasPorBairro, bairro, rua);
-                }
-                if (usaLote) {
-                    const quadraKey = normalizar(extrairCampoTxt(linha, 15)) + "|" + normalizar(extrairCampoTxt(linha, 16));
-                    const lote = extrairCampoTxt(linha, 17);
-                    if (lote) poolAdd(POOL.lotesPorQuadra, quadraKey, lote);
-                }
-            }
+            for (const linha of lines) processar(linha);
         }
         log(`   -> Pools geo: ${POOL.ruasPorBairro.size} bairros, ${POOL.lotesPorQuadra.size} quadras mapeadas.`);
     }
@@ -2725,8 +2751,6 @@
                     for (const [quadra, lotes] of POOL.lotesPorQuadra) {
                         POOL.permLote.set(quadra, lotes.length > 1 ? await derange(lotes, "LOTE|" + quadra) : null);
                     }
-                    POOL.ocorrenciaRua = new Map();
-                    POOL.ocorrenciaLote = new Map();
                 }
 
                 // PASSADA 2: transformar
@@ -2741,15 +2765,26 @@
 
                 while (true) {
                     const { done, value } = await reader.read();
-                    if (done) break;
-                    bytesLidos += value.length;
-                    buffer += decoder.decode(value, { stream: true });
-                    const lines = buffer.split(/\r?\n/);
-                    buffer = lines.pop();
+                    let lines;
+                    if (done) {
+                        // Ultima linha sem quebra no fim do arquivo: ficava no buffer e
+                        // nunca era processada - o registro simplesmente sumia.
+                        buffer += decoder.decode();
+                        lines = buffer ? [buffer.replace(/\r$/, '')] : [];
+                        buffer = "";
+                    } else {
+                        bytesLidos += value.length;
+                        buffer += decoder.decode(value, { stream: true });
+                        lines = buffer.split(/\r?\n/);
+                        buffer = lines.pop();
+                    }
 
                     for (let linha of lines) {
                         if (linha.length < 2) continue;
                         numeroLinhaAbsoluto++;
+                        // Cabecalho do CSV: o arquivo final ja tem o seu (nomesCabecalho).
+                        // Antes ele era transformado como se fosse um registro.
+                        if (MODO_ATUAL === "CSV" && numeroLinhaAbsoluto === 0) continue;
                         if (MODO_ATUAL === "TXT" && !linhaPassaFiltros(linha)) {
                             linhasIgnoradas++;
                             continue;
@@ -2797,10 +2832,11 @@
                                     const bairro = normalizar(extrairCampoTxt(item.linha, 13));
                                     const ruas = POOL.ruasPorBairro.get(bairro);
                                     const perm = POOL.permRua.get(bairro);
-                                    if (ruas && perm) {
-                                        const occ = (POOL.ocorrenciaRua.get(bairro) || 0);
-                                        POOL.ocorrenciaRua.set(bairro, occ + 1);
-                                        valor = ruas[perm[occ % ruas.length]] || valor;
+                                    const pos = POOL.posRua.get(numeroLinhaAbsoluto);
+                                    if (!valor) {
+                                        // rua vazia continua vazia: nao inventa endereco onde nao havia
+                                    } else if (ruas && perm && pos !== undefined) {
+                                        valor = ruas[perm[pos]] || valor; // perm[pos] != pos: nunca a propria rua
                                     } else {
                                         valor = await gerarHash(valor); // bairro com 1 rua: hash
                                     }
@@ -2827,10 +2863,15 @@
                                     const quadraKey = normalizar(extrairCampoTxt(item.linha, 15)) + "|" + normalizar(extrairCampoTxt(item.linha, 16));
                                     const lotes = POOL.lotesPorQuadra.get(quadraKey);
                                     const perm = POOL.permLote.get(quadraKey);
-                                    if (lotes && perm) {
-                                        const occ = (POOL.ocorrenciaLote.get(quadraKey) || 0);
-                                        POOL.ocorrenciaLote.set(quadraKey, occ + 1);
-                                        valor = lotes[perm[occ % lotes.length]] || valor;
+                                    const pos = POOL.posLote.get(numeroLinhaAbsoluto);
+                                    if (!valor) {
+                                        // lote vazio continua vazio
+                                    } else if (lotes && perm && pos !== undefined) {
+                                        valor = lotes[perm[pos]] || valor; // perm[pos] != pos: nunca o proprio lote
+                                    } else {
+                                        // Lote sozinho na quadra: nao tem com quem trocar. Antes o valor
+                                        // REAL passava direto - e setor+quadra+lote identificam o imovel.
+                                        valor = await valorSintetico("LOTE_GEN", valor, FABRICAS.GENERICO(valor));
                                     }
                                     relatorio.tecnicas.add("Swap de lotes dentro da quadra");
                                 }
@@ -2874,6 +2915,7 @@
                     let percent = Math.round((bytesLidos / currentFile.size) * 100);
                     progressBar.style.width = percent + "%";
                     await new Promise(r => setTimeout(r, 0));
+                    if (done) break;
                 }
 
                 log(`   -> Concluído: ${linhasProcessadas} linhas (Ignoradas: ${linhasIgnoradas}).`);
