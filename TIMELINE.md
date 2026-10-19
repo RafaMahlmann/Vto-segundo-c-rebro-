@@ -841,3 +841,16 @@ gravado) também não vaza no export.
 
 Teste: `patches/_testa_seletor.py` (24) e `_test_regressao_completa.py`
 (21), sem quebra. Base64 reembutido no index.html.
+
+---
+
+## PARTE 24 — Versão v4.8 (2026-10-19)
+
+Bump pedido pelo Rafa: três funcionalidades grandes (filtro de linhas,
+prévia ao vivo, edição manual) tinham subido sob a v4.7 sem o número
+mudar. Subiram juntos: title, badge, 4 rodapés, `VERSAO_LOCAL`, `sw.js`
+(vto-cache-v4.8), `version.json` (4.8), README, `package.json`.
+`DATA_ENTREGA` continua `19/10/2026` — já estava certa, não mudou.
+Quem estiver na v4.7 vai ver o banner de nova versão.
+
+Teste: `patches/_test_regressao_completa.py` (21), sem quebra.
