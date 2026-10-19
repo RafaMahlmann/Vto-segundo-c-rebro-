@@ -654,6 +654,18 @@
         </div>
 
         <div class="audit-section">
+            <h3>🔁 Testes automatizados desde a reconstrução (14/09 a 19/10/2026)</h3>
+            <p>O pentest acima mede resistência a ataque adversarial e é um registro histórico — não muda. Em cada entrega depois dele, uma suíte de testes automatizados (Playwright, fora deste arquivo) rodou de novo contra dado <strong>sintético</strong> (nunca real) para confirmar que nada quebrou nem voltou a vazar. É regressão funcional, não um novo pentest — os dois são evidências diferentes e complementares.</p>
+            <ul>
+                <li><strong>Export limpo e arquivo único (14–15/09):</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">patches/_test_etapa1.py</span> — 24 verificações. Confirma que o ZIP exportado não leva as matrículas que estavam na tela nem HTML gerado em tempo de execução.</li>
+                <li><strong>Desfazer/Refazer (14–15/09):</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_etapa5.py</span> (31) + <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_etapa5c.py</span> (18) — confirma que <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">Ctrl+Z</span> dentro de um campo de texto não mexe em matrícula, e que o aviso do botão de reset diz a verdade.</li>
+                <li><strong>Vazamento de dado importado por CSV (rodado em 19/10):</strong> importa uma matrícula-armadilha via CSV, exporta o ZIP, procura a armadilha dentro do pacote. <span class="seal-ok">Resultado: 0 ocorrências</span> — dado importado não vai junto no arquivo exportado.</li>
+                <li><strong>Filtro de linhas, prévia ao vivo e edição manual (16/10):</strong> confirma que os filtros combinam com <strong>E</strong> de verdade (uma linha do grupo errado é barrada mesmo batendo com um dos filtros), que a prévia nos cartões nunca usa o sal do lote real — sal e mapas isolados, testados e confirmados vazios depois de usar a prévia à vontade — e que o processamento real grava exatamente o que foi editado à mão, linha por linha. 15 + 16 verificações.</li>
+                <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
+            </ul>
+        </div>
+
+        <div class="audit-section">
             <h3>📜 Certificado de anonimização</h3>
             <p>Cada lote processado gera um <strong>certificado exportável</strong> (botão azul-claro na aba Processamento) contendo: data/hora, arquivos e técnicas aplicadas, contagem de linhas, confirmação da destruição do sal e um hash de verificação do lote. Anexe esse arquivo ao pedido de aprovação do time de segurança — ele é a prova de que o processo correu conforme o padrão.</p>
         </div>

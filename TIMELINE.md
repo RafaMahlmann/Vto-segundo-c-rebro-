@@ -815,3 +815,29 @@ abertura. Gerei um ZIP novo na hora e mandei pro Rafa, confirmando antes
 outro no código, perto da linha 3173.
 
 Teste: `patches/_test_regressao_completa.py` (21), sem quebra.
+
+---
+
+## PARTE 23 — Aba Auditoria documenta os testes desde a reconstrução (2026-10-19)
+
+Pedido do Rafa: "fizemos um monte de auditorias e testes e faltou
+atualizar essa parte" — a aba Auditoria & Segurança do anonimizador só
+tinha a tabela do pentest de 01/09/2026 (v18.2.2 reprovada → v19.0.0
+aprovada). Todo o trabalho depois disso — fusão, filtro de linhas,
+prévia, edição manual — não aparecia ali.
+
+Entrou uma seção nova, **separada** da tabela do pentest (que é um
+registro histórico de ataque adversarial e não deve ser editado):
+"Testes automatizados desde a reconstrução", deixando claro que é
+regressão funcional contra dado sintético, não um novo pentest — são
+evidências diferentes, não substituem uma a outra.
+
+Antes de escrever, rodei o teste que tinha ficado pendente desde 15/09:
+`patches/_test_zip_leak_csv.py` — importa uma matrícula-armadilha via
+CSV, exporta o ZIP, procura a armadilha dentro. **Resultado: 0
+ocorrências.** Isso fechou um buraco real na documentação: ninguém tinha
+confirmado, por escrito, que dado importado (não só o que já estava
+gravado) também não vaza no export.
+
+Teste: `patches/_testa_seletor.py` (24) e `_test_regressao_completa.py`
+(21), sem quebra. Base64 reembutido no index.html.
