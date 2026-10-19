@@ -808,6 +808,32 @@
         return v;
     }
 
+    // Simulacao generica, format-aware: pras ~150 colunas do SGCG sem tipo
+    // conhecido (so 9 tem gerador dedicado). Sem isso, Simular caia pro
+    // mesmo hash de 32 caracteres do Anonimizar - destruindo o formato
+    // (3 caracteres virava 32, nome composto virava ilegivel). Preserva a
+    // FORMA do original: digito vira digito, letra vira letra (mantendo
+    // maiuscula/minuscula), o resto (espaco, barra, @, traco) fica igual.
+    // Funcao pura - reaproveitada tanto no processamento real (valorSintetico,
+    // sal do lote) quanto na previa isolada (previaValorSintetico, sal a parte).
+    function fabricarGenericoFormatAware(valorOriginal) {
+        return (rand) => String(valorOriginal).split('').map(ch => {
+            if (/\d/.test(ch)) return String(Math.floor(rand() * 10));
+            if (/\p{Lu}/u.test(ch)) return String.fromCharCode(65 + Math.floor(rand() * 26));
+            if (/\p{Ll}/u.test(ch)) return String.fromCharCode(97 + Math.floor(rand() * 26));
+            return ch;
+        }).join('');
+    }
+
+    // Datas no TXT do SGCG vem cruas (AAAAMMDD) ou AAAA-MM-DD no CSV - sem
+    // isso a simulacao generica acima randomizaria os digitos e podia gerar
+    // "20269931" (mes 99), uma data invalida. deslocarData() ja existe e
+    // sempre devolve uma data real.
+    function pareceDataBruta(valor) {
+        const v = String(valor ?? '').trim();
+        return (/^\d{8}$/.test(v) && (v.startsWith('19') || v.startsWith('20'))) || /^\d{4}-\d{2}-\d{2}$/.test(v);
+    }
+
     function calcularDV(cpf9) {
         let s1 = 0; for (let i = 0; i < 9; i++) s1 += cpf9[i] * (10 - i);
         let d1 = (s1 * 10) % 11 % 10;
@@ -965,7 +991,10 @@
                 return prefixo + sufixo;
             });
             if (tipo === "ENDERECO" || tipo === "LOTE") return "⏳ depende do arquivo inteiro — ver após processar";
-            return previaHash(valor); // EMAIL e demais tipos: hash generico, igual ao real
+            if (pareceDataBruta(valor)) {
+                return previaValorSintetico("DATA_GEN", valor, (rand) => deslocarData(valor, Math.floor(rand() * 3651) - 1825));
+            }
+            return previaValorSintetico("GENERICO", valor, fabricarGenericoFormatAware(valor));
         }
         return valor;
     }
@@ -1107,8 +1136,7 @@
         if (n === "NUMERO-IMOVEL") return "NUMERO";
         if (n.startsWith("CEP")) return "CEP";
         if (n === "INSC-LOTE") return "LOTE";
-        if (n.includes("EMAIL")) return "EMAIL";
-        return "HASH"; // demais campos simulados viram hash com sal efêmero
+        return "GENERICO"; // demais campos: simulacao generica format-aware (ve fabricarGenericoFormatAware)
     }
 
     const TERMOS_SENSIVEIS = ["NOME", "CPF", "RG", "TELEFONE", "CELULAR", "EMAIL", "CONTATO", "NUMERO-IMOVEL", "CEP-USUARIO", "CEP-ENDERECO", "ENDERECO"];
@@ -2166,9 +2194,18 @@
                                     }
                                     relatorio.tecnicas.add("Swap de lotes dentro da quadra");
                                 }
+                                else if (pareceDataBruta(valor)) {
+                                    if (MODO_ATUAL === "TXT" && matriculaLinha) {
+                                        const delta = await deltaDiasDaMatricula(matriculaLinha);
+                                        valor = deslocarData(valor, delta);
+                                    } else {
+                                        valor = await valorSintetico("DATA_GEN", valor, (rand) => deslocarData(valor, Math.floor(rand() * 3651) - 1825));
+                                    }
+                                    relatorio.tecnicas.add("Data sintética (formato preservado, coerente por matrícula)");
+                                }
                                 else {
-                                    valor = await gerarHash(valor);
-                                    relatorio.tecnicas.add("Hash SHA-256 + sal efêmero (128 bits)");
+                                    valor = await valorSintetico("GENERICO", valor, fabricarGenericoFormatAware(valor));
+                                    relatorio.tecnicas.add("Simulação genérica (mesmo formato do original: tamanho, texto/número)");
                                 }
                             } else if (item.estado === 5) {
                                 const edicoes = EDICOES_MANUAIS.get(item.colId);

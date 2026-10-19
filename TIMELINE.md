@@ -894,3 +894,58 @@ verificações OK. `patches/_testa_seletor.py` (24) e
 
 **Versão v4.9** (pedido do Rafa): subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 26 — Simular vira format-aware em todas as colunas (Proposta 1)
+
+O achado do Rafa, direto: ele selecionou as 159 colunas, aplicou
+Anonimizar (roxo) esperando uma planilha simulada pra prototipar um
+app, e todas viraram hash de 32 caracteres — "220" (3 dígitos) virou um
+código de 32, nome composto virou ilegível. "Essa função hash tá muito
+fraca... nós estamos anonimizando pra simular algo parecido lá fora."
+
+**A causa raiz:** Anonimizar (hash puro, SHA-256) é assim por design —
+é o estado pra destruir de propósito, auditado como irreversível. Quem
+deveria preservar formato é Simular, mas só tinha gerador dedicado pra
+9 tipos (nome, CPF, RG, telefone, endereço, número, CEP, lote). Das 159
+colunas do SGCG, isso cobre uns 10 — as outras ~150 caíam no mesmo hash
+cru de 32 caracteres, mesmo em Simular. Era essa lacuna, não o
+Anonimizar, que impedia o Rafa de gerar a planilha simulada que queria.
+
+**A correção:** `fabricarGenericoFormatAware()`, função pura — preserva
+a FORMA do original, caractere por caractere: dígito vira dígito, letra
+maiúscula vira letra maiúscula, letra minúscula vira minúscula, o resto
+(espaço, barra, @, traço) fica igual. "220" vira outro número de 3
+dígitos. "JOAO DA SILVA" vira outro nome de 2 palavras, maiúsculo,
+mesmo formato. Um e-mail mantém a forma `usuario@dominio.com`.
+
+**Datas são caso à parte:** randomizar dígito a dígito podia gerar
+"99/37/2028" (mês inválido). `pareceDataBruta()` detecta o formato cru
+do SGCG (AAAAMMDD ou AAAA-MM-DD) e usa o `deslocarData()` que já existe
+(mesmo mecanismo das colunas `DT-` em Manter) — sempre uma data real,
+deslocada e coerente pela matrícula.
+
+**Consistência preservada:** os dois geradores passam pelo
+`valorSintetico()`/`previaValorSintetico()` já existentes — mesmo valor
+original, mesma coluna, sempre o mesmo valor sintético dentro do lote
+(cache por `tipo + valor normalizado`). Isso não mudou meta nenhuma do
+mecanismo, só ganhou mais um "tipo" (`GENERICO`) na mesma engrenagem.
+
+**Os 9 tipos conhecidos não mudaram.** `tipoSimulacao()` continua
+checando nome primeiro; só o fallback final trocou de hash pra
+genérico. A prévia nos cartões (Parte 19) ganhou o mesmo tratamento, com
+o sal isolado de sempre — não toca no lote real.
+
+**Teste:** script Playwright fora do repo — UNIDADE "220" processa pra
+outro número de 3 dígitos, LOCAL "001" pra uma série diferente (cada
+coluna com sua própria aleatoriedade), data bruta vira DD/MM/AAAA válida
+(mês 1–12, dia 1–31), duas linhas com o mesmo original geram o mesmo
+sintético, e NOME-CLIENTE continua usando o gerador de nomes dedicado.
+14 verificações OK. `patches/_testa_seletor.py` (24) e
+`_test_regressao_completa.py` (21), sem quebra.
+
+**Falta (combinado com o Rafa):** agora que Simular preserva formato em
+qualquer coluna, as 6 linhas de ajuda ao lado de cada bolinha (que
+ficaram pendentes por essa mesma lacuna) podem entrar — a frase do verde
+finalmente é verdade em qualquer coluna, não só nas 10 conhecidas.
