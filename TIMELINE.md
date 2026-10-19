@@ -1182,3 +1182,35 @@ janelas; foram simuladas. Conferir no Edge da Sanepar.
 
 **Versão v4.14:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
 `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 31 — Data e hora no nome do arquivo final (2026-10-19, v4.15)
+
+**Pedido do Rafa:** "na hora de salvar o nome, já deixa sugerido escrito
+o nome com a data e hora". Quem quiser troca; quem não quiser só salva
+e depois entende de quando é o arquivo.
+
+**O que mudou (`anonimizador.html`, embutido no `index.html`):**
+- O campo "3. Nome do arquivo final" já vem com
+  `_ANONIMIZADO_19-10-2026_16h42` (`carimboAgora` + `sugerirFimDoNome`).
+  A prévia mostra o nome inteiro: `SGCG_outubro_ANONIMIZADO_19-10-2026_16h42.csv`.
+- Data no jeito de ler daqui (dia-mês-ano). Sem `/` e `:`, que o Windows
+  não aceita em nome de arquivo — por isso `16h42`.
+- A hora é a **do momento de salvar**: o campo se atualiza ao carregar o
+  arquivo e de novo ao clicar em Processar.
+- Se a pessoa escreve outro nome (`NOME_SAIDA_EDITADO`), o dela fica: a
+  data não é colocada por cima.
+- O certificado herda o nome: `..._19-10-2026_16h42_CERTIFICADO.txt`.
+- Efeito colateral bom: dois lotes em horas diferentes já saem com nomes
+  diferentes, sem precisar do `(2)`.
+
+**Teste:** `_teste_salvar.py` (fora do repo) subiu para 45 verificações,
+com relógio falso do Playwright: abre às 08h05, salva às 08h47 → o
+arquivo e o certificado saem com 08h47; nome trocado à mão fica como a
+pessoa escreveu. `_test_etapa2_validacao.py` baixou pela aba 6
+`dados_ficticios_ANONIMIZADO_19-10-2026_17h04.csv`. Demais suítes sem
+mudança. Aba Auditoria: linha "Salvar sem apagar nada" atualizada.
+
+**Versão v4.15:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
+`sw.js`, `version.json`, README, `package.json`.
