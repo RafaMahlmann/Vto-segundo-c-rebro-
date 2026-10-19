@@ -1126,3 +1126,59 @@ não mostra essa janela; foi simulado). Conferir no Edge da Sanepar.
 
 **Versão v4.13:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
 `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 30 — Salvar do Anonimizador sem surpresa (2026-10-19, v4.14)
+
+**Pedido do Rafa:** simular um TXT e um CSV e conferir o salvar
+(exportar, escolher pasta), que estava estranho.
+
+**O que estava estranho (simulado pela aba 6 do VTO):**
+- Com um arquivo só, o nome original sumia: `SGCG_outubro.txt` saía
+  `_ANONIMIZADO.csv`. A tela prometia "NomeOriginal + Sufixo" — e com
+  dois arquivos era assim mesmo. Comportamento diferente pela quantidade.
+- Na pasta escolhida, o lote seguinte **gravava por cima** do anterior
+  (mesmo `_ANONIMIZADO.csv`), sem perguntar.
+- A janela de pasta abria em Downloads, que o Edge/Chrome **recusa**
+  (Downloads, Documentos e Área de Trabalho só servem por subpasta).
+  Fechando a janela, nada acontecia e o log parava em "sal gerado".
+- "Downloads (Padrão)" escrito numa opção e a outra vinha marcada.
+- O certificado ia sempre para Downloads, com nome fixo
+  `CERTIFICADO_ANONIMIZACAO.txt`, mesmo com pasta escolhida.
+- Nenhum aviso de "pronto": só o log preto.
+
+**O que mudou (`anonimizador.html`, embutido no `index.html`):**
+- **3. Nome do arquivo final:** sempre nome do original + o fim do nome
+  (`nomeSaidaDe`), com prévia ao vivo ("Vai sair: ...") e o aviso de que
+  sai em CSV (separado por ;) mesmo vindo de TXT. Caracteres que o
+  Windows recusa viram `_`. Fim do nome vazio: diz por que não pode.
+- **4. Onde salvar:** "⬇️ Pasta Downloads" vem marcada (sem dois
+  diálogos do navegador). "📁 Escolher uma pasta" explica antes que é
+  preciso criar uma pasta dentro de Downloads/Documentos/Área de Trabalho.
+  A pasta é escolhida **antes** do sal nascer; a pasta fica lembrada na
+  aba (os próximos lotes não perguntam de novo) com "Trocar pasta".
+- **Nunca grava por cima** (`nomeLivreNaPasta`): `nome (2).csv`,
+  `nome (3).csv`... vale para o CSV e para o certificado.
+- Erro ao gravar na pasta: cai em Downloads e esquece a pasta — antes os
+  arquivos seguintes iam para os dois lugares.
+- **Caixa de pronto** abaixo do botão: arquivos, onde estão e o que falta
+  (o certificado). Pasta recusada: caixa laranja explicando o que fazer.
+- **Certificado** com nome do lote (`<arquivo>_CERTIFICADO.txt` ou
+  `LOTE_N_ARQUIVOS_CERTIFICADO.txt`), salvo no mesmo lugar do CSV.
+  Botão: "📜 Salvar o certificado do lote". Some quando começa um lote novo.
+
+**Teste:** script Playwright fora do repo com 37 verificações (TXT, CSV,
+dois CSV, pasta simulada com dois lotes seguidos, pasta recusada,
+bloqueada pela empresa, erro ao gravar, permissão perdida). As outras 6
+suítes do Anonimizador e do VTO, `_test_regressao_completa.py`,
+`_testa_seletor.py`, `_test_etapa2_validacao.py` (baixou
+`dados_ficticios_ANONIMIZADO.csv` pela aba 6), `_test_zip_leak_csv.py`
+e `_test_etapa1.py` passaram. Aba Auditoria: linha "Salvar sem apagar nada".
+
+**Não testado:** as janelas reais do Edge (escolher pasta, "pode editar
+arquivos?", recusa de Downloads). O navegador de teste não mostra essas
+janelas; foram simuladas. Conferir no Edge da Sanepar.
+
+**Versão v4.14:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
+`sw.js`, `version.json`, README, `package.json`.

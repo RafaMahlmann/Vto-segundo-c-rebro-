@@ -126,6 +126,29 @@
         .radio-option:hover { background-color: #FAFAFA; border-color: var(--ios-blue); }
         .radio-option input:checked + span { font-weight: 600; color: var(--ios-blue); }
 
+        /* --- SALVAR: previa do nome, dica do destino, resultado --- */
+        .salvar-previa { margin-top: 8px; font-size: 13px; color: var(--text-primary); line-height: 1.6; }
+        .salvar-previa.aviso { color: #C93400; font-weight: 600; }
+        .salvar-previa code, .salvar-resultado code {
+            font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; background: #F2F2F7;
+            padding: 2px 6px; border-radius: 6px; white-space: nowrap;
+        }
+        .salvar-dica { font-size: 12px; color: #86868B; margin-top: 6px; line-height: 1.5; }
+        .salvar-dica strong { color: var(--text-primary); }
+        button.salvar-link {
+            width: auto; padding: 0; margin: 0 0 0 4px; background: none; color: var(--ios-blue);
+            box-shadow: none; font-size: 12px; font-weight: 600; text-decoration: underline; border-radius: 0;
+        }
+        button.salvar-link:hover { background: none; transform: none; box-shadow: none; }
+        .salvar-resultado {
+            display: none; margin-top: 14px; padding: 16px 18px; border-radius: 14px; font-size: 14px;
+            line-height: 1.6; color: var(--text-primary); background: #E8F9F0; border: 1px solid rgba(52, 199, 89, 0.35);
+        }
+        .salvar-resultado.visivel { display: block; }
+        .salvar-resultado.aviso { background: #FFF5E0; border-color: rgba(255, 149, 0, 0.45); }
+        .salvar-resultado h4 { margin: 0 0 6px 0; font-size: 15px; }
+        .salvar-resultado ul { margin: 4px 0 6px 0; padding-left: 20px; }
+
         button {
             width: 100%; padding: 18px; background-color: var(--ios-blue); color: white; border: none;
             border-radius: 14px; font-size: 17px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
@@ -643,29 +666,31 @@
             </div>
 
             <div style="margin-top: 25px;">
-                <label for="outputFileName">3. Sufixo dos Arquivos Finais</label>
-                <input type="text" id="outputFileName" value="_ANONIMIZADO" placeholder="Ex: _ANONIMIZADO">
-                <div style="font-size: 11px; color: #86868B; margin-top: 5px;">* O nome será: NomeOriginal + Sufixo (Ex: Arq1_ANONIMIZADO.csv)</div>
+                <label for="outputFileName">3. Nome do arquivo final</label>
+                <input type="text" id="outputFileName" value="_ANONIMIZADO" placeholder="Ex: _ANONIMIZADO" oninput="salvarAtualizarPrevia()">
+                <div class="salvar-previa" id="salvarPrevia"></div>
+                <div class="salvar-dica">É o nome do original com isso no fim. Sai sempre em CSV (separado por ;), que abre no Excel — mesmo quando o original é TXT.</div>
             </div>
 
             <div style="margin-top: 25px;">
-                <label>4. Destino dos Arquivos</label>
+                <label>4. Onde salvar</label>
                 <div class="radio-group">
                     <label class="radio-option">
-                        <input type="radio" name="saveMode" value="picker" checked>
-                        <span>Selecionar Pasta (Salvar em Lote)</span>
+                        <input type="radio" name="saveMode" value="auto" checked onchange="salvarAtualizarPrevia()">
+                        <span>⬇️ Pasta Downloads</span>
                     </label>
                     <label class="radio-option">
-                        <input type="radio" name="saveMode" value="auto">
-                        <span>Downloads (Padrão)</span>
+                        <input type="radio" name="saveMode" value="picker" onchange="salvarAtualizarPrevia()">
+                        <span>📁 Escolher uma pasta</span>
                     </label>
                 </div>
-                <div style="font-size: 11px; color: #86868B; margin-top: 5px;">* "Selecionar Pasta" permite salvar todos de uma vez em um local específico.</div>
+                <div class="salvar-dica" id="salvarDicaDestino"></div>
             </div>
         </div>
 
         <button id="btnProcess" disabled onclick="iniciarProcessamento()">Processar e Salvar Todos</button>
-        <button id="btnCert" class="btn-cert" onclick="baixarCertificado()">📜 Baixar Certificado de Anonimização do Lote</button>
+        <div class="salvar-resultado" id="salvarResultado" role="status"></div>
+        <button id="btnCert" class="btn-cert" onclick="baixarCertificado()">📜 Salvar o certificado do lote</button>
 
         <div class="progress-wrapper" id="progressContainer">
             <div class="progress-bar" id="progressBar"></div>
@@ -747,6 +772,7 @@
                 <li><strong>Filtro de linhas, prévia ao vivo e edição manual (16/10):</strong> confirma que os filtros combinam com <strong>E</strong> de verdade (uma linha do grupo errado é barrada mesmo batendo com um dos filtros), que a prévia nos cartões nunca usa o sal do lote real — sal e mapas isolados, testados e confirmados vazios depois de usar a prévia à vontade — e que o processamento real grava exatamente o que foi editado à mão, linha por linha. 15 + 16 verificações.</li>
                 <li><strong>Detecção de tipo e edição manual em lote (19/10):</strong> num arquivo de teste com CPF, CNPJ, CEP, data, telefone, e-mail e valor, cada coluna foi reconhecida pelo padrão e pela validação (dígito verificador, data que existe no calendário, DDD que existe) — inclusive um CPF guardado numa coluna de nome errado. Na edição manual, todo valor inventado é conferido contra os valores reais carregados e trocado se bater; valor real digitado à mão só passa com confirmação explícita, linha por linha. 27 + 35 verificações, com o arquivo final conferido linha a linha.</li>
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
+                <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original; numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 37 verificações com TXT e CSV.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
         </div>
@@ -1468,6 +1494,8 @@
     let COLUNAS_DETECTADAS = [];
     let FILE_REF = null;
     let CERTIFICADO = null;
+    let CERTIFICADO_PASTA = null; // pasta onde o lote foi salvo: o certificado vai junto
+    let PASTA_DESTINO = null;     // pasta escolhida nesta aba (so memoria): os proximos lotes reusam
 
     // ===========================================================================
     // VERIFICAÇÃO DE AMBIENTE — FALHA FECHADA
@@ -1519,6 +1547,8 @@
         document.getElementById('columnManager').style.display = 'block';
         document.getElementById('btnProcess').disabled = !CRYPTO_DISPONIVEL;
         document.getElementById('btnCert').style.display = 'none';
+        salvarMostrarResultado(null);
+        salvarAtualizarPrevia();
 
         FILTROS_LINHA = [];
         PRESET_SGCG_APLICADO = false;
@@ -2665,6 +2695,98 @@
         log(`   -> Pools geo: ${POOL.ruasPorBairro.size} bairros, ${POOL.lotesPorQuadra.size} quadras mapeadas.`);
     }
 
+    // ===========================================================================
+    // SALVAR — nome final, pasta, previa e resultado
+    // ===========================================================================
+    // NomeOriginal + fim do nome + ".csv". Tira o que o Windows nao aceita em nome de arquivo.
+    function nomeSaidaDe(nomeOriginal, sufixo) {
+        const ponto = nomeOriginal.lastIndexOf('.');
+        const base = ponto > 0 ? nomeOriginal.substring(0, ponto) : nomeOriginal;
+        let fim = String(sufixo).trim().replace(/[\\/:*?"<>|]/g, '_');
+        if (fim.toLowerCase().endsWith('.csv')) fim = fim.slice(0, -4);
+        return base + fim + '.csv';
+    }
+
+    // Primeiro nome que ainda nao existe na pasta: "x.csv", "x (2).csv", "x (3).csv"...
+    async function nomeLivreNaPasta(pasta, nome) {
+        const ponto = nome.lastIndexOf('.');
+        const base = ponto > 0 ? nome.substring(0, ponto) : nome;
+        const ext = ponto > 0 ? nome.substring(ponto) : '';
+        for (let n = 1; n < 1000; n++) {
+            const tentativa = n === 1 ? nome : `${base} (${n})${ext}`;
+            try {
+                await pasta.getFileHandle(tentativa); // existe: tenta o proximo
+            } catch (e) {
+                if (e && e.name === 'NotFoundError') return tentativa;
+                if (e && e.name === 'TypeMismatchError') continue; // e uma subpasta com esse nome
+                throw e;
+            }
+        }
+        throw new Error('nenhum nome livre na pasta');
+    }
+
+    // Mostra, antes de processar, o nome que vai sair e o que acontece no destino escolhido.
+    function salvarAtualizarPrevia() {
+        const previa = document.getElementById('salvarPrevia');
+        const dica = document.getElementById('salvarDicaDestino');
+        if (!previa || !dica) return;
+        const arquivos = Array.from(document.getElementById('fileInput').files || []);
+        const sufixo = document.getElementById('outputFileName').value.trim();
+        previa.classList.remove('aviso');
+        if (!sufixo) {
+            previa.classList.add('aviso');
+            previa.textContent = 'Escreva o fim do nome. Sem ele, o arquivo final teria o mesmo nome do original.';
+        } else if (!arquivos.length) {
+            previa.innerHTML = 'Vai sair: <code>' + selcEsc(nomeSaidaDe('NomeDoArquivo.txt', sufixo)) + '</code>';
+        } else {
+            const nomes = arquivos.map(f => '<code>' + selcEsc(nomeSaidaDe(f.name, sufixo)) + '</code>');
+            previa.innerHTML = (nomes.length === 1 ? 'Vai sair: ' : `Vão sair ${nomes.length} arquivos: `)
+                + nomes.slice(0, 3).join(', ') + (nomes.length > 3 ? ` e mais ${nomes.length - 3}` : '');
+        }
+
+        const modo = (document.querySelector('input[name="saveMode"]:checked') || {}).value;
+        if (modo === 'picker') {
+            dica.innerHTML = PASTA_DESTINO
+                ? `Pasta escolhida: <strong>${selcEsc(PASTA_DESTINO.name)}</strong>. Os próximos lotes também vão para ela.`
+                  + '<button type="button" class="salvar-link" onclick="salvarTrocarPasta()">Trocar pasta</button>'
+                : 'Ao processar, o navegador pede a pasta. Ele não deixa usar Downloads, Documentos nem a Área de Trabalho direto: '
+                  + 'crie uma pasta dentro delas (botão <strong>Nova pasta</strong>) e escolha essa. Depois ele pergunta se pode salvar nela: aceite.';
+        } else {
+            dica.textContent = 'Vai direto, sem perguntar nada.'
+                + (arquivos.length > 1 ? ' Com vários arquivos, o navegador pode perguntar se deixa baixar todos: clique em Permitir.' : '');
+        }
+    }
+
+    function salvarTrocarPasta() {
+        PASTA_DESTINO = null; // o proximo lote pede a pasta de novo
+        salvarAtualizarPrevia();
+    }
+
+    // Caixa abaixo do botao: o que foi salvo, onde, e o que falta. null esconde.
+    function salvarMostrarResultado(info) {
+        const caixa = document.getElementById('salvarResultado');
+        if (!caixa) return;
+        caixa.classList.remove('visivel', 'aviso');
+        if (!info) { caixa.innerHTML = ''; return; }
+        if (info.aviso) {
+            caixa.innerHTML = '<h4>📁 Nada foi salvo: nenhuma pasta escolhida</h4>'
+                + 'O navegador não deixa usar Downloads, Documentos nem a Área de Trabalho direto. '
+                + 'Clique de novo em Processar, crie uma pasta dentro delas (botão <strong>Nova pasta</strong>) e escolha essa. '
+                + 'Ou marque <strong>Pasta Downloads</strong>.';
+            caixa.classList.add('visivel', 'aviso');
+            return;
+        }
+        const s = info.salvos;
+        const pasta = s.length && s[0].pasta;
+        caixa.innerHTML = `<h4>✓ Pronto: ${s.length === 1 ? '1 arquivo salvo' : s.length + ' arquivos salvos'}</h4>`
+            + '<ul>' + s.map(a => '<li><code>' + selcEsc(a.nome) + '</code></li>').join('') + '</ul>'
+            + '<strong>Onde está:</strong> ' + (pasta
+                ? 'na pasta <strong>' + selcEsc(pasta) + '</strong>.'
+                : 'na pasta Downloads. Ctrl+J mostra a lista de downloads.')
+            + '<br><strong>Falta:</strong> salvar o certificado do lote, no botão azul-claro abaixo. Ele vai para o mesmo lugar.';
+        caixa.classList.add('visivel');
+    }
+
     async function iniciarProcessamento() {
         if (!CRYPTO_DISPONIVEL) {
             alert("⛔ Processamento bloqueado: ambiente sem criptografia nativa (Web Crypto API).");
@@ -2678,7 +2800,7 @@
         const saveMode = document.querySelector('input[name="saveMode"]:checked').value;
 
         let sufixoNome = inputNomeSaida.value.trim();
-        if (!sufixoNome) { alert("Defina o sufixo ou nome do arquivo final."); return; }
+        if (!sufixoNome) { alert("Escreva o fim do nome do arquivo (ex.: _ANONIMIZADO). Sem ele, o arquivo final teria o mesmo nome do original."); return; }
 
         let colunasAtivas = COLUNAS_DETECTADAS.filter(c => c.estado !== 0);
         if (PRESET_SGCG_APLICADO && ORDEM_PRESET.length > 0) {
@@ -2689,30 +2811,62 @@
         }
         if (colunasAtivas.length === 0) { alert("Selecione ao menos uma coluna."); return; }
 
-        // --- SAL EFÊMERO: nasce aqui, morre no final do lote ---
-        iniciarSalEfemero();
-        const inicioLote = new Date();
-        log("🔐 Sal efêmero de 128 bits gerado (vive só na memória deste lote).");
+        // Lote novo: a caixa e o certificado do lote anterior saem da tela.
+        salvarMostrarResultado(null);
+        document.getElementById('btnCert').style.display = 'none';
 
+        // --- PASTA: escolhida ANTES do sal. Antes o sal nascia primeiro e, se a
+        // pessoa fechasse a janela da pasta, o log parava em "sal gerado" e nada
+        // mais acontecia, sem explicar por que.
         let dirHandle = null;
         let usarMetodoDownloadManual = false;
         if (saveMode === 'picker') {
             if (window.showDirectoryPicker) {
-                try {
-                    dirHandle = await window.showDirectoryPicker({ mode: 'readwrite', startIn: 'downloads' });
-                    log(`Pasta de destino selecionada: ${dirHandle.name}`);
-                } catch (err) {
-                    if (err.name === 'AbortError') { destruirSalEfemero(); return; }
-                    log(`Aviso: erro ao selecionar pasta (${err.message}). Usando Downloads padrão.`);
-                    usarMetodoDownloadManual = true;
+                let pasta = PASTA_DESTINO;
+                if (pasta) {
+                    // Reusa a pasta do lote anterior, se o navegador ainda deixa gravar nela.
+                    try {
+                        if ((await pasta.queryPermission({ mode: 'readwrite' })) !== 'granted'
+                            && (await pasta.requestPermission({ mode: 'readwrite' })) !== 'granted') pasta = null;
+                    } catch (e) { pasta = null; }
+                    if (!pasta) { PASTA_DESTINO = null; salvarAtualizarPrevia(); }
+                }
+                if (!pasta) {
+                    try {
+                        pasta = await window.showDirectoryPicker({ id: 'anonimizadorSaida', mode: 'readwrite', startIn: 'documents' });
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            // Fechou a janela - ou o navegador recusou a pasta (Downloads,
+                            // Documentos e Area de Trabalho nao podem ser usadas direto).
+                            log("📁 Nenhuma pasta escolhida: nada foi processado nem salvo.");
+                            salvarMostrarResultado({ aviso: true });
+                            return;
+                        }
+                        log(`Aviso: não deu para usar a pasta (${err.message}). Vai para Downloads.`);
+                        usarMetodoDownloadManual = true;
+                    }
+                }
+                if (pasta) {
+                    dirHandle = pasta;
+                    PASTA_DESTINO = pasta;
+                    log(`📁 Pasta de destino: ${pasta.name}`);
+                    salvarAtualizarPrevia();
                 }
             } else {
-                log("Seleção de pasta não suportada. Usando Downloads Automático.");
+                log("Este navegador não deixa escolher pasta. Vai para Downloads.");
                 usarMetodoDownloadManual = true;
             }
         } else {
             usarMetodoDownloadManual = true;
         }
+        if (usarMetodoDownloadManual && fileInput.files.length > 1) {
+            log("⬇️ Vários arquivos: se o navegador perguntar se pode baixar todos, clique em Permitir.");
+        }
+
+        // --- SAL EFÊMERO: nasce aqui, morre no final do lote ---
+        iniciarSalEfemero();
+        const inicioLote = new Date();
+        log("🔐 Sal efêmero de 128 bits gerado (vive só na memória deste lote).");
 
         btn.disabled = true;
         progressContainer.style.display = 'block';
@@ -2724,17 +2878,15 @@
         }
         let arquivosProcessados = 0;
         const totalArquivos = fileInput.files.length;
+        const salvos = [];
 
         try {
             for (let i = 0; i < totalArquivos; i++) {
                 const currentFile = fileInput.files[i];
-                let nomeFinal;
-                if (totalArquivos > 1) {
-                    const nomeBase = currentFile.name.substring(0, currentFile.name.lastIndexOf('.')) || currentFile.name;
-                    nomeFinal = `${nomeBase}${sufixoNome}.csv`;
-                } else {
-                    nomeFinal = sufixoNome.toLowerCase().endsWith(".csv") ? sufixoNome : sufixoNome + ".csv";
-                }
+                // Sempre NomeOriginal + fim do nome, como a tela promete. Antes, com
+                // um arquivo so, o original sumia e saia "_ANONIMIZADO.csv" - e o
+                // lote seguinte gravava por cima do anterior com o mesmo nome.
+                const nomeFinal = nomeSaidaDe(currentFile.name, sufixoNome);
 
                 log(`[${i + 1}/${totalArquivos}] Processando: ${currentFile.name}...`);
                 progressBar.style.width = '0%';
@@ -2919,26 +3071,40 @@
                 }
 
                 log(`   -> Concluído: ${linhasProcessadas} linhas (Ignoradas: ${linhasIgnoradas}).`);
-                relatorio.arquivos.push({ nome: nomeFinal, linhas: linhasProcessadas, ignoradas: linhasIgnoradas });
 
                 const blob = new Blob([csvContent.join("\n")], { type: "text/csv;charset=utf-8;" });
+                let nomeGravado = nomeFinal;
                 if (dirHandle) {
                     try {
-                        const fileHandle = await dirHandle.getFileHandle(nomeFinal, { create: true });
+                        // Nunca grava por cima: se o nome ja existe na pasta, vira "nome (2).csv".
+                        nomeGravado = await nomeLivreNaPasta(dirHandle, nomeFinal);
+                        const fileHandle = await dirHandle.getFileHandle(nomeGravado, { create: true });
                         const writable = await fileHandle.createWritable();
                         await writable.write(blob);
                         await writable.close();
-                        log(`   -> ✅ Salvo em pasta: ${nomeFinal}`);
-                    } catch (e) { usarMetodoDownloadManual = true; }
+                        if (nomeGravado !== nomeFinal) log(`   -> Já existia ${nomeFinal} na pasta: salvei como ${nomeGravado}, sem apagar o outro.`);
+                        log(`   -> ✅ Salvo na pasta ${dirHandle.name}: ${nomeGravado}`);
+                        salvos.push({ nome: nomeGravado, pasta: dirHandle.name });
+                    } catch (e) {
+                        // Os proximos arquivos tambem vao para Downloads: senao um iria
+                        // para a pasta e para Downloads ao mesmo tempo.
+                        log(`   -> Não deu para salvar na pasta (${e.message}). Vai para Downloads.`);
+                        dirHandle = null;
+                        PASTA_DESTINO = null;
+                        usarMetodoDownloadManual = true;
+                        nomeGravado = nomeFinal;
+                    }
                 }
-                if (usarMetodoDownloadManual || (!dirHandle && totalArquivos > 1)) {
+                if (usarMetodoDownloadManual) {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement("a");
                     link.href = url; link.download = nomeFinal;
                     document.body.appendChild(link); link.click(); document.body.removeChild(link);
                     log(`   -> ✅ Download iniciado: ${nomeFinal}`);
+                    salvos.push({ nome: nomeFinal, pasta: null });
                     await new Promise(r => setTimeout(r, 500));
                 }
+                relatorio.arquivos.push({ nome: nomeGravado, linhas: linhasProcessadas, ignoradas: linhasIgnoradas });
                 arquivosProcessados++;
             }
 
@@ -2947,7 +3113,9 @@
             relatorio.hashVerificacao = (await sha256Hex(resumo + "|" + SALT_HEX)).substring(0, 16);
             relatorio.fim = new Date().toISOString();
             CERTIFICADO = relatorio;
+            CERTIFICADO_PASTA = dirHandle;
             document.getElementById('btnCert').style.display = 'block';
+            salvarMostrarResultado({ salvos: salvos });
 
             log(`🏁 Processo Finalizado. ${arquivosProcessados}/${totalArquivos} arquivos gerados.`);
             log("🔐 Sal efêmero DESTRUÍDO. Nenhuma chave/tabela de reversão foi gravada.");
@@ -2987,11 +3155,30 @@
             "==============================================================="
         ].join("\n");
         const blob = new Blob([txt], { type: "text/plain;charset=utf-8;" });
+        // Nome ligado ao lote (antes era sempre CERTIFICADO_ANONIMIZACAO.txt: com
+        // varios lotes, ninguem sabia qual certificado era de qual arquivo).
+        const nomeCert = (c.arquivos.length === 1
+            ? c.arquivos[0].nome.replace(/\.csv$/i, '')
+            : `LOTE_${c.arquivos.length}_ARQUIVOS`) + '_CERTIFICADO.txt';
+        // Vai para o mesmo lugar do arquivo anonimizado.
+        if (CERTIFICADO_PASTA) {
+            try {
+                const nomeLivre = await nomeLivreNaPasta(CERTIFICADO_PASTA, nomeCert);
+                const fh = await CERTIFICADO_PASTA.getFileHandle(nomeLivre, { create: true });
+                const w = await fh.createWritable();
+                await w.write(blob);
+                await w.close();
+                log(`📜 Certificado salvo na pasta ${CERTIFICADO_PASTA.name}: ${nomeLivre}`);
+                return;
+            } catch (e) {
+                log(`📜 Não deu para salvar o certificado na pasta (${e.message}). Vai para Downloads.`);
+            }
+        }
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
-        link.href = url; link.download = "CERTIFICADO_ANONIMIZACAO.txt";
+        link.href = url; link.download = nomeCert;
         document.body.appendChild(link); link.click(); document.body.removeChild(link);
-        log("📜 Certificado de anonimização baixado.");
+        log(`📜 Certificado baixado: ${nomeCert} (pasta Downloads).`);
     }
 
     function log(msg) {
