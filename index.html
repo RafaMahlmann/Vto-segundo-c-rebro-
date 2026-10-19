@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>VTO v4.12 — Prazos e Vistorias</title>
+<title>VTO v4.13 — Prazos e Vistorias</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#007bff">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,6 +29,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Ar
 .btn-zip-info:hover{transform:scale(1.15)}
 @keyframes zipInfoPulsa{0%,100%{box-shadow:0 2px 6px rgba(255,149,0,.4)}50%{box-shadow:0 2px 14px rgba(255,149,0,.85)}}
 @media (prefers-reduced-motion:reduce){.btn-zip-info{animation:none}}
+/* Assistente Copiar o VTO (reusa o #modalOverlay) */
+.copia-opcoes{display:flex;flex-direction:column;gap:10px;margin:4px 0 10px}
+.copia-opcao{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;background:white;border:2px solid #dee2e6;border-radius:12px;cursor:pointer;text-align:left;font-family:inherit;color:#343a40;transition:border-color .2s,background .2s}
+.copia-opcao:hover,.copia-opcao:focus-visible{border-color:#28a745;background:#f1faf3;outline:none}
+.copia-opcao:disabled{opacity:.55;cursor:wait}
+.copia-icone{font-size:1.6rem;line-height:1;flex-shrink:0}
+.copia-texto{display:flex;flex-direction:column;gap:2px;flex:1}
+.copia-texto strong{font-size:.95rem}
+.copia-texto small{font-size:.8rem;color:#6c757d;line-height:1.4}
+.copia-selo{font-size:.68rem;font-weight:700;color:#155724;background:#d4edda;border-radius:999px;padding:3px 8px;flex-shrink:0}
+.copia-dica{font-size:.8rem;color:#6c757d;line-height:1.5;margin-top:8px}
+.copia-arquivo{font-family:'SF Mono','Menlo',monospace;font-size:.85rem;background:#f1faf3;border:1px solid #c3e6cb;color:#155724;border-radius:8px;padding:8px 12px;margin:6px 0 12px;word-break:break-all}
+.copia-passos{font-size:.85rem;color:#495057;line-height:1.6;padding-left:20px;margin:0}
+.copia-passos li{margin-bottom:6px}
+.copia-nome{white-space:nowrap;font-weight:600}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
 .btn-ajuda:hover,.btn-config:hover{background:#e9ecef;border-color:#adb5bd}
 .btn-ajuda.ativo{background:#fd7e14;color:white;border-color:#fd7e14}
@@ -499,9 +514,9 @@ body.anon-aberto .timeline-panel{display:none}
     <button class="tab-btn" onclick="mostrarAba('anonimizador')">Anonimizador</button>
     <button class="btn-config" onclick="toggleConfig()" title="Configurar prazos por codigo">&#9881;</button>
     <button class="btn-ajuda" id="btnAjuda" onclick="toggleAjuda()">&#10067; Ajuda</button>
-    <button class="btn-zip" onclick="gerarZipCompleto()" title="Exportar VTO + Anonimizador em ZIP">&#128230; Exportar ZIP</button>
-    <button class="btn-zip-info" onclick="abrirAjudaZip()" title="O que e o Exportar ZIP?">?</button>
-    <span class="versao-badge" id="versaoBadge" data-versao>v4.12 · 19/10/2026</span>
+    <button class="btn-zip" onclick="gerarZipCompleto()" title="Copiar o VTO para usar em outro computador ou mandar a alguém">&#128230; Copiar o VTO</button>
+    <button class="btn-zip-info" onclick="abrirAjudaZip()" title="Para que serve Copiar o VTO?">?</button>
+    <span class="versao-badge" id="versaoBadge" data-versao>v4.13 · 19/10/2026</span>
 </div>
 
 <!-- ABA 1: CALCULADORA DE PRAZO (Sanção de Esgoto) -->
@@ -523,7 +538,7 @@ body.anon-aberto .timeline-panel{display:none}
                 <p id="statusTextoSancao" style="margin:0">--</p>
             </div>
         </div>
-        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v4.12 · 19/10/2026</div>
+        <div class="footer" style="text-align:center;margin-top:14px;font-size:.75rem;color:#adb5bd" data-versao>v4.13 · 19/10/2026</div>
     </div>
 </div>
 
@@ -602,7 +617,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
 
-        <div class="footer" data-versao>v4.12 · 19/10/2026</div>
+        <div class="footer" data-versao>v4.13 · 19/10/2026</div>
     </div>
 </div>
 
@@ -726,7 +741,7 @@ body.anon-aberto .timeline-panel{display:none}
             <button onclick="mudarCardFluxo(1)" id="btnCarrosselProximo">Próximo &#10095;</button>
         </div>
     </div>
-    <div class="footer">v4.12 · 19/10/2026 - IT OPE 1580</div>
+    <div class="footer">v4.13 · 19/10/2026 - IT OPE 1580</div>
 </div>
 
 <!-- ABA 4: MATRICULAS -->
@@ -867,7 +882,7 @@ body.anon-aberto .timeline-panel{display:none}
             </div>
         </div>
     </div>
-    <div class="footer">v4.12 · 19/10/2026 - Timeline Proporcional</div>
+    <div class="footer">v4.13 · 19/10/2026 - Timeline Proporcional</div>
 </div>
 
 <!-- ABA 6: ANONIMIZADOR -->
@@ -1187,7 +1202,8 @@ function abrirAjudaZip() {
     const overlay = document.getElementById('modalOverlay');
     const box = overlay.querySelector('.modal-box');
     if (!window._modalOriginal) { window._modalOriginal = box.innerHTML; }
-    box.innerHTML = '<h3>&#128230; Para que serve o Exportar ZIP?</h3><div style="font-size:.85rem;color:#495057;line-height:1.65"><p><strong>É o programa inteiro num arquivo só.</strong> O ZIP é um pacote compactado: dentro dele vai o VTO completo, com o Anonimizador junto.</p><p><strong>Para usar em outro computador:</strong> salve o ZIP, abra a pasta dele e clique duas vezes no arquivo <strong>index.html</strong>. O programa abre no navegador — não precisa instalar nada.</p><p><strong>Para compartilhar com um colega:</strong> é só mandar esse mesmo ZIP por e-mail ou WhatsApp. Quem recebe faz igual: abre o ZIP e clica no index.html.</p><p><strong>Fica tranquilo:</strong> o ZIP sai limpo, sem as matrículas e datas da sua tela. Seus dados ficam só no seu computador.</p></div><div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>';
+    const arquivoHtml = 'VTO-v' + VERSAO_LOCAL + '.html';
+    box.innerHTML = '<h3>&#128230; Para que serve Copiar o VTO?</h3><div style="font-size:.85rem;color:#495057;line-height:1.65"><p><strong>O VTO inteiro cabe num arquivo só,</strong> com o Anonimizador dentro. Não precisa instalar nada.</p><p><strong>Para usar em outro computador:</strong> escolha "Usar no computador". Sai o arquivo <strong>' + arquivoHtml + '</strong>. Clique duas vezes nele e o VTO abre no navegador.</p><p><strong>Para mandar a um colega:</strong> escolha "Mandar para alguém". Sai um ZIP, que passa melhor por e-mail. Quem recebe clica com o botão direito no ZIP, <em>Extrair tudo</em>, e abre o ' + arquivoHtml + '.</p><p><strong>Seus dados não vão junto:</strong> a cópia sai sem as matrículas e datas da sua tela.</p></div><div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>';
     overlay.classList.add('ativo');
     ajudaAberta = true;
 }
@@ -2786,7 +2802,15 @@ document.addEventListener('keydown', function(e) {
     if (e.key === ' ' && ativo === inputBaixa && !inputBaixa.value) { e.preventDefault(); marcarEmAberto(); return; }
     if (e.key === 'Enter' && (ativo === inputCriacao || ativo === inputBaixa)) { e.preventDefault(); if (ativo === inputCriacao && inputCriacao.value) { inputBaixa.focus(); } else if (ativo === inputBaixa) { salvarDatasModal(); } return; }
 });
-document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) fecharModal(); });
+// Clique no fundo escuro fecha a janela que estiver aberta. Antes fechava
+// sempre como se fosse a das datas: a caixa ficava com o texto da ajuda e o
+// proximo servico registrado quebrava (modalTitulo nao existia mais).
+document.getElementById('modalOverlay').addEventListener('click', function(e) {
+    if (e.target !== this) return;
+    if (configAberta) fecharModalConfig();
+    else if (ajudaAberta) fecharModalAjuda();
+    else fecharModal();
+});
 
 // ===== CALCULADORA RAPIDA 180 DIAS =====
 // Folha flutuante nas abas Fluxo e Matriculas. Conta os dias entre a data
@@ -3169,7 +3193,7 @@ function gerarMockData() {
 }
 
 // ===== VERIFICADOR DE NOVA VERSAO =====
-const VERSAO_LOCAL = '4.12';
+const VERSAO_LOCAL = '4.13';
 // Data da ultima entrega (muda só quando sobe código novo, não quando o arquivo é aberto).
 // Atualizar junto com VERSAO_LOCAL a cada entrega relevante.
 const DATA_ENTREGA = '19/10/2026';
@@ -3224,7 +3248,7 @@ function baixarNovaVersao() {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'vto-segundo-cerebro-v' + VERSAO_REMOTA + '.html';
+            a.download = 'VTO-v' + VERSAO_REMOTA + '.html'; // mesmo nome do Copiar o VTO
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -3396,69 +3420,106 @@ function prepararHtmlLimpo() {
     return '<!DOCTYPE html>\n' + raiz.outerHTML;
 }
 
+// ----- Assistente "Copiar o VTO" -----
+// O index.html ja e o VTO inteiro: o Anonimizador vai dentro dele, em Base64.
+// Entao a copia e UM arquivo - solto (.html) ou dentro de um ZIP, que passa
+// melhor por e-mail. Antes o ZIP levava tambem o anonimizador.html solto,
+// sobra do tempo em que ele era arquivo irmao: dois .html no pacote, nomes
+// tecnicos, e ninguem sabia qual abrir.
+function nomeCopiaVto(extensao) { return 'VTO-v' + VERSAO_LOCAL + '.' + extensao; }
+
+function mostrarTelaCopia(html) {
+    const overlay = document.getElementById('modalOverlay');
+    const box = overlay.querySelector('.modal-box');
+    if (!window._modalOriginal) { window._modalOriginal = box.innerHTML; }
+    box.innerHTML = html;
+    overlay.classList.add('ativo');
+    ajudaAberta = true; // Esc e clique no fundo fecham pelo fecharModalAjuda()
+}
+
+// Passo 1: escolher para que e a copia. Substitui o confirm() cinza do navegador.
 function gerarZipCompleto() {
-    const seguir = confirm('O pacote vai levar o aplicativo vazio.\n\n'
-        + 'As matriculas que estao na tela agora NAO vao junto no arquivo.\n\n'
-        + 'Gerar o ZIP?');
-    if (!seguir) return;
+    const temSeletor = typeof window.showSaveFilePicker === 'function';
+    mostrarTelaCopia('<h3>&#128230; Copiar o VTO</h3>'
+        + '<p class="instrucao">A cópia leva só o programa. As matrículas e datas da sua tela não vão junto.</p>'
+        + '<div class="copia-opcoes">'
+        + '<button class="copia-opcao" id="copiaOpHtml" onclick="salvarCopia(\'html\')"><span class="copia-icone">&#128196;</span><span class="copia-texto"><strong>Usar no computador</strong><small>Um arquivo .html. Abre com dois cliques.</small></span><span class="copia-selo">mais simples</span></button>'
+        + '<button class="copia-opcao" id="copiaOpZip" onclick="salvarCopia(\'zip\')"><span class="copia-icone">&#128230;</span><span class="copia-texto"><strong>Mandar para alguém</strong><small>O mesmo arquivo dentro de um ZIP. Passa melhor por e-mail.</small></span></button>'
+        + '</div>'
+        + '<p class="copia-dica">' + (temSeletor
+            ? 'Na próxima tela, você escolhe a pasta. A Área de Trabalho é fácil de achar depois.'
+            : 'O arquivo vai para a pasta Downloads.') + '</p>'
+        + '<div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Cancelar (Esc)</button></div>');
+    const primeira = document.getElementById('copiaOpHtml');
+    if (primeira) primeira.focus();
+}
 
-    const btn = document.querySelector('.btn-zip');
-    const original = btn ? btn.textContent : 'Exportar ZIP';
-    if (btn) btn.textContent = '...';
+// Passo 2: salvar. Passo 3: dizer onde ficou e como abrir.
+async function salvarCopia(formato) {
+    document.querySelectorAll('.copia-opcao').forEach(b => { b.disabled = true; });
 
-    // Coleta HTML do VTO a partir de uma copia LIMPA do documento
-    let htmlVto = prepararHtmlLimpo();
-
-    // Coleta HTML do Anonimizador a partir do bloco Base64 embutido
-    // (funciona em file://, onde XHR/fetch para arquivos locais sao bloqueados)
-    let htmlAnon = '';
-    try {
-        const fonte = document.getElementById('anonimizadorFonte');
-        if (fonte && fonte.textContent) {
-            const b64 = fonte.textContent.trim();
-            const bin = atob(b64);
-            const bytes = new Uint8Array(bin.length);
-            for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-            htmlAnon = new TextDecoder('utf-8').decode(bytes);
-        }
-    } catch (e) {
-        htmlAnon = '';
-    }
-
-    // Fallback: tenta XHR (funciona quando servido via http)
-    if (!htmlAnon) {
-        try {
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', 'anonimizador.html', false);
-            xhr.send();
-            if (xhr.status === 0 || xhr.status === 200) htmlAnon = xhr.responseText;
-        } catch (e) { /* ignora */ }
-    }
-
-    if (!htmlAnon) {
-        alert('Nao deu para carregar o anonimizador. O arquivo pode estar corrompido.');
-        if (btn) btn.textContent = original;
+    // Copia LIMPA do documento: o retrato tirado antes de o app desenhar.
+    const html = prepararHtmlLimpo();
+    // Sem o Base64 a aba 6 abriria vazia na copia - melhor parar aqui.
+    if (html.indexOf('id="anonimizadorFonte"') === -1) {
+        mostrarTelaCopia('<h3>Não deu para copiar</h3>'
+            + '<p class="instrucao">Este arquivo do VTO está incompleto: falta o Anonimizador. Baixe o VTO de novo pelo GitHub.</p>'
+            + '<div class="modal-botoes"><button class="modal-btn cancelar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>');
         return;
     }
+    const nome = nomeCopiaVto(formato);
+    const blob = formato === 'zip'
+        ? new Blob([criarZipMulti({ [nomeCopiaVto('html')]: html })], { type: 'application/zip' })
+        : new Blob([html], { type: 'text/html' });
 
-    // Gera ZIP com os dois arquivos
-    const zip = criarZipMulti({
-        'index.html': htmlVto,
-        'anonimizador.html': htmlAnon
-    });
-
-    // Dispara download
-    const blob = new Blob([zip], { type: 'application/zip' });
+    // Edge e Chrome abrem o "Salvar como" do Windows: a pessoa escolhe a pasta
+    // e sabe onde o arquivo ficou. Sem ele (Firefox, ou bloqueado pela empresa),
+    // cai no download normal, que vai para Downloads.
+    if (typeof window.showSaveFilePicker === 'function') {
+        try {
+            const alca = await window.showSaveFilePicker({
+                suggestedName: nome,
+                startIn: 'downloads',
+                types: [formato === 'zip'
+                    ? { description: 'Pacote ZIP', accept: { 'application/zip': ['.zip'] } }
+                    : { description: 'Arquivo do VTO', accept: { 'text/html': ['.html'] } }]
+            });
+            const escrita = await alca.createWritable();
+            await escrita.write(blob);
+            await escrita.close();
+            mostrarTelaCopia(telaCopiaSalva(formato, alca.name, 'na pasta que você escolheu.'));
+            return;
+        } catch (e) {
+            // Fechou o "Salvar como" sem salvar: volta para a escolha, sem erro.
+            if (e && e.name === 'AbortError') { gerarZipCompleto(); return; }
+            // Qualquer outro problema: segue para o download normal.
+        }
+    }
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'vto-completo-v' + VERSAO_LOCAL + '.zip';
+    a.download = nome;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    mostrarTelaCopia(telaCopiaSalva(formato, nome, 'na pasta Downloads. Ctrl+J mostra a lista de downloads.'));
+}
 
-    if (btn) btn.textContent = original;
+function telaCopiaSalva(formato, nomeArquivo, onde) {
+    // O nome pode ter sido digitado no "Salvar como": entra como texto, nunca como HTML.
+    const nomeSeguro = String(nomeArquivo).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const passos = formato === 'zip'
+        ? '<li><strong>Para mandar:</strong> anexe esse ZIP no e-mail ou no WhatsApp.</li>'
+          + '<li><strong>Para abrir:</strong> botão direito no ZIP &rarr; <em>Extrair tudo</em> &rarr; <em>Extrair</em>. Na pasta nova, clique duas vezes em <span class="copia-nome">' + nomeCopiaVto('html') + '</span>.</li>'
+        : '<li><strong>Para abrir:</strong> clique duas vezes no arquivo. O VTO abre no navegador, sem instalar nada.</li>';
+    const dica = formato === 'zip'
+        ? '<p class="copia-dica">Por que extrair: aberto de dentro do ZIP, o Windows usa uma cópia temporária, que some depois.</p>'
+        : '';
+    return '<h3>&#10003; Cópia salva</h3>'
+        + '<div class="copia-arquivo">' + (formato === 'zip' ? '&#128230; ' : '&#128196; ') + nomeSeguro + '</div>'
+        + '<ol class="copia-passos"><li><strong>Onde está:</strong> ' + onde + '</li>' + passos + '</ol>' + dica
+        + '<div class="modal-botoes"><button class="modal-btn salvar" onclick="fecharModalAjuda()">Fechar (Esc)</button></div>';
 }
 
 function criarZipMulti(arquivos) {
@@ -3469,6 +3530,12 @@ function criarZipMulti(arquivos) {
 
     const u16 = v => [v & 0xFF, (v >> 8) & 0xFF];
     const u32 = v => [v & 0xFF, (v >> 8) & 0xFF, (v >> 16) & 0xFF, (v >> 24) & 0xFF];
+
+    // Data e hora de agora no formato do ZIP (MS-DOS). Com zero, o Windows
+    // mostrava o arquivo sem data e, extraido, com data de 1980.
+    const agora = new Date();
+    const horaDos = (agora.getHours() << 11) | (agora.getMinutes() << 5) | (agora.getSeconds() >> 1);
+    const dataDos = ((agora.getFullYear() - 1980) << 9) | ((agora.getMonth() + 1) << 5) | agora.getDate();
 
     for (const [nome, conteudo] of Object.entries(arquivos)) {
         const nomeBytes = enc.encode(nome);
@@ -3485,8 +3552,8 @@ function criarZipMulti(arquivos) {
         w(u16(10));
         w(u16(0));
         w(u16(0));
-        w(u16(0));
-        w(u16(0));
+        w(u16(horaDos));
+        w(u16(dataDos));
         w(u32(crc));
         w(u32(t));
         w(u32(t));
@@ -3505,8 +3572,8 @@ function criarZipMulti(arquivos) {
         x(u16(10));
         x(u16(0));
         x(u16(0));
-        x(u16(0));
-        x(u16(0));
+        x(u16(horaDos));
+        x(u16(dataDos));
         x(u32(crc));
         x(u32(t));
         x(u32(t));

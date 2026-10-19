@@ -1069,3 +1069,60 @@ ganhou a linha "Nada some, nada sobra, nada cruza".
 
 **Versão v4.12:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
 `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 29 — Copiar o VTO, com assistente (2026-10-19, v4.13)
+
+**Pedido do Rafa:** "esse negócio de pasta, zip, ficou confuso". Salvar
+um ZIP, ver o que o app mostra e fazer uma coisa assistida.
+
+**O que estava esquisito (visto salvando um ZIP de verdade):**
+- Janela cinza do navegador, sem acento: "O pacote vai levar o
+  aplicativo vazio... Gerar o ZIP?".
+- O ZIP caía calado em Downloads, sem dizer onde nem o que fazer depois.
+- Dentro do ZIP, dois `.html` (`index.html` e `anonimizador.html`):
+  ninguém sabia qual abrir. O segundo era sobra do tempo em que o
+  Anonimizador era arquivo irmão; hoje ele vai dentro do VTO em Base64.
+- Os arquivos do ZIP não tinham data (Windows mostrava em branco;
+  extraídos, ficavam com 1980).
+- A ajuda do "?" dizia "um arquivo só" (eram dois) e mandava "abrir a
+  pasta" de um ZIP ainda não extraído.
+- Achado no caminho: clicar no fundo escuro de qualquer ajuda fechava
+  como se fosse a janela das datas. A caixa ficava com o texto da ajuda
+  e o próximo serviço registrado quebrava (`modalTitulo` nulo).
+
+**O que mudou:**
+- Botão do topo virou **📦 Copiar o VTO** (verbo + o programa, para não
+  confundir com "Salvar Arquivo", que é o JSON dos dados).
+- Abre um assistente no lugar do `confirm()`:
+  1. **Para que é a cópia?** "Usar no computador" (arquivo `.html`) ou
+     "Mandar para alguém" (o mesmo arquivo dentro de um ZIP, que passa
+     melhor por e-mail). A frase de cima diz que as matrículas não vão.
+  2. **Salvar:** no Edge/Chrome abre o "Salvar como" do Windows, já em
+     Downloads e com o nome certo — a pessoa escolhe a pasta. Fechou sem
+     salvar: volta para a escolha. Sem o "Salvar como" (Firefox, ou
+     bloqueado pela empresa): download normal.
+  3. **Cópia salva:** nome do arquivo, onde está e como abrir. No ZIP:
+     "botão direito → Extrair tudo → Extrair", e por que extrair.
+- A cópia é **um arquivo só**, `VTO-v4.13.html`, solto ou dentro do ZIP.
+  O banner de nova versão baixa com o mesmo nome.
+- ZIP com data e hora de verdade.
+- Clique no fundo fecha a janela certa (config, ajuda ou datas).
+
+**Teste:** script Playwright fora do repo com 34 verificações: sem
+janela do navegador, Esc, clique no fundo nas 3 janelas e registro de
+serviço depois, download do `.html` e do ZIP, ZIP íntegro com um
+arquivo e a data de hoje, "Salvar como" simulado (nome sugerido, pasta,
+cancelar, bloqueio da empresa, nome com `<b>` aparece como texto),
+matrícula-armadilha fora da cópia, celular 375 px, a cópia abre com as 6
+abas e o Anonimizador. Atualizados para o fluxo novo:
+`_test_regressao_completa.py`, `_test_zip_leak_csv.py` (armadilha: 0),
+`_test_etapa1.py` (24) e `_testa_ajuda_zip.py`. `_testa_seletor.py` sem
+mudança. AGENTS.md: mapa do ZIP atualizado.
+
+**Não testado:** o "Salvar como" real do Windows (o navegador de teste
+não mostra essa janela; foi simulado). Conferir no Edge da Sanepar.
+
+**Versão v4.13:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
+`sw.js`, `version.json`, README, `package.json`.

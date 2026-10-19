@@ -85,7 +85,7 @@ Use este mapa para localizar trechos **sem reescrever o arquivo**. Os números d
 | `// ===== GRAFICOS CANVAS =====` | 1713+ | 4 gráficos da aba Estatísticas |
 | `// ===== CONTADOR 180 =====` | 2077+ | Contagem a partir da 1ª data de criação da matrícula |
 | `// ===== EXPORTAR/IMPORTAR =====` | ~2420+ | CSV e JSON |
-| `// ===== GERAR ZIP PORTATIL =====` | ~2728+ | `prepararHtmlLimpo()` + `gerarZipCompleto()` + `criarZipMulti()` |
+| `// ===== GERAR ZIP PORTATIL =====` | ~2728+ | `prepararHtmlLimpo()` + `gerarZipCompleto()` (abre o assistente "Copiar o VTO") + `salvarCopia()` + `criarZipMulti()`. A copia e UM arquivo `VTO-vX.html` (solto ou dentro do ZIP); testes desligam `showSaveFilePicker`, que no navegador de teste espera uma janela que nunca aparece |
 | `// ===== DADOS MOCK =====` | 2310+ | `gerarMockData()` — 30 matrículas de demonstração |
 | `// ===== VERIFICADOR DE NOVA VERSAO =====` | ~2661+ | Único `fetch()` autorizado + `versaoEhMaior()` |
 

@@ -29,9 +29,10 @@ async def main():
         await page.wait_for_timeout(500)
         aberto = await page.locator("#modalOverlay.ativo").count()
         texto = await page.locator("#modalOverlay .modal-box").text_content()
-        tem_titulo = "Para que serve o Exportar ZIP?" in texto
-        tem_compartilhar = "compartilhar com um colega" in texto
-        tem_limpo = "sai limpo" in texto
+        # v4.13: o botao virou "Copiar o VTO" e a ajuda acompanhou
+        tem_titulo = "Para que serve Copiar o VTO?" in texto
+        tem_compartilhar = "mandar a um colega" in texto
+        tem_limpo = "não vão junto" in texto
         print("3) modal abre:", "OK" if aberto else "PROBLEMA")
         print("3b) texto completo:", "OK" if tem_titulo and tem_compartilhar and tem_limpo else "PROBLEMA")
         await page.screenshot(path=str(PRINTS / "11_ajuda_zip.png"))

@@ -111,8 +111,9 @@ def main():
         checa("setas de roleta nao duplicam", navs_limpo == navs_fonte,
               "(fonte %d / limpo %d / sujo %d)" % (navs_fonte, navs_limpo, navs_sujo))
 
-        # ---------- E: confirmacao antes de baixar ----------
-        print("\n[E] confirmacao antes de baixar")
+        # ---------- E: aviso antes de baixar ----------
+        # Desde a v4.13 o aviso e o assistente Copiar o VTO, nao mais o confirm().
+        print("\n[E] aviso antes de baixar")
         perguntas = []
 
         def responde(d):
@@ -122,13 +123,16 @@ def main():
         pg.on("dialog", responde)
         pg.click(".btn-zip")
         pg.wait_for_timeout(600)
-        checa("pergunta antes de gerar o ZIP", len(perguntas) == 1,
-              "(%d dialogo(s))" % len(perguntas))
-        if perguntas:
-            checa("aviso fala dos dados da tela", "NAO vao junto" in perguntas[0],
-                  "\n         texto: " + perguntas[0].replace("\n", " | "))
+        aviso = pg.evaluate("() => document.getElementById('modalOverlay').classList.contains('ativo') ? document.querySelector('#modalOverlay .modal-box').innerText : ''")
+        checa("assistente abre antes de gerar qualquer arquivo", "Usar no computador" in aviso and not perguntas,
+              "(%d dialogo(s) do navegador)" % len(perguntas))
+        checa("aviso fala dos dados da tela", "não vão junto" in aviso,
+              "\n         texto: " + aviso.replace("\n", " | ")[:160])
+        pg.keyboard.press("Escape")
+        pg.wait_for_timeout(300)
         rotulo = pg.evaluate("() => document.querySelector('.btn-zip').textContent")
-        checa("botao volta ao normal ao recusar", "..." not in rotulo,
+        fechou = not pg.evaluate("() => document.getElementById('modalOverlay').classList.contains('ativo')")
+        checa("cancelar fecha sem baixar e o botao fica igual", fechou and "Copiar o VTO" in rotulo,
               "(rotulo: %s)" % rotulo.strip())
 
         # ---------- F: regressao no app original ----------

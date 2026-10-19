@@ -11,7 +11,7 @@
 #   8. aba 5: os 4 graficos canvas nao sao virgens
 #   9. exportar CSV e JSON (download com conteudo valido)
 #  10. importar o JSON de volta
-#  11. exportar ZIP, reabrir o index.html extraido e conferir as 6 abas + aba 6
+#  11. Copiar o VTO em ZIP, reabrir o VTO-vX.html extraido e conferir as 6 abas + aba 6
 # Uso: venv_agente/Scripts/python.exe patches/_test_regressao_completa.py
 import json
 import shutil
@@ -243,10 +243,16 @@ def main():
             else:
                 marca("import/json", False, "sem arquivo JSON exportado para reimportar")
 
-            # ---- 11. exportar ZIP e reabrir o exportado ----
+            # ---- 11. Copiar o VTO em ZIP e reabrir a copia ----
+            # O "Salvar como" de verdade espera uma janela que o navegador de teste
+            # nunca mostra; sem ele o assistente cai no download normal.
             baixados.clear()
+            pg.evaluate("() => { window.showSaveFilePicker = undefined; }")
             pg.locator("button.btn-zip").first.click()
+            pg.wait_for_timeout(300)
+            pg.locator("#copiaOpZip").click()
             pg.wait_for_timeout(2500)
+            pg.keyboard.press("Escape")
             zip_path = None
             for d in baixados:
                 dest = tmp / d.suggested_filename
@@ -256,9 +262,12 @@ def main():
             if zip_path:
                 extraido = tmp / "zip_extraido"
                 with zipfile.ZipFile(zip_path) as z:
+                    nomes_zip = z.namelist()
                     z.extractall(extraido)
-                idx = extraido / "index.html"
-                tem_anon = (extraido / "anonimizador.html").exists()
+                esperado = "VTO-v" + pg.evaluate("() => VERSAO_LOCAL") + ".html"
+                idx = extraido / esperado
+                # Um arquivo so: o Anonimizador vai dentro dele, em Base64.
+                um_so = nomes_zip == [esperado] and 'id="anonimizadorFonte"' in idx.read_text(encoding="utf-8")
                 pg2 = ctx.new_page()
                 erros2 = []
                 pg2.on("pageerror", lambda e: erros2.append(str(e)))
@@ -276,7 +285,7 @@ def main():
                 except Exception:
                     abriu_tudo = False
                 crit2 = [e for e in erros2 if "favicon" not in e.lower()]
-                marca("zip/exporta", tem_anon, "ZIP com index.html + anonimizador.html" if tem_anon else "faltou anonimizador no ZIP")
+                marca("zip/exporta", um_so, "ZIP com um arquivo so: " + esperado + " (Anonimizador dentro)" if um_so else "conteudo inesperado: " + ", ".join(nomes_zip))
                 marca("zip/reabre", abriu_tudo and not crit2,
                       "reaberto: 6 abas + aba 6 carregando" if (abriu_tudo and not crit2)
                       else "aba 6 falhou ou erros: " + "; ".join(crit2[:3]))

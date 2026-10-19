@@ -53,10 +53,14 @@ def main():
                 print("FALHA | nao conseguiu importar o CSV de teste")
                 sys.exit(1)
 
-            # 3. exporta o ZIP (aceitando a confirmacao)
+            # 3. Copiar o VTO em ZIP (sem o "Salvar como", que no navegador de
+            #    teste fica esperando uma janela que nunca aparece)
             downloads = []
             pg.on("download", lambda d: downloads.append(d))
+            pg.evaluate("() => { window.showSaveFilePicker = undefined; }")
             pg.locator("button.btn-zip").first.click()
+            pg.wait_for_timeout(300)
+            pg.locator("#copiaOpZip").click()
             pg.wait_for_timeout(2500)
             if not downloads:
                 print("FALHA | nenhum ZIP baixou")
@@ -80,7 +84,7 @@ def main():
             # 4. abre o exportado e ve se nasce limpo (so mock)
             pg2 = ctx.new_page()
             pg2.on("dialog", lambda d: d.dismiss())
-            pg2.goto((extraido / "index.html").as_uri())
+            pg2.goto((extraido / nomes[0]).as_uri())
             pg.wait_for_timeout(600)
             tem_armadilha = pg2.evaluate("() => matriculas.some(m => m.numero === '" + ARMADILHA + "')")
             n_mock = pg2.evaluate("() => matriculas.length")
