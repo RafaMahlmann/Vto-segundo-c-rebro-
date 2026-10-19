@@ -407,13 +407,105 @@
         .opcoes-avancadas-titulo { font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 12px; }
         .opcoes-avancadas .btn-pq { margin-bottom: 16px; }
 
+        /* ---------- tipo detectado de cada coluna (selo no cartao) ---------- */
+        .selc-tipo { min-height: 18px; line-height: 1; }
+        .selc-tipo.clicavel { cursor: pointer; }
+        .tipo-selo {
+            display: inline-block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 100px;
+            background: #F2F2F7; color: var(--text-secondary); text-decoration: none;
+        }
+        .tipo-selo.tipo-alta { background: #E3F6EA; color: #1A7340; }
+        .tipo-selo.tipo-media { background: #FFF3DC; color: #9A5B00; }
+        .tipo-selo.tipo-baixa { background: #F2F2F7; color: #6E6E73; }
+        .tipo-selo.tipo-ok { background: #1D1D1F; color: #fff; }
+        .tipo-selo.tipo-geo { background: #EAF3FF; color: #0062CC; }
+        .selc-tipo.clicavel .tipo-selo:hover { filter: brightness(.95); }
+        .selc-tipo-painel {
+            display: none; white-space: normal; text-decoration: none; cursor: default;
+            font-size: 11px; font-weight: 500; line-height: 1.45; color: var(--text-primary);
+            background: #fff; border: 1px solid var(--border-color); border-radius: 10px; padding: 8px;
+        }
+        .selc-tipo-painel.aberto { display: block; }
+        .tipo-btn {
+            display: block; width: 100%; margin: 6px 0 0; padding: 7px 8px; font-size: 11px; font-weight: 700;
+            border-radius: 8px; box-shadow: none; background: #F2F2F7; color: var(--text-primary);
+        }
+        .tipo-btn:hover { transform: none; box-shadow: none; background: #E5E5EA; }
+        .tipo-btn.tipo-btn-sim { background: var(--ios-blue); color: #fff; }
+        .tipo-btn.tipo-btn-sim:hover { background: var(--ios-blue-hover); }
+        .tipo-outro { display: block; margin: 6px 0 0; font-size: 11px; font-weight: 600; color: var(--text-primary); }
+        .tipo-outro select {
+            display: block; width: 100%; margin-top: 4px; font-size: 11px; padding: 5px;
+            border-radius: 8px; border: 1px solid var(--border-color); background: #fff; font-family: inherit;
+        }
+        .tipos-resumo { font-size: 13px; color: var(--text-primary); margin: 10px 0 4px; line-height: 1.6; }
+        .tipos-resumo:empty { display: none; }
+        .recorte-aviso {
+            display: none; font-size: 13px; line-height: 1.6; background: #F0F0FB; color: #3F3DB0;
+            border-radius: 10px; padding: 8px 12px; margin: 10px 0;
+        }
+        .recorte-aviso.visivel { display: block; }
+
         /* ---------- estado Manual (6o) ---------- */
         .selc-bol[data-estado="5"] { background: #5856D6; color: #5856D6; }
         .chip-manual.selc-card { outline: 1px solid rgba(88,86,214,.3); }
         .selc-val-manual { color: #5856D6; font-weight: 600; }
 
-        /* ---------- editor de edicao manual ---------- */
-        .manual-painel { max-width: 680px; }
+        /* ---------- edicao manual em lote, dentro do cartao ---------- */
+        .selc-grade.manual-editando { max-height: none !important; }
+        /* barra preta de selecao some durante o lote: cobria os campos e as acoes dela nao servem ali */
+        .selc-grade.manual-editando ~ .selc-barra { opacity: 0 !important; pointer-events: none !important; }
+        .selc-card.manual-aberto {
+            grid-column: 1 / -1; cursor: default; transform: none !important; text-decoration: none;
+            outline: 2px solid #5856D6; outline-offset: 1px; background: #fff;
+        }
+        .selc-card.manual-aberto .selc-amostras, .selc-card.manual-aberto .selc-linha { display: none; }
+        .manual-inline { color: var(--text-primary); font-size: 13px; font-weight: 400; white-space: normal; margin-top: 6px; }
+        .manual-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+        .manual-nav-pos { font-size: 12px; font-weight: 700; color: #5856D6; }
+        .manual-mini {
+            width: auto; margin: 0; padding: 7px 12px; font-size: 12px; font-weight: 700; border-radius: 10px;
+            box-shadow: none; background: #F2F2F7; color: var(--text-primary);
+        }
+        .manual-mini:hover { background: #E5E5EA; transform: none; box-shadow: none; }
+        .manual-mini:active { transform: scale(.97); }
+        .manual-mini:disabled { opacity: .35; background: #F2F2F7; color: var(--text-primary); }
+        .manual-mini.manual-mini-forte { background: #5856D6; color: #fff; }
+        .manual-mini.manual-mini-forte:hover { background: #4644B8; }
+        .manual-chute { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); margin-bottom: 4px; }
+        .manual-chute strong { color: var(--text-primary); }
+        .manual-ajuda { font-size: 12px; color: var(--text-secondary); margin: 4px 0 8px; }
+        .manual-campo { display: grid; grid-template-columns: 26px 1fr auto; gap: 8px; align-items: center; }
+        .manual-n { font-size: 11px; color: var(--text-secondary); text-align: right; }
+        .manual-orig {
+            width: auto; margin: 0; padding: 8px 11px; font-size: 14px; border-radius: 10px;
+            background: #F2F2F7; color: var(--text-primary); box-shadow: none;
+        }
+        .manual-orig:hover { background: #E5E5EA; transform: none; box-shadow: none; }
+        .manual-alerta { display: none; grid-column: 2 / 4; font-size: 12px; color: #B42318; line-height: 1.5; }
+        .manual-alerta.visivel { display: block; }
+        .manual-alerta label, .manual-rev-problema label {
+            display: inline-flex; align-items: center; gap: 6px; margin: 0; font-size: 12px; font-weight: 700; color: #B42318; cursor: pointer;
+        }
+        .manual-alerta input, .manual-rev-problema input { width: auto; margin: 0; }
+        .manual-linha-input.manual-colisao { border-color: var(--error-red) !important; background: #FFF1F0 !important; }
+        .manual-recorte {
+            display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600;
+            margin: 10px 0; cursor: pointer;
+        }
+        .manual-recorte input { width: auto; margin-top: 2px; }
+        #manualRevisaoLote {
+            grid-column: 1 / -1; background: #fff; border: 2px solid #5856D6; border-radius: 14px;
+            padding: 14px 16px; color: var(--text-primary); font-size: 13px; cursor: default;
+        }
+        .manual-rev-col { border-top: 1px solid #F2F2F7; padding: 10px 0; }
+        .manual-rev-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .manual-rev-topo span { color: var(--text-secondary); font-size: 12px; flex: 1; }
+        .manual-rev-amostra { font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .manual-rev-problema { color: #B42318; font-size: 12px; margin: 6px 0 0 12px; line-height: 1.5; }
+        .manual-pendencias { color: #B42318; font-weight: 700; font-size: 13px; margin: 6px 0; }
+        .manual-pendencias:empty { display: none; }
         .manual-aviso {
             background: #FFF1F0; border: 1px solid rgba(255,59,48,.25); color: #B42318;
             border-radius: 12px; padding: 12px 14px; font-size: 13px; line-height: 1.5; margin: 4px 0 16px;
@@ -430,15 +522,6 @@
             border-color: #5856D6 !important; color: #AEAEB2 !important; transition: color .1s ease;
         }
         .manual-linha-input.manual-alterado { color: #1D1D1F !important; font-weight: 700; }
-        .manual-revisao-resumo { font-size: 13px; color: var(--text-primary); font-weight: 600; margin: 4px 0 14px; }
-        .manual-revisao-linha {
-            display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-            padding: 10px 12px; border-radius: 10px; background: #F2F2F7; border-left: 3px solid #5856D6;
-        }
-        .manual-revisao-linha.manual-revisao-igual { border-left-color: #C7C7CC; }
-        .manual-revisao-valor { font-family: 'SF Mono', 'Menlo', monospace; font-size: 13px; font-weight: 700; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .manual-revisao-vazio { font-weight: 400; font-style: italic; color: var(--text-secondary); }
-        .manual-revisao-original { font-size: 11px; color: var(--text-secondary); white-space: nowrap; flex-shrink: 0; }
         .manual-risco-check {
             display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600;
             color: #B42318; margin: 6px 0; cursor: pointer;
@@ -447,14 +530,6 @@
         .manual-btn-aplicar { background: linear-gradient(135deg, #5856D6 0%, #4644b8 100%); }
         .manual-btn-aplicar:not(:disabled):hover { box-shadow: 0 4px 14px rgba(88,86,214,.35); }
         .manual-btn-aplicar:active:not(:disabled) { transform: scale(.97); }
-        .manual-fila-badge {
-            display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700;
-            color: #5856D6; background: #F0F0FB; border-radius: 100px; padding: 6px 14px; margin-bottom: 14px; width: fit-content;
-        }
-        .manual-fila-cancelar {
-            width: auto; background: none; box-shadow: none; border: none; padding: 0; margin: 0;
-            color: var(--text-secondary); font-size: 12px; font-weight: 600; text-decoration: underline; cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -508,17 +583,16 @@
                     <button type="button" class="selc-btn-mini" onclick="filtroAbrirEscolhaColuna()">+ Adicionar filtro</button>
                 </div>
 
+                <div class="tipos-resumo" id="tiposResumo"></div>
+                <div class="recorte-aviso" id="recorteAviso"></div>
+
                 <div class="instruction-note" style="display:block;margin-top:10px">
-                    ✍️ Edição manual: clique na bolinha roxo-azulada de qualquer coluna, na lista abaixo.
+                    ✍️ Edição manual: bolinha índigo de um cartão, ou selecione várias colunas e use a bolinha índigo da barra preta — você passa de cartão em cartão.
                 </div>
             </div>
 
             <div class="filtro-overlay" id="filtroOverlay">
                 <div class="filtro-painel" id="filtroCorpo"></div>
-            </div>
-
-            <div class="filtro-overlay" id="manualOverlay">
-                <div class="filtro-painel manual-painel" id="manualCorpo"></div>
             </div>
 
             <label>
@@ -543,7 +617,7 @@
                 <div class="legend-item" style="display:flex; align-items:center;">
                     <span class="dot" style="background:#5856D6"></span>
                     ✍️ Manual
-                    <span class="help-icon" data-tooltip="Voce digita o valor a mao, linha por linha (ate 50). O que nao for editado sai vazio nessa coluna. Bypassa o anonimizador automatico — risco e seu.">?</span>
+                    <span class="help-icon" data-tooltip="Você escolhe até 50 linhas. Cada campo já vem com um valor inventado e conferido contra os reais — dá pra escrever por cima. O que não for editado sai vazio nessa coluna (ou some, com o recorte). Pula o anonimizador automático: o risco é seu.">?</span>
                 </div>
             </div>
 
@@ -564,7 +638,7 @@
                 <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
                 <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT)" onclick="selcAplicarEmMassa(4)"></button>
                 <button class="selc-bol-grande" data-estado="0" title="Excluir" onclick="selcAplicarEmMassa(0)"></button>
-                <button class="selc-bol-grande" data-estado="5" title="✍️ Manual (abre uma fila, uma coluna de cada vez)" onclick="manualIniciarFila()"></button>
+                <button class="selc-bol-grande" data-estado="5" title="✍️ Manual: editar as colunas selecionadas, de cartão em cartão" onclick="manualIniciarFila()"></button>
                 <button class="selc-limpar" onclick="selcLimparSelecao()">Limpar</button>
             </div>
 
@@ -671,6 +745,7 @@
                 <li><strong>Desfazer/Refazer (14–15/09):</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_etapa5.py</span> (31) + <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_etapa5c.py</span> (18) — confirma que <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">Ctrl+Z</span> dentro de um campo de texto não mexe em matrícula, e que o aviso do botão de reset diz a verdade.</li>
                 <li><strong>Vazamento de dado importado por CSV (rodado em 19/10):</strong> importa uma matrícula-armadilha via CSV, exporta o ZIP, procura a armadilha dentro do pacote. <span class="seal-ok">Resultado: 0 ocorrências</span> — dado importado não vai junto no arquivo exportado.</li>
                 <li><strong>Filtro de linhas, prévia ao vivo e edição manual (16/10):</strong> confirma que os filtros combinam com <strong>E</strong> de verdade (uma linha do grupo errado é barrada mesmo batendo com um dos filtros), que a prévia nos cartões nunca usa o sal do lote real — sal e mapas isolados, testados e confirmados vazios depois de usar a prévia à vontade — e que o processamento real grava exatamente o que foi editado à mão, linha por linha. 15 + 16 verificações.</li>
+                <li><strong>Detecção de tipo e edição manual em lote (19/10):</strong> num arquivo de teste com CPF, CNPJ, CEP, data, telefone, e-mail e valor, cada coluna foi reconhecida pelo padrão e pela validação (dígito verificador, data que existe no calendário, DDD que existe) — inclusive um CPF guardado numa coluna de nome errado. Na edição manual, todo valor inventado é conferido contra os valores reais carregados e trocado se bater; valor real digitado à mão só passa com confirmação explícita, linha por linha. 27 + 35 verificações, com o arquivo final conferido linha a linha.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
         </div>
@@ -843,40 +918,136 @@
         return [d1, d2];
     }
 
-    async function gerarCpfSintetico(original) {
-        return valorSintetico("CPF", original, (rand) => {
+    // CNPJ: modulo 11 com pesos 5..2,9..2. Desde jul/2026 a Receita emite CNPJ
+    // com letras nas 12 primeiras posicoes; cada caractere vale (codigo ASCII - 48),
+    // entao digito continua valendo ele mesmo e "A" vale 17.
+    function dvCnpj(base12) {
+        const calc = (arr, pesos) => {
+            const r = arr.reduce((s, v, i) => s + v * pesos[i], 0) % 11;
+            return r < 2 ? 0 : 11 - r;
+        };
+        const d1 = calc(base12, [5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        const d2 = calc([...base12, d1], [6, 5, 4, 3, 2, 9, 8, 7, 6, 5, 4, 3, 2]);
+        return [d1, d2];
+    }
+
+    function cpfValido(valor) {
+        const v = String(valor ?? '').replace(/[.\-\s]/g, '');
+        if (!/^\d{11}$/.test(v) || /^(\d)\1{10}$/.test(v)) return false;
+        const [d1, d2] = calcularDV(v.slice(0, 9).split('').map(Number));
+        return d1 === +v[9] && d2 === +v[10];
+    }
+
+    function cnpjValido(valor) {
+        const v = String(valor ?? '').toUpperCase().replace(/[.\-\/\s]/g, '');
+        if (!/^[0-9A-Z]{12}\d{2}$/.test(v) || /^(.)\1{13}$/.test(v)) return false;
+        const [d1, d2] = dvCnpj(v.slice(0, 12).split('').map(c => c.charCodeAt(0) - 48));
+        return d1 === +v[12] && d2 === +v[13];
+    }
+
+    // Aceita AAAAMMDD (TXT do SGCG), AAAA-MM-DD e DD/MM/AAAA. So devolve data que
+    // existe no calendario (31/02 nao passa) - senao null.
+    function dataParaISO(valor) {
+        const v = String(valor ?? '').trim();
+        let y, m, d;
+        if (/^\d{8}$/.test(v)) { y = +v.slice(0, 4); m = +v.slice(4, 6); d = +v.slice(6, 8); }
+        else if (/^\d{4}-\d{2}-\d{2}$/.test(v)) { [y, m, d] = v.split('-').map(Number); }
+        else if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) { [d, m, y] = v.split('/').map(Number); }
+        else return null;
+        if (y < 1900 || y > 2100 || m < 1 || m > 12 || d < 1) return null;
+        const dt = new Date(Date.UTC(y, m - 1, d));
+        if (dt.getUTCMonth() !== m - 1 || dt.getUTCDate() !== d) return null;
+        return `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    }
+
+    // Se o original vinha pontuado (123.456.789-09), o inventado sai pontuado igual.
+    function aplicarMascaraDoOriginal(original, semMascara) {
+        const o = String(original ?? '');
+        const slots = o.replace(/[^0-9A-Za-z]/g, '').length;
+        if (slots !== semMascara.length || slots === o.length) return semMascara;
+        let i = 0;
+        return o.split('').map(ch => /[0-9A-Za-z]/.test(ch) ? semMascara[i++] : ch).join('');
+    }
+
+    // Formulas dos geradores num lugar so (antes estavam copiadas em 3 lugares).
+    // Cada uma recebe o original e devolve (rand) => valor inventado. Quem escolhe
+    // a fonte do acaso e quem chama: valorSintetico (sal do lote real),
+    // previaValorSintetico (sal isolado da previa) ou randCripto (chute da edicao
+    // manual, sem estado nenhum guardado).
+    const FABRICAS = {
+        CPF: (original) => (rand) => {
             const d = [];
             for (let i = 0; i < 9; i++) d.push(Math.floor(rand() * 10));
             const [d1, d2] = calcularDV(d);
-            return [...d, d1, d2].join("");
-        });
-    }
-
-    async function gerarRgSintetico(original) {
-        return valorSintetico("RG", original, (rand) => {
+            return aplicarMascaraDoOriginal(original, [...d, d1, d2].join(""));
+        },
+        CNPJ: (original) => (rand) => {
+            const base = [];
+            for (let i = 0; i < 8; i++) base.push(Math.floor(rand() * 10));
+            base.push(0, 0, 0, 1); // filial 0001, como na maioria dos CNPJ reais
+            const [d1, d2] = dvCnpj(base);
+            return aplicarMascaraDoOriginal(original, base.join("") + d1 + d2);
+        },
+        RG: () => (rand) => {
             let s = "";
             for (let i = 0; i < 9; i++) s += Math.floor(rand() * 10);
             return s;
-        });
-    }
-
-    async function gerarTelefoneSintetico(original) {
-        const m = String(original).match(/\b(\d{2})\D*\d{4,5}/);
-        const ddd = m ? m[1] : "47";
-        return valorSintetico("TEL", original, (rand) => {
-            let n = "9";
-            for (let i = 0; i < 8; i++) n += Math.floor(rand() * 10);
-            return ddd + n;
-        });
-    }
-
-    async function gerarNomeSintetico(original) {
-        return valorSintetico("NOME", original, (rand) => {
+        },
+        TEL: (original) => {
+            const m = String(original).match(/\b(\d{2})\D*\d{4,5}/);
+            const ddd = m ? m[1] : "47";
+            return (rand) => {
+                let n = "9";
+                for (let i = 0; i < 8; i++) n += Math.floor(rand() * 10);
+                return ddd + n;
+            };
+        },
+        NOME: () => (rand) => {
             const n = NOMES[Math.floor(rand() * NOMES.length)];
             const s1 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
             const s2 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
             return `${n} ${s1} ${s2}`.toUpperCase();
-        });
+        },
+        CEP: (original) => (rand) => {
+            const digits = String(original).replace(/\D/g, '');
+            const prefixo = digits.length >= 5 ? digits.substring(0, 5) : "88000";
+            let sufixo = String(Math.floor(rand() * 1000)).padStart(3, '0');
+            if (digits.length >= 8 && sufixo === digits.substring(5, 8)) sufixo = String((parseInt(sufixo) + 1) % 1000).padStart(3, '0');
+            return prefixo + sufixo;
+        },
+        NUMERO: (original) => {
+            const orig = parseInt(String(original).replace(/\D/g, ''), 10);
+            return (rand) => {
+                let n;
+                do { n = 1 + Math.floor(rand() * 9998); } while (n === orig);
+                // preserva paridade (lado da rua) quando o original é numérico
+                if (!isNaN(orig) && (n % 2) !== (orig % 2)) n = n === 9999 ? n - 1 : n + 1;
+                return String(n);
+            };
+        },
+        DATA: (original) => {
+            const iso = dataParaISO(original);
+            // nao e data de verdade: inventa no mesmo formato em vez de deixar o original passar
+            if (!iso) return fabricarGenericoFormatAware(original);
+            return (rand) => deslocarData(iso, Math.floor(rand() * 3651) - 1825);
+        },
+        GENERICO: (original) => fabricarGenericoFormatAware(original),
+    };
+
+    async function gerarCpfSintetico(original) {
+        return valorSintetico("CPF", original, FABRICAS.CPF(original));
+    }
+
+    async function gerarRgSintetico(original) {
+        return valorSintetico("RG", original, FABRICAS.RG(original));
+    }
+
+    async function gerarTelefoneSintetico(original) {
+        return valorSintetico("TEL", original, FABRICAS.TEL(original));
+    }
+
+    async function gerarNomeSintetico(original) {
+        return valorSintetico("NOME", original, FABRICAS.NOME(original));
     }
 
     // ===========================================================================
@@ -942,59 +1113,22 @@
         return v;
     }
 
-    // Mesmas formulas de gerarCpfSintetico/gerarRgSintetico/gerarTelefoneSintetico/
-    // gerarNomeSintetico, só que passando pela previaValorSintetico isolada acima.
-    async function previaTransformar(valor, nome, estado) {
+    // Mesmas FABRICAS do processamento real, so que passando pela
+    // previaValorSintetico isolada acima.
+    async function previaTransformar(valor, nome, estado, colId) {
         if (estado === 1) return valor;
         if (estado === 0) return null; // excluída: nao sai no arquivo final
         if (!valor) return valor;
         if (estado === 2) return previaHash(valor);
         if (estado === 3) return previaDuble(valor);
         if (estado === 4) {
-            const tipo = tipoSimulacao(nome);
-            if (tipo === "NOME") return previaValorSintetico("NOME", valor, (rand) => {
-                const n = NOMES[Math.floor(rand() * NOMES.length)];
-                const s1 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
-                const s2 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
-                return `${n} ${s1} ${s2}`.toUpperCase();
-            });
-            if (tipo === "CPF") return previaValorSintetico("CPF", valor, (rand) => {
-                const d = []; for (let i = 0; i < 9; i++) d.push(Math.floor(rand() * 10));
-                const [d1, d2] = calcularDV(d);
-                return [...d, d1, d2].join("");
-            });
-            if (tipo === "RG") return previaValorSintetico("RG", valor, (rand) => {
-                let s = ""; for (let i = 0; i < 9; i++) s += Math.floor(rand() * 10);
-                return s;
-            });
-            if (tipo === "TEL") {
-                const m = String(valor).match(/\b(\d{2})\D*\d{4,5}/);
-                const ddd = m ? m[1] : "47";
-                return previaValorSintetico("TEL", valor, (rand) => {
-                    let n = "9"; for (let i = 0; i < 8; i++) n += Math.floor(rand() * 10);
-                    return ddd + n;
-                });
-            }
-            if (tipo === "NUMERO") {
-                const original = parseInt(String(valor).replace(/\D/g, ''), 10);
-                return previaValorSintetico("NUM", valor, (rand) => {
-                    let n; do { n = 1 + Math.floor(rand() * 9998); } while (n === original);
-                    if (!isNaN(original) && (n % 2) !== (original % 2)) n = n === 9999 ? n - 1 : n + 1;
-                    return String(n);
-                });
-            }
-            if (tipo === "CEP") return previaValorSintetico("CEP", valor, (rand) => {
-                const digits = String(valor).replace(/\D/g, '');
-                const prefixo = digits.length >= 5 ? digits.substring(0, 5) : "88000";
-                let sufixo = String(Math.floor(rand() * 1000)).padStart(3, '0');
-                if (digits.length >= 8 && sufixo === digits.substring(5, 8)) sufixo = String((parseInt(sufixo) + 1) % 1000).padStart(3, '0');
-                return prefixo + sufixo;
-            });
+            const tipo = tipoGeradorDaColuna(colId, nome);
             if (tipo === "ENDERECO" || tipo === "LOTE") return "⏳ depende do arquivo inteiro — ver após processar";
-            if (pareceDataBruta(valor)) {
-                return previaValorSintetico("DATA_GEN", valor, (rand) => deslocarData(valor, Math.floor(rand() * 3651) - 1825));
-            }
-            return previaValorSintetico("GENERICO", valor, fabricarGenericoFormatAware(valor));
+            if (tipo === "NUMERO") return previaValorSintetico("NUM", valor, FABRICAS.NUMERO(valor));
+            if (tipo === "DATA") return previaValorSintetico("DATA_GEN", valor, FABRICAS.DATA(valor));
+            if (FABRICAS[tipo] && tipo !== "GENERICO") return previaValorSintetico(tipo, valor, FABRICAS[tipo](valor));
+            if (pareceDataBruta(valor)) return previaValorSintetico("DATA_GEN", valor, FABRICAS.DATA(valor));
+            return previaValorSintetico("GENERICO", valor, FABRICAS.GENERICO(valor));
         }
         return valor;
     }
@@ -1016,15 +1150,15 @@
         }
         if (col.estado === 5) {
             const edicoes = EDICOES_MANUAIS.get(id);
-            box.innerHTML = [0, 1, 2].map(idx => {
-                const v = edicoes ? edicoes.get(idx) : undefined;
-                return v !== undefined
-                    ? `<span class="selc-val selc-val-manual">${selcEsc(v)}</span>`
-                    : `<span class="selc-val selc-val-excluida">(sem edição aqui)</span>`;
-            }).join('');
+            const primeiras = edicoes ? [...edicoes.entries()].sort((a, b) => a[0] - b[0]).slice(0, 3) : [];
+            box.innerHTML = primeiras.length
+                ? primeiras.map(([, v]) => v === ''
+                    ? '<span class="selc-val selc-val-excluida">(vazio)</span>'
+                    : `<span class="selc-val selc-val-manual">${selcEsc(v)}</span>`).join('')
+                : '<span class="selc-val selc-val-excluida">(sem edição ainda)</span>';
             return;
         }
-        const transformados = await Promise.all(originais.slice(0, 3).map(v => previaTransformar(v, col.nome, col.estado)));
+        const transformados = await Promise.all(originais.slice(0, 3).map(v => previaTransformar(v, col.nome, col.estado, col.id)));
         box.innerHTML = transformados.map(v => {
             if (v === '' || v === undefined || v === null) return '<span class="selc-val">—</span>';
             const classe = String(v).startsWith('⏳') ? 'selc-val-aviso' : '';
@@ -1146,6 +1280,136 @@
     const TERMOS_SIMULAVEIS = ["NOME-CLIENTE", "CPF", "RG", "TELEFONE", "CEL-SMS", "CONTATO-IMOVEL", "ENDERECO", "NUMERO-IMOVEL", "CEP", "INSC-LOTE", "EMAIL"];
 
     // ===========================================================================
+    // RECONHECEDORES DE TIPO — padrao + validacao + palavra no nome da coluna
+    // Mesmo desenho do Microsoft Presidio, Purview e Google DLP: cada tipo tem um
+    // teste por valor (formato e, quando existe, digito verificador) e palavras
+    // que, no nome da coluna, reforcam o palpite. A coluna ganha um nivel na
+    // escala do Purview (alta 85 / media 75 / baixa 65). E so palpite: quem
+    // confirma e a pessoa (pratica do SDV - deteccao e ponto de partida).
+    // Nada aqui usa IA nem sai do navegador.
+    // ===========================================================================
+    const DDD_VALIDOS = new Set([11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 24, 27, 28, 31, 32, 33, 34, 35, 37, 38,
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 51, 53, 54, 55, 61, 62, 63, 64, 65, 66, 67, 68, 69, 71, 73, 74, 75, 77, 79,
+        81, 82, 83, 84, 85, 86, 87, 88, 89, 91, 92, 93, 94, 95, 96, 97, 98, 99]);
+
+    // forca: forte = tem digito verificador ou estrutura que nao acontece por acaso;
+    // media = formato reconhecivel mas que pode coincidir; fraca = so tamanho.
+    const TIPOS_INFO = {
+        CPF:       { rotulo: 'CPF', forca: 'forte', palavras: ['CPF'], prova: 'passam no dígito verificador do CPF' },
+        CNPJ:      { rotulo: 'CNPJ', forca: 'forte', palavras: ['CNPJ', 'CGC'], prova: 'passam no dígito verificador do CNPJ' },
+        EMAIL:     { rotulo: 'E-mail', forca: 'forte', palavras: ['EMAIL', 'MAIL'], prova: 'têm formato de e-mail' },
+        DATA:      { rotulo: 'Data', forca: 'forte', palavras: ['DT', 'DATA'], prova: 'são datas que existem no calendário' },
+        TEL:       { rotulo: 'Telefone', forca: 'media', palavras: ['TELEFONE', 'TEL', 'CEL', 'CELULAR', 'FONE', 'CONTATO', 'SMS'], prova: 'têm DDD que existe e tamanho de telefone' },
+        CEP:       { rotulo: 'CEP', forca: 'media', palavras: ['CEP'], prova: 'têm formato de CEP' },
+        MATRICULA: { rotulo: 'Matrícula', forca: 'fraca', palavras: ['MATRICULA'], prova: 'têm 8 dígitos (matrícula não tem dígito verificador)' },
+        RG:        { rotulo: 'RG', forca: 'fraca', palavras: ['RG'], prova: 'têm de 7 a 9 dígitos (RG não tem regra nacional)' },
+        VALOR:     { rotulo: 'Valor (R$)', forca: 'media', palavras: ['VALOR', 'VLR', 'VL'], prova: 'têm valor com centavos' },
+        NOME:      { rotulo: 'Nome de pessoa', forca: 'media', palavras: ['NOME'], prova: 'têm 2 ou mais palavras, só com letras' },
+        CODIGO:    { rotulo: 'Código / categoria', forca: 'media', palavras: ['COD', 'CODIGO', 'CATEG', 'UNIDADE', 'LOCAL', 'CLASSE', 'CODOPE', 'SIT', 'TIPO'], prova: '' },
+        NUMERO:    { rotulo: 'Número de imóvel', forca: 'fraca', palavras: ['NUMERO', 'NUM', 'NRO'], prova: 'têm de 1 a 5 dígitos' },
+        TEXTO:     { rotulo: 'Texto / genérico', forca: 'fraca', palavras: [], prova: 'nenhum padrão conhecido bateu' },
+    };
+    // do mais especifico pro mais generico - desempata quando dois tipos servem
+    const ORDEM_TIPOS = ['CPF', 'CNPJ', 'EMAIL', 'DATA', 'TEL', 'CEP', 'MATRICULA', 'RG', 'VALOR', 'NOME', 'CODIGO', 'NUMERO'];
+
+    function soDigitos(v) { return String(v).replace(/\D/g, ''); }
+
+    const TESTES_VALOR = {
+        CPF: v => cpfValido(v),
+        CNPJ: v => cnpjValido(v),
+        EMAIL: v => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v),
+        DATA: v => dataParaISO(v) !== null,
+        TEL: v => {
+            if (!/^[\d()\s.\-]+$/.test(v)) return false;
+            const d = soDigitos(v);
+            if (d.length !== 10 && d.length !== 11) return false;
+            if (!DDD_VALIDOS.has(+d.slice(0, 2))) return false;
+            if (d.length === 11 && d[2] !== '9') return false;
+            return !/^(\d)\1+$/.test(d);
+        },
+        CEP: v => /^\d{5}-?\d{3}$/.test(v) && !v.startsWith('00') && !/^(\d)\1{7}$/.test(soDigitos(v)),
+        MATRICULA: v => /^\d{8}$/.test(v),
+        RG: v => /^[\d.\-]+[Xx]?$/.test(v) && soDigitos(v).length >= 7 && soDigitos(v).length <= 9,
+        VALOR: v => /^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(v) || /^-?\d+[.,]\d{2}$/.test(v),
+        NOME: v => /^[A-Za-zÀ-ÿ']+(?: [A-Za-zÀ-ÿ']+)+$/.test(v),
+        NUMERO: v => /^\d{1,5}$/.test(v),
+    };
+
+    // Compara palavra inteira, nao pedaco: "RG" nao pode bater em "ENERGIA".
+    function palavraNaColuna(tipo, nomeColuna) {
+        const n = selcNorm(nomeColuna);
+        if (tipo === 'NOME' && TERMOS_SENSIVEIS_EXCECOES.some(e => n.includes(e))) return false;
+        const tokens = n.split(/[^A-Z0-9]+/);
+        return TIPOS_INFO[tipo].palavras.some(p => tokens.includes(p));
+    }
+
+    function avaliarTiposDaColuna(nomeColuna, valores) {
+        const vals = valores.map(v => String(v).trim()).filter(v => v !== '');
+        if (vals.length < 5) return { tipo: null, n: vals.length };
+        const resultados = [];
+        for (const tipo of ORDEM_TIPOS) {
+            let taxa, prova = TIPOS_INFO[tipo].prova;
+            if (tipo === 'CODIGO') {
+                // propriedade da coluna, nao do valor: poucos valores, todos do mesmo tamanho
+                const distintos = new Set(vals);
+                const tamanhos = new Set(vals.map(v => v.length));
+                const ok = distintos.size <= 30 && distintos.size < vals.length && tamanhos.size === 1 && vals[0].length <= 6;
+                taxa = ok ? 1 : 0;
+                prova = `só ${distintos.size} valor(es) diferente(s), todos com ${vals[0].length} caractere(s)`;
+            } else {
+                taxa = vals.filter(TESTES_VALOR[tipo]).length / vals.length;
+            }
+            if (taxa < 0.6) continue;
+            let palavra = palavraNaColuna(tipo, nomeColuna);
+            if (tipo === 'CEP' && !palavra) {
+                const noParana = vals.filter(v => { const x = +soDigitos(v); return x >= 80000000 && x <= 87999999; }).length / vals.length;
+                if (noParana >= 0.9) { palavra = true; prova += ' e caem na faixa do Paraná (80000–87999)'; }
+            }
+            const forca = TIPOS_INFO[tipo].forca;
+            let nivel;
+            if (taxa >= 0.9) {
+                if (forca === 'fraca') nivel = palavra ? 'media' : 'baixa';
+                else nivel = palavra ? 'alta' : (forca === 'forte' ? 'media' : 'baixa');
+            } else {
+                nivel = (palavra && forca !== 'fraca') ? 'media' : 'baixa';
+            }
+            resultados.push({ tipo, taxa, nivel, palavra, prova });
+        }
+        if (!resultados.length) return { tipo: 'TEXTO', nivel: 'baixa', taxa: 1, palavra: false, prova: TIPOS_INFO.TEXTO.prova, n: vals.length, alternativas: [] };
+        const peso = { alta: 3, media: 2, baixa: 1 };
+        resultados.sort((a, b) => (peso[b.nivel] - peso[a.nivel])
+            || ((b.palavra ? 1 : 0) - (a.palavra ? 1 : 0))
+            || (ORDEM_TIPOS.indexOf(a.tipo) - ORDEM_TIPOS.indexOf(b.tipo)));
+        return { ...resultados[0], n: vals.length, alternativas: resultados.slice(1) };
+    }
+
+    const TIPO_DETECTADO = new Map();  // colId -> resultado de avaliarTiposDaColuna
+    const TIPO_CONFIRMADO = new Map(); // colId -> tipo escolhido pela pessoa
+    let DETECCAO_TOKEN = 0;
+
+    // Tipo confirmado -> gerador usado no Simular e no chute da edicao manual.
+    const MAPA_TIPO_GERADOR = {
+        CPF: 'CPF', CNPJ: 'CNPJ', RG: 'RG', TEL: 'TEL', NOME: 'NOME', CEP: 'CEP', NUMERO: 'NUMERO', DATA: 'DATA',
+        MATRICULA: 'GENERICO', EMAIL: 'GENERICO', VALOR: 'GENERICO', CODIGO: 'GENERICO', TEXTO: 'GENERICO',
+    };
+
+    // Endereco e lote trocam valor REAL do mesmo bairro/quadra (swap geo-coerente),
+    // o que e melhor que qualquer gerador - por isso o nome da coluna manda nesses dois.
+    function tipoGeoDaColuna(nome) {
+        if (MODO_ATUAL !== 'TXT' || !nome) return null;
+        const t = tipoSimulacao(nome);
+        return (t === 'ENDERECO' || t === 'LOTE') ? t : null;
+    }
+
+    function tipoGeradorDaColuna(colId, nome) {
+        const geo = tipoGeoDaColuna(nome);
+        if (geo) return geo;
+        const conf = colId !== undefined ? TIPO_CONFIRMADO.get(colId) : undefined;
+        if (conf) return MAPA_TIPO_GERADOR[conf];
+        return tipoSimulacao(nome || '');
+    }
+
+    // ===========================================================================
     // POOLS GEOGRÁFICOS (passada 1) — swap geo-coerente
     // ===========================================================================
     const POOL = { ruasPorBairro: new Map(), lotesPorQuadra: new Map() };
@@ -1183,11 +1447,10 @@
     // Edicao manual por coluna: colId -> Map(numeroLinhaAbsoluto -> valor digitado).
     // Linha nao presente no Map sai vazia no arquivo final (e intencional, nao e bug).
     const EDICOES_MANUAIS = new Map();
-    let MANUAL_EDITANDO = null;
-    let MANUAL_LINHAS_CARREGADAS = []; // [{idx, original}] da coluna em edicao agora
-    let MANUAL_REVISAO_VALORES = []; // valores digitados, paralelo a MANUAL_LINHAS_CARREGADAS
-    let MANUAL_FILA = []; // colIds restantes, quando a edicao manual comecou da barra preta
-    let MANUAL_FILA_TOTAL = 0; // tamanho original da fila (0 = nao esta numa fila)
+    // Lote de edicao manual aberto agora (null = nenhum). Ver manualIniciarLote().
+    let MANUAL_LOTE = null;
+    // Recorte: so essas linhas (numeroLinhaAbsoluto) saem no arquivo final. null = sem recorte.
+    let RECORTE_IDX = null;
     const LIMITE_VALORES_FILTRO = 1000;
     let FILTRO_EDITANDO = null;
     let FILTRO_VALORES_TEMP = null;
@@ -1255,9 +1518,16 @@
         FILTROS_LINHA = [];
         PRESET_SGCG_APLICADO = false;
         EDICOES_MANUAIS.clear();
+        TIPO_DETECTADO.clear();
+        TIPO_CONFIRMADO.clear();
+        MANUAL_LOTE = null;
+        RECORTE_IDX = null;
         filtroRenderChips();
+        recorteAtualizarAviso();
+        tiposAtualizarResumo();
         COLUNAS_DETECTADAS = [];
         document.getElementById('chipsContainer').innerHTML = "";
+        document.getElementById('chipsContainer').classList.remove('manual-editando');
         SELECIONADAS.clear(); AMOSTRAS = {};
         document.getElementById('selcBusca').value = '';
         document.getElementById('selcVazio').classList.remove('visivel');
@@ -1278,6 +1548,7 @@
         }
         document.body.classList.toggle('selc-modo-csv', MODO_ATUAL === 'CSV');
         carregarAmostras();
+        detectarTiposColunas();
     }
 
     function configurarModoTXT() {
@@ -1342,6 +1613,8 @@
         chip.innerHTML =
             `<div class="selc-topo"><span class="selc-check">✓</span>` +
             `<span class="selc-nome" title="${selcEsc(nome)}">${selcEsc(nome)}</span></div>` +
+            `<div class="selc-tipo" id="tipo-${id}" onclick="event.stopPropagation(); tipoAlternarPainel(${id})"><span class="tipo-selo tipo-carregando">🔎 analisando…</span></div>` +
+            `<div class="selc-tipo-painel" id="tipoPainel-${id}" onclick="event.stopPropagation()"></div>` +
             `<div class="selc-amostras" id="amostra-${id}"><span class="selc-val">…</span></div>` +
             `<div class="selc-linha"><div class="selc-bolinhas">` +
             [1, 2, 3, 4, 5, 0].map(e => {
@@ -1460,13 +1733,14 @@
     function selcAtualizarContador() {
         const el = document.getElementById('selcContador');
         if (!el) return;
-        const tot = { 1: 0, 2: 0, 3: 0, 4: 0, 0: 0 };
+        const tot = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 0: 0 };
         COLUNAS_DETECTADAS.forEach(c => { tot[c.estado] = (tot[c.estado] || 0) + 1; });
         const partes = [];
         if (tot[1]) partes.push(`${tot[1]} Manter`);
         if (tot[2]) partes.push(`${tot[2]} Anonimizar`);
         if (tot[3]) partes.push(`${tot[3]} Dublê`);
         if (tot[4]) partes.push(`${tot[4]} Simular`);
+        if (tot[5]) partes.push(`${tot[5]} Manual`);
         if (tot[0]) partes.push(`${tot[0]} Excluir`);
         el.textContent = partes.join('  ·  ');
         el.classList.remove('pulsa'); void el.offsetWidth; el.classList.add('pulsa');
@@ -1493,6 +1767,167 @@
         } catch (e) {
             console.warn('Amostras indisponiveis:', e);
         }
+    }
+
+    // ===========================================================================
+    // TIPO DE CADA COLUNA — varredura, selo no cartao e confirmacao
+    // ===========================================================================
+    const LIMITE_LINHAS_DETECCAO = 2000; // ~2 MB num TXT do SGCG: rapido e suficiente
+    const LIMITE_VALORES_DETECCAO = 500; // por coluna
+
+    async function detectarTiposColunas() {
+        if (!FILE_REF || !COLUNAS_DETECTADAS.length) return;
+        const token = ++DETECCAO_TOKEN;
+        const coletados = new Map(COLUNAS_DETECTADAS.map(c => [c.id, []]));
+        const reader = FILE_REF.stream().getReader();
+        const decoder = new TextDecoder(CSV_ENCODING);
+        let buffer = '', lidas = 0, cabecalhoPulado = MODO_ATUAL !== 'CSV';
+        const processar = (linha) => {
+            if (linha.length < 2) return;
+            if (!cabecalhoPulado) { cabecalhoPulado = true; return; }
+            const partes = MODO_ATUAL === 'CSV' ? linha.split(CSV_DELIMITADOR) : null;
+            COLUNAS_DETECTADAS.forEach(col => {
+                const arr = coletados.get(col.id);
+                if (arr.length >= LIMITE_VALORES_DETECCAO) return;
+                const v = MODO_ATUAL === 'TXT'
+                    ? extrairCampoTxt(linha, col.id)
+                    : (partes[col.id] || '').replace(/^["']|["']$/g, '').trim();
+                if (v !== '') arr.push(v);
+            });
+            lidas++;
+        };
+        try {
+            while (lidas < LIMITE_LINHAS_DETECCAO) {
+                const { done, value } = await reader.read();
+                if (done) { if (buffer) processar(buffer); break; }
+                buffer += decoder.decode(value, { stream: true });
+                const partes = buffer.split(/\r?\n/);
+                buffer = partes.pop();
+                for (const l of partes) { processar(l); if (lidas >= LIMITE_LINHAS_DETECCAO) break; }
+            }
+            reader.cancel().catch(() => {});
+        } catch (e) {
+            console.warn('Deteccao de tipos indisponivel:', e);
+            return;
+        }
+        if (token !== DETECCAO_TOKEN) return; // outro arquivo foi carregado no meio
+        COLUNAS_DETECTADAS.forEach(col => {
+            TIPO_DETECTADO.set(col.id, avaliarTiposDaColuna(col.nome, coletados.get(col.id)));
+            selcRenderTipo(col.id);
+        });
+        tiposAtualizarResumo();
+        const alta = [...TIPO_DETECTADO.values()].filter(d => d.nivel === 'alta').length;
+        log(`🔎 Tipos detectados em ${lidas} linha(s): ${alta} coluna(s) com confiança alta. Confira no selo de cada cartão.`);
+    }
+
+    function selcRenderTipo(id) {
+        const el = document.getElementById(`tipo-${id}`);
+        if (!el) return;
+        const col = COLUNAS_DETECTADAS.find(c => c.id === id);
+        const geo = col ? tipoGeoDaColuna(col.nome) : null;
+        const conf = TIPO_CONFIRMADO.get(id);
+        const det = TIPO_DETECTADO.get(id);
+        el.classList.toggle('clicavel', !geo && !!det);
+        if (geo) {
+            el.innerHTML = `<span class="tipo-selo tipo-geo" title="Troca por um valor real do mesmo ${geo === 'ENDERECO' ? 'bairro' : 'quarteirão'} — melhor que inventar">🏠 ${geo === 'ENDERECO' ? 'endereço · troca no bairro' : 'lote · troca na quadra'}</span>`;
+        } else if (conf) {
+            el.innerHTML = `<span class="tipo-selo tipo-ok" title="Você confirmou. Clique pra trocar.">✓ ${TIPOS_INFO[conf].rotulo}</span>`;
+        } else if (!det) {
+            el.innerHTML = '<span class="tipo-selo tipo-carregando">🔎 analisando…</span>';
+        } else if (!det.tipo) {
+            el.innerHTML = '<span class="tipo-selo tipo-vazio" title="Menos de 5 valores preenchidos">sem dados suficientes</span>';
+        } else {
+            el.innerHTML = `<span class="tipo-selo tipo-${det.nivel}" title="${Math.round(det.taxa * 100)}% ${selcEsc(det.prova)}. Clique pra confirmar.">${TIPOS_INFO[det.tipo].rotulo}? · ${det.nivel}</span>`;
+        }
+    }
+
+    function tipoAlternarPainel(id) {
+        const p = document.getElementById(`tipoPainel-${id}`);
+        if (!p) return;
+        if (p.classList.contains('aberto')) { p.classList.remove('aberto'); p.innerHTML = ''; return; }
+        const col = COLUNAS_DETECTADAS.find(c => c.id === id);
+        if (!col || tipoGeoDaColuna(col.nome)) return;
+        const det = TIPO_DETECTADO.get(id);
+        if (!det) return;
+        const conf = TIPO_CONFIRMADO.get(id);
+        let texto;
+        if (conf) {
+            texto = `Confirmado como <strong>${TIPOS_INFO[conf].rotulo}</strong>.`;
+        } else if (det.tipo) {
+            texto = `Parece <strong>${TIPOS_INFO[det.tipo].rotulo}</strong>: ${Math.round(det.taxa * 100)}% das ${det.n} linhas analisadas ${selcEsc(det.prova)}` +
+                `${det.palavra ? ', e o nome da coluna bate' : ''}. É isso?`;
+        } else {
+            texto = 'Poucos valores preenchidos pra arriscar um palpite. Se você sabe o tipo, escolha abaixo.';
+        }
+        const opcoes = Object.keys(TIPOS_INFO).map(t => `<option value="${t}">${TIPOS_INFO[t].rotulo}</option>`).join('');
+        p.innerHTML = `<div class="tipo-texto">${texto}</div>` +
+            (!conf && det.tipo ? `<button type="button" class="tipo-btn tipo-btn-sim" onclick="tipoConfirmar(${id}, '${det.tipo}')">Sim, é ${TIPOS_INFO[det.tipo].rotulo}</button>` : '') +
+            `<label class="tipo-outro">${conf || det.tipo ? 'Não, é:' : 'É:'}` +
+            `<select onchange="tipoConfirmar(${id}, this.value)"><option value="">escolha o tipo…</option>${opcoes}</select></label>` +
+            (conf ? `<button type="button" class="tipo-btn" onclick="tipoDesconfirmar(${id})">Desfazer confirmação</button>` : '');
+        p.classList.add('aberto');
+    }
+
+    function tipoAplicado(id) {
+        const p = document.getElementById(`tipoPainel-${id}`);
+        if (p) { p.classList.remove('aberto'); p.innerHTML = ''; }
+        selcRenderTipo(id);
+        selcRenderAmostraTransformada(id);
+        tiposAtualizarResumo();
+        if (MANUAL_LOTE && MANUAL_LOTE.etapa === 'editar' && MANUAL_LOTE.cols[MANUAL_LOTE.pos] === id) manualRenderLote();
+    }
+
+    function tipoConfirmar(id, tipo) {
+        if (!TIPOS_INFO[tipo]) return;
+        TIPO_CONFIRMADO.set(id, tipo);
+        const col = COLUNAS_DETECTADAS.find(c => c.id === id);
+        log(`Tipo confirmado: ${col ? col.nome : id} = ${TIPOS_INFO[tipo].rotulo}`);
+        tipoAplicado(id);
+    }
+
+    function tipoDesconfirmar(id) {
+        TIPO_CONFIRMADO.delete(id);
+        tipoAplicado(id);
+    }
+
+    function tiposPendentesAlta() {
+        return COLUNAS_DETECTADAS.filter(c => {
+            const d = TIPO_DETECTADO.get(c.id);
+            return d && d.nivel === 'alta' && !TIPO_CONFIRMADO.has(c.id) && !tipoGeoDaColuna(c.nome);
+        });
+    }
+
+    function tiposConfirmarAltaConfianca() {
+        const pendentes = tiposPendentesAlta();
+        pendentes.forEach(c => { TIPO_CONFIRMADO.set(c.id, TIPO_DETECTADO.get(c.id).tipo); tipoAplicado(c.id); });
+        log(`Tipos confirmados em lote: ${pendentes.length} coluna(s) de confiança alta.`);
+    }
+
+    function tiposAtualizarResumo() {
+        const el = document.getElementById('tiposResumo');
+        if (!el) return;
+        if (!TIPO_DETECTADO.size) { el.innerHTML = ''; return; }
+        const pendentes = tiposPendentesAlta().length;
+        const confirmados = TIPO_CONFIRMADO.size;
+        el.innerHTML = pendentes
+            ? `🔎 ${pendentes} coluna(s) com tipo de confiança alta ainda sem confirmar. ` +
+              `<button type="button" class="selc-btn-mini" onclick="tiposConfirmarAltaConfianca()">Confirmar as ${pendentes}</button>`
+            : `🔎 ${confirmados} tipo(s) confirmado(s). O selo de cada cartão diz o que parece ser — clique nele pra conferir ou trocar.`;
+    }
+
+    function recorteAtualizarAviso() {
+        const el = document.getElementById('recorteAviso');
+        if (!el) return;
+        if (!RECORTE_IDX) { el.classList.remove('visivel'); el.innerHTML = ''; return; }
+        el.innerHTML = `✂️ Recorte ligado: o arquivo final sai só com as ${RECORTE_IDX.size} linha(s) da edição manual. ` +
+            `<button type="button" class="selc-btn-mini" onclick="recorteDesligar()">Desligar recorte</button>`;
+        el.classList.add('visivel');
+    }
+
+    function recorteDesligar() {
+        RECORTE_IDX = null;
+        recorteAtualizarAviso();
+        log('Recorte desligado: o arquivo final volta a ter todas as linhas.');
     }
 
 
@@ -1721,190 +2156,390 @@
     }
 
     // ===========================================================================
-    // EDICAO MANUAL POR COLUNA — 6o estado. A bolinha nao aplica na hora (os
-    // outros 5 aplicam com 1 clique): abre o editor, porque precisa de dado
-    // digitado. Linha que o usuario nao editar sai vazia no arquivo final.
+    // EDICAO MANUAL EM LOTE — dentro dos proprios cartoes
+    // A bolinha indigo nao aplica na hora (os outros 5 estados aplicam com 1
+    // clique): abre um lote. O cartao da coluna cresce ali mesmo na grade e a
+    // pessoa passa de cartao em cartao (Anterior / Proxima). As mesmas N linhas
+    // valem pra todas as colunas do lote - cada linha vira um registro inteiro.
+    // Cada campo ja nasce com um chute (gerador do tipo da coluna) conferido
+    // contra os valores reais carregados: se bater, chuta de novo. Se a pessoa
+    // digitar algo igual a um valor real, o campo fica vermelho e so passa com
+    // "manter igual de proposito". Uma revisao no fim, com o aviso de risco.
+    // No arquivo final: linha fora do lote sai vazia nessas colunas - ou nem
+    // sai, se o recorte estiver ligado.
     // ===========================================================================
-    function manualAbrirEditor(colId) {
-        if (!FILE_REF) { alert("Carregue um arquivo primeiro."); return; }
-        MANUAL_EDITANDO = colId;
-        MANUAL_LINHAS_CARREGADAS = [];
+    const LIMITE_LINHAS_MANUAL = 50;
+
+    function selcEscAttr(s) {
+        return selcEsc(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function randCripto() {
+        return crypto.getRandomValues(new Uint32Array(1))[0] / 4294967296;
+    }
+
+    // Chuta, confere contra os reais e chuta de novo se bater. Se o campo for
+    // pequeno demais pra fugir de todos (ex.: 1 digito), devolve ok=false e a
+    // tela avisa - nunca fica girando pra sempre.
+    function chutarValor(tipoGerador, original, proibidos) {
+        if (String(original ?? '').trim() === '') return { valor: '', ok: true };
+        const fab = (FABRICAS[tipoGerador] || FABRICAS.GENERICO)(original);
+        let v = '';
+        for (let t = 0; t < 50; t++) {
+            v = fab(randCripto);
+            if (!proibidos.has(normalizar(v))) return { valor: v, ok: true };
+        }
+        return { valor: v, ok: false };
+    }
+
+    function tipoParaChute(colId) {
         const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
-        const nome = col ? col.nome : '';
-        const existente = EDICOES_MANUAIS.get(colId);
-        const qtdExistente = existente ? existente.size : 5;
-        const corpo = document.getElementById('manualCorpo');
-        const emFila = MANUAL_FILA_TOTAL > 0;
-        const posFila = MANUAL_FILA_TOTAL - MANUAL_FILA.length;
-        corpo.innerHTML =
-            (emFila ? `<div class="manual-fila-badge">Coluna ${posFila} de ${MANUAL_FILA_TOTAL} selecionadas · <button type="button" class="manual-fila-cancelar" onclick="manualCancelarFila()">cancelar fila</button></div>` : '') +
-            `<h3>✍️ Editar ${selcEsc(nome)} manualmente</h3>` +
-            `<div class="manual-aviso">⚠️ <strong>Risco assumido por você.</strong> O que estiver escrito aqui vai direto pro arquivo final, sem passar pelo anonimizador automático. Não digite CPF, nome, endereço ou qualquer outro dado real.</div>` +
-            `<label class="manual-qtd-label">Quantas linhas quer editar? (1 a 50)` +
-            `<input type="number" id="manualQtd" min="1" max="50" value="${Math.min(50, Math.max(1, qtdExistente))}"></label>` +
-            `<div class="filtro-val-rodape">` +
-            `<button type="button" class="selc-btn-mini" onclick="manualCarregarLinhas(${colId})">Carregar linhas do arquivo</button>` +
-            (emFila ? `<button type="button" class="selc-btn-mini" onclick="manualPularFila()">Pular esta coluna →</button>` : '') +
-            `</div>` +
-            `<div id="manualListaArea"></div>`;
-        document.getElementById('manualOverlay').classList.add('aberto');
+        const conf = TIPO_CONFIRMADO.get(colId);
+        if (conf) return { gerador: MAPA_TIPO_GERADOR[conf], rotulo: TIPOS_INFO[conf].rotulo, origem: 'confirmado' };
+        const det = TIPO_DETECTADO.get(colId);
+        if (det && det.tipo && det.nivel !== 'baixa') {
+            return { gerador: MAPA_TIPO_GERADOR[det.tipo], rotulo: TIPOS_INFO[det.tipo].rotulo, origem: 'detectado, ainda sem confirmar' };
+        }
+        const porNome = tipoSimulacao(col ? col.nome : '');
+        const rotulos = { NOME: 'Nome de pessoa', CPF: 'CPF', RG: 'RG', TEL: 'Telefone', NUMERO: 'Número de imóvel', CEP: 'CEP' };
+        if (rotulos[porNome]) return { gerador: porNome, rotulo: rotulos[porNome], origem: 'pelo nome da coluna' };
+        return { gerador: 'GENERICO', rotulo: 'mesmo formato do original', origem: 'sem tipo definido' };
     }
 
-    // Fila de edicao manual, iniciada pela barra preta de acao em massa.
-    // Cada coluna da fila passa pelo editor completo, uma de cada vez -
-    // a seguranca (revisar + checkbox de risco) nao muda, so o clique inicial.
-    function manualIniciarFila() {
-        if (!SELECIONADAS.size) return;
+    function manualOriginal(linha, colId) {
+        return MODO_ATUAL === 'TXT'
+            ? extrairCampoTxt(linha.bruta, colId)
+            : (linha.partes[colId] || '').replace(/^["']|["']$/g, '').trim();
+    }
+
+    function manualAbrirEditor(colId) { manualIniciarLote([colId]); }
+    function manualIniciarFila() { manualIniciarLote(Array.from(SELECIONADAS)); }
+
+    function manualIniciarLote(cols) {
         if (!FILE_REF) { alert("Carregue um arquivo primeiro."); return; }
-        MANUAL_FILA = Array.from(SELECIONADAS);
-        MANUAL_FILA_TOTAL = MANUAL_FILA.length;
-        manualProximoDaFila();
+        if (!cols.length) return;
+        if (MANUAL_LOTE && MANUAL_LOTE.etapa !== 'quantidade' && !confirm('Já tem uma edição manual aberta. Descartar e começar outra?')) return;
+        const ordem = COLUNAS_DETECTADAS.map(c => c.id);
+        cols = [...new Set(cols)].sort((a, b) => ordem.indexOf(a) - ordem.indexOf(b));
+        const existente = EDICOES_MANUAIS.get(cols[0]);
+        MANUAL_LOTE = {
+            cols, pos: 0, etapa: 'quantidade',
+            n: Math.min(LIMITE_LINHAS_MANUAL, (existente && existente.size) || 5),
+            recorte: cols.length > 1 || !!RECORTE_IDX,
+            linhas: [], rascunho: new Map(),
+        };
+        manualRenderLote();
     }
 
-    function manualProximoDaFila() {
-        if (!MANUAL_FILA.length) { MANUAL_FILA_TOTAL = 0; return; }
-        const colId = MANUAL_FILA.shift();
-        manualAbrirEditor(colId);
+    function manualLimparCartoes() {
+        document.querySelectorAll('#chipsContainer .manual-aberto').forEach(c => c.classList.remove('manual-aberto'));
+        document.querySelectorAll('#chipsContainer .manual-inline').forEach(e => e.remove());
+        const rev = document.getElementById('manualRevisaoLote');
+        if (rev) rev.remove();
     }
 
-    function manualAvancarFila() {
-        if (MANUAL_FILA.length > 0) manualProximoDaFila();
-        else { MANUAL_FILA_TOTAL = 0; manualFechar(); }
+    function manualRenderLote() {
+        manualLimparCartoes();
+        const grade = document.getElementById('chipsContainer');
+        if (!MANUAL_LOTE) { grade.classList.remove('manual-editando'); return; }
+        grade.classList.add('manual-editando');
+        if (MANUAL_LOTE.etapa === 'revisar') { manualRenderRevisao(); return; }
+        const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
+        const chip = document.getElementById(`chip-${colId}`);
+        if (!chip) return;
+        chip.classList.remove('oculto'); // a busca podia ter escondido
+        chip.classList.add('manual-aberto');
+        const box = document.createElement('div');
+        box.className = 'manual-inline';
+        box.onclick = (e) => e.stopPropagation();
+        box.innerHTML = MANUAL_LOTE.etapa === 'quantidade' ? manualHtmlQuantidade() : manualHtmlEditar(colId);
+        chip.appendChild(box);
+        if (MANUAL_LOTE.etapa === 'editar') MANUAL_LOTE.linhas.forEach((_, i) => manualAtualizarCampo(i));
+        chip.scrollIntoView({ block: 'nearest' });
     }
 
-    function manualPularFila() {
-        manualAvancarFila();
+    function manualHtmlNav() {
+        const L = MANUAL_LOTE, total = L.cols.length, ultima = L.pos === total - 1, editando = L.etapa === 'editar';
+        const avancar = !editando ? '<span></span>'
+            : `<button type="button" class="manual-mini manual-mini-forte" onclick="${ultima ? 'manualIrRevisao()' : `manualIrPara(${L.pos + 1})`}">${ultima ? 'Revisar o lote →' : 'Próxima →'}</button>`;
+        return `<div class="manual-nav">` +
+            `<button type="button" class="manual-mini" onclick="manualIrPara(${L.pos - 1})" ${L.pos === 0 || !editando ? 'disabled' : ''}>← Anterior</button>` +
+            `<span class="manual-nav-pos">✍️ Coluna ${L.pos + 1} de ${total}</span>` + avancar +
+            `</div>`;
     }
 
-    function manualCancelarFila() {
-        MANUAL_FILA = [];
-        MANUAL_FILA_TOTAL = 0;
-        manualFechar();
+    function manualHtmlQuantidade() {
+        const L = MANUAL_LOTE;
+        return manualHtmlNav() +
+            `<div class="manual-aviso">⚠️ <strong>Risco assumido por você.</strong> O que estiver nos campos vai direto pro arquivo final, sem passar pelo anonimizador automático. ` +
+            `Cada campo já vem com um valor inventado e conferido. Se você digitar um valor real, o campo fica vermelho.</div>` +
+            `<label class="manual-qtd-label">Quantas linhas? (1 a ${LIMITE_LINHAS_MANUAL})` +
+            `<input type="number" id="manualQtd" min="1" max="${LIMITE_LINHAS_MANUAL}" value="${L.n}"></label>` +
+            (L.cols.length > 1 ? `<p class="manual-ajuda">As mesmas linhas valem pras ${L.cols.length} colunas — cada linha vira um registro inteiro.</p>` : '') +
+            `<label class="manual-recorte"><input type="checkbox" id="manualRecorte" ${L.recorte ? 'checked' : ''}> Recortar o arquivo final: sai só com essas linhas</label>` +
+            `<div class="filtro-val-rodape">` +
+            `<button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualCarregarLote()">Carregar linhas e chutar valores</button>` +
+            `</div>`;
     }
 
-    async function manualCarregarLinhas(colId) {
-        const qtd = Math.min(50, Math.max(1, Number(document.getElementById('manualQtd').value) || 5));
-        const area = document.getElementById('manualListaArea');
-        area.innerHTML = '<p class="filtro-carregando">Lendo o arquivo…</p>';
-
+    async function manualCarregarLote() {
+        const L = MANUAL_LOTE;
+        if (!L) return;
+        L.n = Math.min(LIMITE_LINHAS_MANUAL, Math.max(1, Number(document.getElementById('manualQtd').value) || 5));
+        L.recorte = document.getElementById('manualRecorte').checked;
+        // Numeracao igual a do laco de processamento (linha substantiva, contando o
+        // cabecalho do CSV) - e assim que a edicao acha a mesma linha depois.
         const linhas = [];
         const reader = FILE_REF.stream().getReader();
         const decoder = new TextDecoder(CSV_ENCODING);
-        let buffer = "", numeroLinhaAbsoluto = -1;
+        let buffer = '', numero = -1;
+        const pega = (linha) => {
+            if (linha.length < 2) return false;
+            numero++;
+            if (MODO_ATUAL === 'CSV' && numero === 0) return false; // cabecalho
+            if (MODO_ATUAL === 'TXT' && !linhaPassaFiltros(linha)) return false;
+            linhas.push({ idx: numero, bruta: linha, partes: MODO_ATUAL === 'CSV' ? linha.split(CSV_DELIMITADOR) : null });
+            return linhas.length >= L.n;
+        };
         leitura: while (true) {
             const { done, value } = await reader.read();
             if (done) break;
             buffer += decoder.decode(value, { stream: true });
             const partes = buffer.split(/\r?\n/);
             buffer = partes.pop();
-            for (const linha of partes) {
-                if (linha.length < 2) continue;
-                numeroLinhaAbsoluto++;
-                if (MODO_ATUAL === 'TXT' && !linhaPassaFiltros(linha)) continue;
-                const original = MODO_ATUAL === 'TXT'
-                    ? extrairCampoTxt(linha, colId)
-                    : (linha.split(CSV_DELIMITADOR)[colId] || '').replace(/["']/g, '').trim();
-                linhas.push({ idx: numeroLinhaAbsoluto, original });
-                if (linhas.length >= qtd) break leitura;
-            }
+            for (const l of partes) if (pega(l)) break leitura;
         }
-        MANUAL_LINHAS_CARREGADAS = linhas;
-        manualRenderLista(colId);
+        reader.cancel().catch(() => {});
+        if (MANUAL_LOTE !== L) return;
+        if (!linhas.length) { alert('Nenhuma linha encontrada (arquivo vazio ou o filtro de linhas bloqueou tudo).'); return; }
+        L.linhas = linhas;
+        L.cols.forEach(colId => manualPrepararRascunho(colId));
+        L.etapa = 'editar';
+        L.pos = 0;
+        manualRenderLote();
     }
 
-    function manualRenderLista(colId, valoresOverride) {
+    function manualPrepararRascunho(colId) {
+        const L = MANUAL_LOTE;
+        const originais = L.linhas.map(l => manualOriginal(l, colId));
+        const proibidos = new Set(originais.filter(o => o.trim() !== '').map(normalizar));
         const existente = EDICOES_MANUAIS.get(colId);
-        const area = document.getElementById('manualListaArea');
-        if (!MANUAL_LINHAS_CARREGADAS.length) {
-            area.innerHTML = '<p class="filtro-carregando">Nenhuma linha encontrada (arquivo vazio ou filtro de linhas bloqueou tudo).</p>';
-            return;
-        }
-        const linhasHtml = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
-            const valorAtual = valoresOverride ? valoresOverride[i]
-                : (existente && existente.has(l.idx) ? existente.get(l.idx) : l.original);
-            const alterado = valorAtual !== l.original;
-            return `<input type="text" class="manual-linha-input${alterado ? ' manual-alterado' : ''}" id="manualInput${i}" ` +
-                `data-original="${selcEsc(l.original)}" value="${selcEsc(valorAtual)}" oninput="manualAtualizarCorCampo(this)">`;
-        }).join('');
-        const emFila = MANUAL_FILA_TOTAL > 0;
-        area.innerHTML =
-            `<div class="manual-lista">${linhasHtml}</div>` +
-            `<div class="filtro-val-rodape">` +
-            `<button type="button" class="selc-btn-mini" onclick="${emFila ? 'manualPularFila()' : 'manualFechar()'}">${emFila ? 'Pular esta coluna →' : 'Cancelar'}</button>` +
-            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualAbrirRevisao(${colId})">Revisar antes de aplicar</button>` +
-            `</div>`;
-    }
-
-    function manualAtualizarCorCampo(el) {
-        el.classList.toggle('manual-alterado', el.value !== el.dataset.original);
-    }
-
-    // Etapa de revisao: mostra como cada linha vai sair antes de aplicar de
-    // verdade. "Voltar e editar" preserva o que foi digitado (nao reseta).
-    function manualAbrirRevisao(colId) {
-        MANUAL_REVISAO_VALORES = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
-            const input = document.getElementById(`manualInput${i}`);
-            return input ? input.value : l.original;
+        const { gerador } = tipoParaChute(colId);
+        const r = { originais, valores: [], origem: [], proposital: [], chuteFalhou: [] };
+        L.linhas.forEach((l, i) => {
+            if (existente && existente.has(l.idx)) {
+                r.valores[i] = existente.get(l.idx); r.origem[i] = 'digitado'; r.chuteFalhou[i] = false;
+            } else {
+                const c = chutarValor(gerador, originais[i], proibidos);
+                r.valores[i] = c.valor; r.origem[i] = 'chute'; r.chuteFalhou[i] = !c.ok;
+            }
+            r.proposital[i] = false;
         });
-        manualRenderRevisao(colId);
+        L.rascunho.set(colId, r);
     }
 
-    function manualRenderRevisao(colId) {
-        const area = document.getElementById('manualListaArea');
-        let alteradas = 0;
-        const linhasHtml = MANUAL_LINHAS_CARREGADAS.map((l, i) => {
-            const valor = MANUAL_REVISAO_VALORES[i];
-            const mudou = valor !== l.original;
-            if (mudou) alteradas++;
-            const valorMostrado = valor === '' ? '<span class="manual-revisao-vazio">(vazio — sai em branco)</span>' : selcEsc(valor);
-            const legenda = mudou ? ('era: ' + selcEsc(l.original === '' ? '(vazio)' : l.original)) : 'sem alteração';
-            return `<div class="manual-revisao-linha${mudou ? '' : ' manual-revisao-igual'}">` +
-                `<div class="manual-revisao-valor">${valorMostrado}</div>` +
-                `<div class="manual-revisao-original">${legenda}</div>` +
-                `</div>`;
+    function manualHtmlEditar(colId) {
+        const L = MANUAL_LOTE, r = L.rascunho.get(colId), t = tipoParaChute(colId);
+        const campos = L.linhas.map((l, i) =>
+            `<div class="manual-campo">` +
+            `<span class="manual-n" title="Linha ${l.idx + 1} do arquivo">${i + 1}</span>` +
+            `<input type="text" class="manual-linha-input" id="manualInput-${i}" value="${selcEscAttr(r.valores[i])}" placeholder="(vazio — sai em branco)" oninput="manualDigitou(${i}, this.value)">` +
+            `<button type="button" class="manual-orig" title="Trazer o valor original pra escrever por cima" onclick="manualTrazerOriginal(${i})">↺</button>` +
+            `<div class="manual-alerta" id="manualAlerta-${i}"></div>` +
+            `</div>`).join('');
+        return manualHtmlNav() +
+            `<div class="manual-chute">🎲 Chute como <strong>${selcEsc(t.rotulo)}</strong> <span>(${t.origem})</span>` +
+            `<button type="button" class="manual-mini" onclick="manualChutarDeNovo()">Chutar de novo</button></div>` +
+            (t.origem !== 'confirmado' ? `<p class="manual-ajuda">Não é ${selcEsc(t.rotulo)}? Clique no selo do tipo, no alto deste cartão, e escolha o certo — o próximo chute já usa.</p>` : '') +
+            `<div class="manual-lista">${campos}</div>` +
+            `<div class="filtro-val-rodape"><button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button></div>`;
+    }
+
+    function manualRascunhoAtual() {
+        return MANUAL_LOTE.rascunho.get(MANUAL_LOTE.cols[MANUAL_LOTE.pos]);
+    }
+
+    function manualStatus(r, i) {
+        const v = String(r.valores[i] ?? '').trim();
+        if (v === '') return { tipo: 'vazio' };
+        const nv = normalizar(v);
+        if (r.originais[i].trim() !== '' && nv === normalizar(r.originais[i])) return { tipo: 'igual', mesma: true, linha: i + 1 };
+        const j = r.originais.findIndex((o, k) => k !== i && o.trim() !== '' && normalizar(o) === nv);
+        if (j >= 0) return { tipo: 'igual', mesma: false, linha: j + 1 };
+        return { tipo: 'ok' };
+    }
+
+    function manualAtualizarCampo(i) {
+        const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
+        const r = MANUAL_LOTE.rascunho.get(colId);
+        const input = document.getElementById(`manualInput-${i}`);
+        const alerta = document.getElementById(`manualAlerta-${i}`);
+        if (!input || !alerta) return;
+        const s = manualStatus(r, i);
+        input.classList.toggle('manual-alterado', s.tipo === 'ok');
+        input.classList.toggle('manual-colisao', s.tipo === 'igual' && !r.proposital[i]);
+        if (s.tipo === 'igual') {
+            alerta.innerHTML = `⚠ ${s.mesma ? 'Igual ao valor original desta linha' : `Igual ao valor original da linha ${s.linha}`} — é dado real. ` +
+                `<label><input type="checkbox" ${r.proposital[i] ? 'checked' : ''} onchange="manualProposital(${colId}, ${i}, this.checked)"> manter igual de propósito</label>`;
+            alerta.classList.add('visivel');
+        } else if (r.chuteFalhou[i]) {
+            alerta.innerHTML = '⚠ Não deu pra inventar um valor diferente de todos os reais (campo curto demais). Confira.';
+            alerta.classList.add('visivel');
+        } else {
+            alerta.innerHTML = '';
+            alerta.classList.remove('visivel');
+        }
+    }
+
+    function manualDigitou(i, v) {
+        const r = manualRascunhoAtual();
+        r.valores[i] = v; r.origem[i] = 'digitado'; r.proposital[i] = false; r.chuteFalhou[i] = false;
+        manualAtualizarCampo(i);
+    }
+
+    function manualTrazerOriginal(i) {
+        const r = manualRascunhoAtual();
+        r.valores[i] = r.originais[i]; r.origem[i] = 'original'; r.proposital[i] = false; r.chuteFalhou[i] = false;
+        const input = document.getElementById(`manualInput-${i}`);
+        if (input) { input.value = r.valores[i]; input.focus(); }
+        manualAtualizarCampo(i);
+    }
+
+    function manualProposital(colId, i, marcado) {
+        const r = MANUAL_LOTE && MANUAL_LOTE.rascunho.get(colId);
+        if (!r) return;
+        r.proposital[i] = marcado;
+        if (MANUAL_LOTE.etapa === 'editar') manualAtualizarCampo(i);
+        else manualAtualizarBotaoLote();
+    }
+
+    function manualChutarDeNovo() {
+        const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
+        const r = MANUAL_LOTE.rascunho.get(colId);
+        const proibidos = new Set(r.originais.filter(o => o.trim() !== '').map(normalizar));
+        const { gerador } = tipoParaChute(colId);
+        r.valores.forEach((_, i) => {
+            if (r.origem[i] === 'digitado') return; // o que a pessoa digitou fica
+            const c = chutarValor(gerador, r.originais[i], proibidos);
+            r.valores[i] = c.valor; r.origem[i] = 'chute'; r.proposital[i] = false; r.chuteFalhou[i] = !c.ok;
+        });
+        manualRenderLote();
+    }
+
+    function manualIrPara(pos) {
+        if (!MANUAL_LOTE || pos < 0 || pos >= MANUAL_LOTE.cols.length) return;
+        MANUAL_LOTE.pos = pos;
+        MANUAL_LOTE.etapa = 'editar';
+        manualRenderLote();
+    }
+
+    function manualIrRevisao() {
+        MANUAL_LOTE.etapa = 'revisar';
+        manualRenderLote();
+    }
+
+    function manualPendencias() {
+        const L = MANUAL_LOTE;
+        let n = 0;
+        L.cols.forEach(colId => {
+            const r = L.rascunho.get(colId);
+            L.linhas.forEach((_, i) => { if (manualStatus(r, i).tipo === 'igual' && !r.proposital[i]) n++; });
+        });
+        return n;
+    }
+
+    function manualRenderRevisao() {
+        const L = MANUAL_LOTE;
+        const blocos = L.cols.map((colId, pos) => {
+            const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+            const r = L.rascunho.get(colId);
+            let mudadas = 0, iguais = 0, vazias = 0;
+            const problemas = [];
+            L.linhas.forEach((_, i) => {
+                const s = manualStatus(r, i);
+                if (s.tipo === 'ok') mudadas++;
+                else if (s.tipo === 'vazio') vazias++;
+                else {
+                    iguais++;
+                    problemas.push(`<div class="manual-rev-problema">Linha ${i + 1}: <strong>${selcEsc(r.valores[i])}</strong> — igual ao original ${s.mesma ? 'desta linha' : `da linha ${s.linha}`}. ` +
+                        `<label><input type="checkbox" ${r.proposital[i] ? 'checked' : ''} onchange="manualProposital(${colId}, ${i}, this.checked)"> manter igual de propósito</label></div>`);
+                }
+            });
+            const amostra = r.valores.slice(0, 3).map(v => selcEsc(v === '' ? '(vazio)' : v)).join(' · ');
+            return `<div class="manual-rev-col">` +
+                `<div class="manual-rev-topo"><strong>${selcEsc(col ? col.nome : colId)}</strong>` +
+                `<span>${mudadas} inventada(s) ou mudada(s) · ${iguais} igual(is) a dado real · ${vazias} vazia(s)</span>` +
+                `<button type="button" class="manual-mini" onclick="manualIrPara(${pos})">Editar</button></div>` +
+                `<div class="manual-rev-amostra">${amostra}${L.linhas.length > 3 ? ' · …' : ''}</div>` +
+                problemas.join('') + `</div>`;
         }).join('');
-        const total = MANUAL_LINHAS_CARREGADAS.length;
-        const resumo = alteradas === total
-            ? `${total} de ${total} linha(s) alterada(s).`
-            : `${alteradas} de ${total} linha(s) alterada(s), ${total - alteradas} sem mudança.`;
-        area.innerHTML =
-            `<p class="manual-revisao-resumo">${resumo} Confere se é isso mesmo que você quer deixar.</p>` +
-            `<div class="manual-lista">${linhasHtml}</div>` +
-            `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotao()"> Entendi o risco: estou digitando o dado que vai pro arquivo final.</label>` +
+        const painel = document.createElement('div');
+        painel.id = 'manualRevisaoLote';
+        painel.onclick = (e) => e.stopPropagation();
+        painel.innerHTML =
+            `<div class="manual-nav"><button type="button" class="manual-mini" onclick="manualIrPara(${L.cols.length - 1})">← Voltar</button>` +
+            `<span class="manual-nav-pos">✍️ Revisar: ${L.cols.length} coluna(s) × ${L.linhas.length} linha(s)</span><span></span></div>` +
+            `<div class="manual-aviso">⚠️ <strong>Último passo antes de aplicar.</strong> O que está aqui vai pro arquivo final sem passar pelo anonimizador automático.</div>` +
+            blocos +
+            `<label class="manual-recorte"><input type="checkbox" id="manualRecorteRev" ${L.recorte ? 'checked' : ''} onchange="MANUAL_LOTE.recorte = this.checked"> Recortar o arquivo final: sai só com essas ${L.linhas.length} linha(s)</label>` +
+            `<p class="manual-pendencias" id="manualPendencias"></p>` +
+            `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotaoLote()"> Entendi o risco: estou mandando esses valores pro arquivo final.</label>` +
             `<div class="filtro-val-rodape">` +
-            `<button type="button" class="selc-btn-mini" onclick="manualVoltarEditar(${colId})">← Voltar e editar</button>` +
-            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmarRevisao(${colId})">Confirmar e aplicar</button>` +
+            `<button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmarLote()">Confirmar e aplicar</button>` +
             `</div>`;
+        document.getElementById('chipsContainer').prepend(painel);
+        manualAtualizarBotaoLote();
+        painel.scrollIntoView({ block: 'nearest' });
     }
 
-    function manualVoltarEditar(colId) {
-        manualRenderLista(colId, MANUAL_REVISAO_VALORES);
-    }
-
-    function manualAtualizarBotao() {
+    function manualAtualizarBotaoLote() {
+        const pend = manualPendencias();
+        const el = document.getElementById('manualPendencias');
+        if (el) el.textContent = pend ? `Falta decidir ${pend} linha(s) igual(is) a dado real: mude o valor ou marque "manter igual de propósito".` : '';
         const chk = document.getElementById('manualRiscoOk');
         const btn = document.getElementById('manualBtnAplicar');
-        if (btn) btn.disabled = !chk?.checked;
+        if (btn) btn.disabled = !(chk && chk.checked) || pend > 0;
     }
 
-    function manualConfirmarRevisao(colId) {
-        const mapa = new Map();
-        MANUAL_LINHAS_CARREGADAS.forEach((l, i) => mapa.set(l.idx, MANUAL_REVISAO_VALORES[i]));
-        EDICOES_MANUAIS.set(colId, mapa);
-        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
-        if (col) col.estado = 5;
-        const chip = document.getElementById(`chip-${colId}`);
-        if (chip && col) { atualizarVisualChip(chip, col.nome, 5); selcRenderAmostraTransformada(colId); }
-        manualAvancarFila();
+    function manualConfirmarLote() {
+        const L = MANUAL_LOTE;
+        if (!L || manualPendencias() > 0) return;
+        L.cols.forEach(colId => {
+            const r = L.rascunho.get(colId);
+            const mapa = new Map();
+            L.linhas.forEach((l, i) => mapa.set(l.idx, r.valores[i]));
+            EDICOES_MANUAIS.set(colId, mapa);
+            const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+            if (col) col.estado = 5;
+            const chip = document.getElementById(`chip-${colId}`);
+            if (chip && col) atualizarVisualChip(chip, col.nome, 5);
+        });
+        if (L.recorte) {
+            // soma com um recorte anterior: nao corta linha que outro lote ja editou
+            const novo = new Set(RECORTE_IDX || []);
+            L.linhas.forEach(l => novo.add(l.idx));
+            RECORTE_IDX = novo;
+        } else {
+            RECORTE_IDX = null;
+        }
+        log(`✍️ Edição manual aplicada: ${L.cols.length} coluna(s) × ${L.linhas.length} linha(s)${RECORTE_IDX ? ` · recorte ligado (${RECORTE_IDX.size} linha(s))` : ''}.`);
+        const cols = L.cols;
+        manualFecharLote();
+        cols.forEach(id => selcRenderAmostraTransformada(id));
+        recorteAtualizarAviso();
     }
 
-    function manualFechar() {
-        document.getElementById('manualOverlay').classList.remove('aberto');
-        MANUAL_EDITANDO = null;
-        MANUAL_LINHAS_CARREGADAS = [];
-        MANUAL_REVISAO_VALORES = [];
-        MANUAL_FILA = [];
-        MANUAL_FILA_TOTAL = 0;
+    function manualFecharLote() {
+        MANUAL_LOTE = null;
+        manualRenderLote();
+        selcFiltrar(); // devolve a busca ao que estava
+    }
+
+    function manualSairLote() {
+        if (MANUAL_LOTE && MANUAL_LOTE.etapa !== 'quantidade' && !confirm('Sair sem aplicar? O que você editou neste lote se perde.')) return;
+        manualFecharLote();
     }
 
     // ===========================================================================
@@ -2057,6 +2692,10 @@
         progressContainer.style.display = 'block';
 
         const relatorio = { inicio: inicioLote.toISOString(), arquivos: [], tecnicas: new Set() };
+        if (RECORTE_IDX) {
+            relatorio.tecnicas.add(`Recorte manual: arquivo final só com ${RECORTE_IDX.size} linha(s) escolhida(s)`);
+            log(`✂️ Recorte ligado: só ${RECORTE_IDX.size} linha(s) vão pro arquivo final.`);
+        }
         let arquivosProcessados = 0;
         const totalArquivos = fileInput.files.length;
 
@@ -2115,6 +2754,10 @@
                             linhasIgnoradas++;
                             continue;
                         }
+                        if (RECORTE_IDX && !RECORTE_IDX.has(numeroLinhaAbsoluto)) {
+                            linhasIgnoradas++;
+                            continue;
+                        }
 
                         let valoresOriginais = [];
                         if (MODO_ATUAL === "TXT") {
@@ -2144,9 +2787,10 @@
                                 valor = await formatarDubleMatricula(valor);
                                 relatorio.tecnicas.add("Dublê de matrícula (8 dígitos, único, ≠ original)");
                             } else if (item.estado === 4) {
-                                const tipo = tipoSimulacao(item.nome);
+                                const tipo = tipoGeradorDaColuna(item.colId, item.nome);
                                 if (tipo === "NOME") { valor = await gerarNomeSintetico(valor); relatorio.tecnicas.add("Nomes sintéticos"); }
                                 else if (tipo === "CPF") { valor = await gerarCpfSintetico(valor); relatorio.tecnicas.add("CPF sintético com DV válido"); }
+                                else if (tipo === "CNPJ") { valor = await valorSintetico("CNPJ", valor, FABRICAS.CNPJ(valor)); relatorio.tecnicas.add("CNPJ sintético com DV válido"); }
                                 else if (tipo === "RG") { valor = await gerarRgSintetico(valor); relatorio.tecnicas.add("RG sintético"); }
                                 else if (tipo === "TEL") { valor = await gerarTelefoneSintetico(valor); relatorio.tecnicas.add("Telefone sintético (DDD preservado)"); }
                                 else if (tipo === "ENDERECO" && MODO_ATUAL === "TXT") {
@@ -2163,25 +2807,21 @@
                                     relatorio.tecnicas.add("Swap de ruas dentro do bairro (derangement)");
                                 }
                                 else if (tipo === "NUMERO") {
-                                    const original = parseInt(String(valor).replace(/\D/g, ''), 10);
-                                    valor = await valorSintetico("NUM", valor + "|" + matriculaLinha, (rand) => {
-                                        let n;
-                                        do { n = 1 + Math.floor(rand() * 9998); } while (n === original);
-                                        // preserva paridade (lado da rua) quando o original é numérico
-                                        if (!isNaN(original) && (n % 2) !== (original % 2)) n = n === 9999 ? n - 1 : n + 1;
-                                        return String(n);
-                                    });
+                                    valor = await valorSintetico("NUM", valor + "|" + matriculaLinha, FABRICAS.NUMERO(valor));
                                     relatorio.tecnicas.add("Número de imóvel randomizado (trava ≠ original)");
                                 }
                                 else if (tipo === "CEP") {
-                                    valor = await valorSintetico("CEP", valor, (rand) => {
-                                        const digits = String(valor).replace(/\D/g, '');
-                                        const prefixo = digits.length >= 5 ? digits.substring(0, 5) : "88000";
-                                        let sufixo = String(Math.floor(rand() * 1000)).padStart(3, '0');
-                                        if (digits.length >= 8 && sufixo === digits.substring(5, 8)) sufixo = String((parseInt(sufixo) + 1) % 1000).padStart(3, '0');
-                                        return prefixo + sufixo;
-                                    });
+                                    valor = await valorSintetico("CEP", valor, FABRICAS.CEP(valor));
                                     relatorio.tecnicas.add("CEP: prefixo regional preservado, sufixo randomizado");
+                                }
+                                else if (tipo === "DATA") {
+                                    const iso = dataParaISO(valor);
+                                    if (iso && MODO_ATUAL === "TXT" && matriculaLinha) {
+                                        valor = deslocarData(iso, await deltaDiasDaMatricula(matriculaLinha));
+                                    } else if (valor) {
+                                        valor = await valorSintetico("DATA_GEN", valor, FABRICAS.DATA(valor));
+                                    }
+                                    relatorio.tecnicas.add("Data sintética (formato preservado, coerente por matrícula)");
                                 }
                                 else if (tipo === "LOTE" && MODO_ATUAL === "TXT") {
                                     const quadraKey = normalizar(extrairCampoTxt(item.linha, 15)) + "|" + normalizar(extrairCampoTxt(item.linha, 16));
@@ -2199,12 +2839,12 @@
                                         const delta = await deltaDiasDaMatricula(matriculaLinha);
                                         valor = deslocarData(valor, delta);
                                     } else {
-                                        valor = await valorSintetico("DATA_GEN", valor, (rand) => deslocarData(valor, Math.floor(rand() * 3651) - 1825));
+                                        valor = await valorSintetico("DATA_GEN", valor, FABRICAS.DATA(valor));
                                     }
                                     relatorio.tecnicas.add("Data sintética (formato preservado, coerente por matrícula)");
                                 }
                                 else {
-                                    valor = await valorSintetico("GENERICO", valor, fabricarGenericoFormatAware(valor));
+                                    valor = await valorSintetico("GENERICO", valor, FABRICAS.GENERICO(valor));
                                     relatorio.tecnicas.add("Simulação genérica (mesmo formato do original: tamanho, texto/número)");
                                 }
                             } else if (item.estado === 5) {

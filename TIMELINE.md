@@ -949,3 +949,79 @@ sintético, e NOME-CLIENTE continua usando o gerador de nomes dedicado.
 qualquer coluna, as 6 linhas de ajuda ao lado de cada bolinha (que
 ficaram pendentes por essa mesma lacuna) podem entrar — a frase do verde
 finalmente é verdade em qualquer coluna, não só nas 10 conhecidas.
+
+---
+
+## PARTE 27 — Detecção de tipo + edição manual em lote dentro dos cartões (2026-10-19, v4.11)
+
+O Rafa achou vaga a primeira proposta ("parece que tá fazendo coisa tão
+simples") e pediu base em conhecimento consolidado. Pesquisado antes de
+codar: Microsoft Presidio, Purview e Google DLP (reconhecedor = padrão +
+validação + palavra-chave), SDV do MIT (detecção é só ponto de partida,
+a pessoa confirma; gerar falso sem guardar o mapa de volta), visions /
+pandas-profiling (do tipo genérico ao mais específico), NIST FF1 (o
+padrão de "embaralhar mantendo formato" exige 1 milhão de combinações —
+campo de 3 dígitos é pequeno demais pra isso).
+
+**1. Fórmulas num lugar só (`FABRICAS`).** Os geradores de CPF, RG,
+telefone, nome, CEP e número estavam copiados em 3 lugares (processamento,
+prévia, edição manual). Viraram um objeto só; quem chama escolhe a fonte
+do acaso (sal do lote, sal da prévia ou `crypto` puro no chute manual).
+Entraram CNPJ (com a regra alfanumérica da Receita, em vigor desde
+jul/2026) e Data (AAAAMMDD, AAAA-MM-DD e DD/MM/AAAA; 31/02 não passa).
+CPF e CNPJ inventados agora mantêm a pontuação do original.
+
+**2. Reconhecedores de tipo.** Ao carregar o arquivo, até 2.000 linhas são
+lidas e cada coluna é testada contra 12 tipos (CPF, CNPJ, e-mail, data,
+telefone, CEP, matrícula, RG, valor, nome, código/categoria, número de
+imóvel). Nível na escala do Purview: alta / média / baixa — tipo com
+dígito verificador sozinho chega em média; com a palavra no nome da
+coluna, alta. CEP na faixa do Paraná (80000–87999) conta como prova.
+Coluna com menos de 5 valores não arrisca palpite. Cada cartão ganhou um
+selo ("CPF? · média"); clicar explica o porquê ("100% das 30 linhas
+passam no dígito verificador") e pergunta "É isso?" — sim, ou escolhe
+outro tipo. "Confirmar as N" confirma de uma vez os de confiança alta.
+
+**3. Tipo confirmado guia o Simular.** Uma coluna de nome qualquer que
+guarda CPF passa a receber CPF inventado com DV válido no arquivo inteiro.
+Endereço e lote continuam pelo nome (trocam por valor real do mesmo
+bairro/quadra, melhor que qualquer gerador) — o selo deles diz isso.
+
+**4. Edição manual em lote, dentro dos cartões (pedido do Rafa).** A caixa
+grande por cima da tela saiu. Selecionou colunas → bolinha índigo da barra
+preta → o cartão cresce ali mesmo na grade. "← Anterior / Próxima →"
+navega entre os cartões sem perder nada. As mesmas N linhas (1 a 50) valem
+pra todas as colunas — cada linha vira um registro inteiro.
+- Cada campo já nasce com um **chute** do tipo da coluna, **conferido**
+  contra todos os valores reais carregados: se bater, chuta de novo (até
+  50 vezes; se não der, avisa em vez de travar).
+- "↺" traz o original pra escrever por cima. "Chutar de novo" troca só o
+  que a pessoa não digitou.
+- Valor igual a um dado real (da mesma linha ou de outra) fica vermelho
+  com o aviso, e só passa marcando "manter igual de propósito".
+- **Uma revisão no fim do lote**: resumo por coluna, as linhas iguais a
+  dado real listadas, aviso de risco. Com pendência, não aplica.
+- **Recorte**: ligado por padrão quando são várias colunas — o arquivo
+  final sai só com as N linhas (aviso fixo nas opções avançadas, com
+  botão pra desligar). Soma com recorte anterior em vez de cortar linha
+  que outro lote já editou.
+- A barra preta some enquanto o lote está aberto (cobria os campos).
+
+**Teste:** 4 scripts Playwright fora do repo — prévia (15), simulação
+genérica (14), tipos (27: os 11 tipos detectados certo, inclusive o CPF
+escondido em COMPLEMENTO, e o arquivo final com CPF válido nessa coluna)
+e lote manual (35: navegar, voltar, chute ≠ todos os reais, aviso de
+igual, revisão bloqueando com pendência, arquivo final com 5 linhas e os
+valores exatamente como revisados). `patches/_testa_seletor.py` (24) e
+`_test_regressao_completa.py` (21), sem quebra. Aba Auditoria atualizada.
+
+**Achados fora do escopo (não mexidos, avisados ao Rafa):**
+- `MAPA_DELTA_DATA` não é limpo em `destruirSalEfemero()`: dois lotes na
+  mesma sessão reaproveitam o deslocamento de data por matrícula — quebra
+  a promessa "lotes diferentes não se cruzam" da aba Auditoria.
+- No modo CSV o cabeçalho é processado como se fosse linha de dado.
+- A última linha some se o arquivo não terminar com quebra de linha
+  (sobra no `buffer` e nunca é processada).
+
+**Versão v4.11:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
+`sw.js`, `version.json`, README, `package.json`.

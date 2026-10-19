@@ -7,7 +7,7 @@
 - **Dominio:** Gestao de Vistorias Tecnicas Operacionais (VTO) da Sanepar
 - **Norma Base:** IT OPE 1580 — Vistorias Tecnicas Operacionais em Ligacoes Prediais de Esgoto
 - **Repositorio:** `RafaMahlmann/Vto-segundo-c-rebro-` (GitHub)
-- **Versao Atual:** 4.10 (6 abas; Anonimizador LGPD embutido com filtro de linhas, previa ao vivo, edicao manual por coluna, fila de edicao manual em lote e Simular format-aware em todas as colunas; export sem dado pessoal)
+- **Versao Atual:** 4.11 (6 abas; Anonimizador LGPD embutido com filtro de linhas, previa ao vivo, deteccao de tipo por coluna, edicao manual em lote dentro dos cartoes e Simular format-aware em todas as colunas; export sem dado pessoal)
 
 > **ATENCAO, AGENTE DE IA:** antes de qualquer alteracao, leia o `AGENTS.md` desta pasta.
 > Ele define o protocolo de edicao cirurgica, as proibicoes e o mapa do `index.html`.
