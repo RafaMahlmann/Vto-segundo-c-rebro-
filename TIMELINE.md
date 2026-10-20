@@ -1338,3 +1338,53 @@ cobertos hoje por `_teste_lote_manual.py` e `_teste_manual_v2.py`.
 
 **Versão v4.17 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 34 — Visual do Anonimizador, entrega B (2026-10-20, v4.18)
+
+**Pedido do Rafa:** fazer a entrega B das propostas de visual (3, 4 e 5),
+os "momentos raros" — onde vale investir em capricho, pela régua de
+frequência de uso.
+
+**3. Revisão em quadradinhos.** Cada coluna ganha uma fileira com um
+quadradinho por linha, na cor do que ela é (como o gráfico de
+contribuições do GitHub): verde inventado, vermelho igual a dado real,
+laranja real de propósito, cinza vazio. As contas viraram selos ("3
+inventado(s)", "1 igual(is) a dado real"). Clicar num quadradinho abre a
+coluna já no campo daquela linha, que pisca de leve em amarelo (1,2 s).
+Marcar "manter igual de propósito" pinta o quadrado de laranja na hora.
+"Confirmar e aplicar" acende uma vez quando libera (240 ms).
+
+**4. Botão Processar vira a barra de progresso.** A barrinha separada
+embaixo saiu: o próprio botão enche da esquerda para a direita
+("Processando… 42%", "Processando 2 de 3… 70%") — é para ele que a
+pessoa está olhando. No fim, "✓ Pronto" verde por 1,6 s e volta.
+A caixa de pronto entra de leve (200 ms) e ganha selos de prova:
+"✓ N linha(s) processada(s)", "🔐 Sal destruído", "⬇️ Pasta Downloads"
+(ou a pasta escolhida). A caixa agora aparece **depois** do `finally`:
+o selo "Sal destruído" só é dito com o sal já destruído.
+
+**5. Área de soltar o arquivo.** "Choose Files / No file chosen" deu
+lugar a "📂 Arraste o TXT ou CSV para cá ou clique para escolher". O
+input nativo continua lá, invisível e cobrindo a área inteira — clicar
+abre a escolha e soltar o arquivo funciona sem código extra de arrastar.
+Arrastando por cima, a área acende (borda azul, `scale(1.01)`). Depois de
+escolher, um selo por arquivo: nome, tamanho e tipo ("TXT (colunas fixas
+do SGCG)").
+
+Tudo desliga com "reduzir movimento".
+
+**Teste:** `_teste_visual_b.py` (fora do repo), 25 verificações: área em
+português cobrindo o input, clique abre a escolha de arquivo, realce ao
+arrastar, selo do arquivo; quadradinhos e cores, laranja ao marcar,
+clique abre a linha com foco, botão acende; botão passa por
+"Processando… N%" até "✓ Pronto", selos de prova com o sal destruído de
+verdade, volta ao normal; reduzir movimento. As outras 9 suítes de fora
+e as 5 do repo passaram (inclusive as que esperam o `#fileInput`
+visível). **Não testado:** soltar um arquivo de verdade em cima da área
+(o navegador de teste não simula o arrastar nativo do sistema) — conferir
+no Edge.
+
+**Versão v4.18 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.

@@ -233,13 +233,53 @@
         .chip-exclude { background-color: #F2F2F7; color: #C7C7CC; border-color: transparent; text-decoration: line-through; }
         .chip:hover { transform: scale(1.02); }
 
-        .progress-wrapper {
-            margin-top: 25px; background-color: #F2F2F7; border-radius: 100px;
-            overflow: hidden; height: 10px; display: none;
+        /* --- botao Processar como barra de progresso (substitui a barrinha separada) --- */
+        #btnProcess { position: relative; isolation: isolate; overflow: hidden; }
+        #btnProcess::before {
+            content: ''; position: absolute; inset: 0; z-index: -1; background: rgba(255, 255, 255, 0.24);
+            transform-origin: left center; transform: scaleX(var(--progresso, 0)); transition: transform .25s ease-out;
         }
-        .progress-bar {
-            width: 0%; height: 100%; background: linear-gradient(90deg, var(--ios-blue), #5AC8FA);
-            border-radius: 100px; transition: width 0.4s ease;
+        #btnProcess.processando:disabled { background-color: var(--ios-blue); color: #fff; cursor: progress; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25); }
+        #btnProcess.pronto, #btnProcess.pronto:hover { background-color: #34C759; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.3); }
+        #btnProcess.pronto { animation: btnPronto .26s ease-out; }
+        @keyframes btnPronto { 0% { transform: scale(1); } 45% { transform: scale(1.015); } 100% { transform: scale(1); } }
+        /* caixa de pronto entra de leve, uma vez por lote */
+        .salvar-resultado.visivel { animation: resultadoEntra .2s ease-out; }
+        @keyframes resultadoEntra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+        .salvar-selos { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 8px; }
+        .salvar-selo {
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 999px;
+            background: #fff; border: 1px solid rgba(52, 199, 89, 0.4); color: #1A7340; font-size: 12.5px; font-weight: 600;
+        }
+        .salvar-resultado.aviso .salvar-selo { border-color: rgba(255, 149, 0, 0.45); color: #8A4B00; }
+
+        /* --- area de soltar o arquivo (o input nativo fica por cima, invisivel) --- */
+        .arquivo-zona {
+            position: relative; border: 2px dashed #C7C7CC; border-radius: 16px; background: #FAFAFC;
+            padding: 22px 20px; text-align: center; transition: border-color .15s ease-out, background-color .15s ease-out, transform .15s ease-out;
+        }
+        .arquivo-zona:hover, .arquivo-zona.arrastando { border-color: var(--ios-blue); background: #F2F8FD; }
+        .arquivo-zona.arrastando { transform: scale(1.01); }
+        .arquivo-zona:focus-within { border-color: var(--ios-blue); box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); }
+        .arquivo-zona input[type="file"] {
+            position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer;
+            padding: 0; margin: 0; border: none; z-index: 2;
+        }
+        .arquivo-zona-conteudo { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 14px; color: var(--text-primary); pointer-events: none; }
+        .arquivo-zona-icone { font-size: 26px; line-height: 1; }
+        .arquivo-zona-dica { font-size: 12px; color: var(--text-secondary); }
+        .arquivo-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 10px; pointer-events: none; }
+        .arquivo-chips:empty { display: none; }
+        .arquivo-chip {
+            display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1px solid var(--border-color);
+            border-radius: 10px; padding: 6px 12px; font-size: 13px; animation: arquivoChipEntra .18s ease-out both;
+        }
+        @keyframes arquivoChipEntra { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+
+        @media (prefers-reduced-motion: reduce) {
+            #btnProcess::before, .arquivo-zona { transition: none !important; }
+            #btnProcess.pronto, .salvar-resultado.visivel, .arquivo-chip { animation: none !important; }
+            .arquivo-zona.arrastando { transform: none !important; }
         }
 
         /* registro no mesmo mundo claro do resto (antes: terminal preto com texto verde) */
@@ -541,6 +581,38 @@
         .manual-rev-col { border-top: 1px solid #F2F2F7; padding: 10px 0; }
         .manual-rev-topo { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
         .manual-rev-topo span { color: var(--text-secondary); font-size: 12px; flex: 1; }
+        /* revisao num olhar: um quadradinho por linha, cor = o que ela e */
+        .manual-quads { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+        .manual-quad {
+            display: inline-block; width: 16px; height: 16px; border-radius: 4px; vertical-align: -3px;
+            border: none; padding: 0; margin: 0; box-shadow: none; cursor: pointer;
+        }
+        button.manual-quad { width: 16px; }
+        button.manual-quad:hover { transform: scale(1.2); box-shadow: none; }
+        .manual-quad.ok { background: #34C759; }
+        .manual-quad.real { background: #FF3B30; }
+        .manual-quad.proposital { background: #FF9500; }
+        .manual-quad.vazio { background: #D1D1D6; }
+        button.manual-quad.ok:hover { background: #2DB14F; }
+        button.manual-quad.real:hover { background: #E0352B; }
+        button.manual-quad.proposital:hover { background: #E68600; }
+        button.manual-quad.vazio:hover { background: #C7C7CC; }
+        .manual-quad-legenda .manual-quad { cursor: default; width: 12px; height: 12px; vertical-align: -1px; }
+        .manual-contas { display: inline-flex; gap: 6px; flex-wrap: wrap; flex: 1; }
+        .manual-rev-topo .manual-contas span, .manual-rev-topo .manual-quads { flex: none; }
+        .manual-conta { font-size: 12px; font-weight: 600; padding: 2px 9px; border-radius: 999px; }
+        .manual-conta.ok { background: #E8F9F0; color: #1A7340; }
+        .manual-conta.real { background: #FFF1F0; color: #B42318; }
+        .manual-conta.vazio { background: #F2F2F7; color: var(--text-secondary); }
+        /* "Confirmar e aplicar" acende quando libera; a linha aberta pelo quadradinho pisca de leve */
+        @keyframes manualAcende { 0% { transform: scale(.98); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        .manual-acendeu { animation: manualAcende .24s ease-out; }
+        @keyframes manualDestaque { from { background: #FFF6D6; } to { background: transparent; } }
+        .manual-campo.manual-destaque { animation: manualDestaque 1.2s ease-out; border-radius: 10px; }
+        @media (prefers-reduced-motion: reduce) {
+            .manual-acendeu, .manual-campo.manual-destaque { animation: none !important; }
+            button.manual-quad:hover { transform: none; }
+        }
         .manual-rev-amostra { font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .manual-rev-problema { color: #B42318; font-size: 12px; margin: 6px 0 0 12px; line-height: 1.5; }
         .manual-pendencias { color: #B42318; font-weight: 700; font-size: 13px; margin: 6px 0; }
@@ -676,9 +748,20 @@
         </div>
 
         <div class="control-group">
-            <label for="fileInput">1. Carregar Arquivos (TXT ou CSV)</label>
-            <input type="file" id="fileInput" accept=".txt, .csv" multiple onchange="analisarArquivoInicial()">
-            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">* Dica: Segure Ctrl para selecionar vários arquivos de uma vez.</div>
+            <label for="fileInput">1. Carregar arquivos (TXT ou CSV)</label>
+            <!-- O input nativo cobre a area inteira, invisivel: clicar abre a escolha e
+                 soltar o arquivo em cima funciona sem codigo extra de arrastar. -->
+            <div class="arquivo-zona" id="arquivoZona">
+                <input type="file" id="fileInput" accept=".txt, .csv" multiple onchange="analisarArquivoInicial()"
+                       ondragenter="arquivoArrastando(true)" ondragleave="arquivoArrastando(false)" ondrop="arquivoArrastando(false)"
+                       aria-describedby="arquivoZonaTexto">
+                <div class="arquivo-zona-conteudo" id="arquivoZonaTexto">
+                    <span class="arquivo-zona-icone">📂</span>
+                    <span><strong>Arraste o TXT ou CSV para cá</strong> ou clique para escolher</span>
+                    <span class="arquivo-zona-dica">Mais de um arquivo: segure Ctrl ao escolher.</span>
+                </div>
+                <div class="arquivo-chips" id="arquivoChips"></div>
+            </div>
         </div>
 
         <div class="column-manager" id="columnManager">
@@ -798,10 +881,6 @@
         <button id="btnProcess" disabled onclick="iniciarProcessamento()">Processar e Salvar Todos</button>
         <div class="salvar-resultado" id="salvarResultado" role="status"></div>
         <button id="btnCert" class="btn-cert" onclick="baixarCertificado()">📜 Salvar o certificado do lote</button>
-
-        <div class="progress-wrapper" id="progressContainer">
-            <div class="progress-bar" id="progressBar"></div>
-        </div>
 
         <div class="log-titulo">📋 Registro do que aconteceu</div>
         <div class="log-area" id="logConsole">
@@ -1644,8 +1723,42 @@
         }
     }
 
+    // Area de soltar: so o realce visual. Soltar o arquivo no input (que cobre a
+    // area, invisivel) e o proprio navegador que faz.
+    function arquivoArrastando(sim) {
+        const zona = document.getElementById('arquivoZona');
+        if (zona) zona.classList.toggle('arrastando', !!sim);
+    }
+
+    function tamanhoLegivel(bytes) {
+        if (bytes < 1024) return bytes + ' bytes';
+        if (bytes < 1048576) return Math.round(bytes / 1024).toLocaleString('pt-BR') + ' KB';
+        return (bytes / 1048576).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' MB';
+    }
+
+    // Depois de escolher: o nome, o tamanho e o tipo de cada arquivo, num selo.
+    function arquivoRenderChips() {
+        const zona = document.getElementById('arquivoZona');
+        const chips = document.getElementById('arquivoChips');
+        const texto = document.getElementById('arquivoZonaTexto');
+        if (!zona || !chips || !texto) return;
+        const arquivos = Array.from(document.getElementById('fileInput').files || []);
+        zona.classList.toggle('com-arquivo', arquivos.length > 0);
+        chips.innerHTML = arquivos.map(f => {
+            const n = f.name.toLowerCase();
+            const tipo = n.endsWith('.txt') ? 'TXT (colunas fixas do SGCG)' : n.endsWith('.csv') ? 'CSV' : 'formato desconhecido';
+            return `<span class="arquivo-chip">📄 <strong>${selcEsc(f.name)}</strong> · ${tamanhoLegivel(f.size)} · ${tipo}</span>`;
+        }).join('');
+        texto.innerHTML = arquivos.length
+            ? '<span class="arquivo-zona-dica">Para trocar, clique ou arraste outro arquivo para cá.</span>'
+            : '<span class="arquivo-zona-icone">📂</span><span><strong>Arraste o TXT ou CSV para cá</strong> ou clique para escolher</span>' +
+              '<span class="arquivo-zona-dica">Mais de um arquivo: segure Ctrl ao escolher.</span>';
+    }
+
     async function analisarArquivoInicial() {
         const fileInput = document.getElementById('fileInput');
+        arquivoArrastando(false);
+        arquivoRenderChips();
         if (!fileInput.files.length) return;
 
         FILE_REF = fileInput.files[0];
@@ -2666,7 +2779,11 @@
         if (!r) return;
         r.proposital[i] = marcado;
         if (MANUAL_LOTE.etapa === 'editar') manualAtualizarCampo(i);
-        else manualAtualizarBotaoLote();
+        else {
+            const q = document.getElementById(`manualQuad-${colId}-${i}`);
+            if (q) { q.classList.remove('real', 'proposital'); q.classList.add(manualClasseQuadro(r, i)); }
+            manualAtualizarBotaoLote();
+        }
     }
 
     // Novos chutes nas linhas escolhidas (todas, se nao disser), coerentes entre si.
@@ -2777,9 +2894,20 @@
                 }
             });
             const amostra = r.valores.slice(0, 3).map(v => selcEsc(v === '' ? '(vazio)' : v)).join(' · ');
+            // Um quadradinho por linha, na cor do que ela e (como o grafico de
+            // contribuicoes do GitHub): da para ver o lote inteiro num olhar.
+            const quadros = L.linhas.map((_, i) => {
+                const classe = manualClasseQuadro(r, i);
+                return `<button type="button" class="manual-quad ${classe}" id="manualQuad-${colId}-${i}" ` +
+                    `title="Linha ${i + 1}: ${selcEscAttr(r.valores[i] === '' ? '(vazio)' : r.valores[i])} — ${MANUAL_QUAD_ROTULO[classe]}. Clique para abrir." ` +
+                    `aria-label="Linha ${i + 1}: ${MANUAL_QUAD_ROTULO[classe]}" onclick="manualAbrirLinha(${pos}, ${i})"></button>`;
+            }).join('');
+            const contas = `<span class="manual-conta ok">${mudadas} inventado(s)</span>` +
+                (iguais ? `<span class="manual-conta real">${iguais} igual(is) a dado real</span>` : '') +
+                (vazias ? `<span class="manual-conta vazio">${vazias} vazio(s)</span>` : '');
             return `<div class="manual-rev-col">` +
                 `<div class="manual-rev-topo"><strong>${selcEsc(col ? col.nome : colId)}</strong>` +
-                `<span>${mudadas} inventada(s) ou mudada(s) · ${iguais} igual(is) a dado real · ${vazias} vazia(s)</span>` +
+                `<span class="manual-quads">${quadros}</span><span class="manual-contas">${contas}</span>` +
                 `<button type="button" class="manual-mini" onclick="manualIrPara(${pos})">Editar</button></div>` +
                 `<div class="manual-rev-amostra">${amostra}${L.linhas.length > 3 ? ' · …' : ''}</div>` +
                 problemas.join('') + `</div>`;
@@ -2794,6 +2922,8 @@
             `<p class="manual-rotulo">Revisar: ${L.cols.length} coluna(s) × ${L.linhas.length} linha(s)</p>` +
             `<div class="manual-aviso">⚠️ <strong>Último passo antes de aplicar.</strong> O que está aqui vai pro arquivo final sem passar pelo anonimizador automático.</div>` +
             blocos +
+            `<p class="manual-ajuda manual-quad-legenda">Cada quadrado é uma linha: <span class="manual-quad ok"></span> inventado · <span class="manual-quad real"></span> igual a dado real · ` +
+            `<span class="manual-quad proposital"></span> real de propósito · <span class="manual-quad vazio"></span> vazio. Clique num quadrado para abrir a linha.</p>` +
             `<label class="manual-recorte"><input type="checkbox" id="manualRecorteRev" ${L.recorte ? 'checked' : ''} onchange="MANUAL_LOTE.recorte = this.checked"> Recortar o arquivo final: sai só com essas ${L.linhas.length} linha(s)</label>` +
             `<p class="manual-pendencias" id="manualPendencias"></p>` +
             `<label class="manual-risco-check"><input type="checkbox" id="manualRiscoOk" onchange="manualAtualizarBotaoLote()"> Entendi o risco: estou mandando esses valores pro arquivo final.</label>` +
@@ -2812,7 +2942,33 @@
         if (el) el.textContent = pend ? `Falta decidir ${pend} linha(s) igual(is) a dado real: mude o valor ou marque "manter igual de propósito".` : '';
         const chk = document.getElementById('manualRiscoOk');
         const btn = document.getElementById('manualBtnAplicar');
-        if (btn) btn.disabled = !(chk && chk.checked) || pend > 0;
+        if (!btn) return;
+        const estava = btn.disabled;
+        btn.disabled = !(chk && chk.checked) || pend > 0;
+        // Liberou agora: o botao "acende" uma vez (momento raro, vale o capricho).
+        if (estava && !btn.disabled) {
+            btn.classList.remove('manual-acendeu'); void btn.offsetWidth; btn.classList.add('manual-acendeu');
+        }
+    }
+
+    const MANUAL_QUAD_ROTULO = { ok: 'inventado ou mudado', vazio: 'vazio', proposital: 'igual a dado real, de propósito', real: 'igual a dado real' };
+
+    function manualClasseQuadro(r, i) {
+        const s = manualStatus(r, i);
+        if (s.tipo === 'ok') return 'ok';
+        if (s.tipo === 'vazio') return 'vazio';
+        return r.proposital[i] ? 'proposital' : 'real';
+    }
+
+    // Quadradinho da revisao -> abre a coluna ja no campo daquela linha.
+    function manualAbrirLinha(pos, i) {
+        manualIrPara(pos);
+        const campo = document.getElementById(`manualInput-${i}`);
+        if (!campo) return;
+        campo.focus();
+        campo.scrollIntoView({ block: 'center' });
+        const linha = campo.closest('.manual-campo');
+        if (linha) { linha.classList.remove('manual-destaque'); void linha.offsetWidth; linha.classList.add('manual-destaque'); }
     }
 
     function manualConfirmarLote() {
@@ -3218,7 +3374,13 @@
         }
         const s = info.salvos;
         const pasta = s.length && s[0].pasta;
+        // Selos de prova: o que foi feito, em poucas palavras. "Sal destruido" so
+        // aparece se o sal ja nao existe mesmo.
+        const selos = (info.linhas !== undefined ? `<span class="salvar-selo">✓ ${info.linhas} linha(s) processada(s)</span>` : '')
+            + (SALT_HEX === null ? '<span class="salvar-selo">🔐 Sal destruído</span>' : '')
+            + `<span class="salvar-selo">${pasta ? '📁 ' + selcEsc(pasta) : '⬇️ Pasta Downloads'}</span>`;
         caixa.innerHTML = `<h4>✓ Pronto: ${s.length === 1 ? '1 arquivo salvo' : s.length + ' arquivos salvos'}</h4>`
+            + `<div class="salvar-selos">${selos}</div>`
             + '<ul>' + s.map(a => '<li><code>' + selcEsc(a.nome) + '</code></li>').join('') + '</ul>'
             + '<strong>Onde está:</strong> ' + (pasta
                 ? 'na pasta <strong>' + selcEsc(pasta) + '</strong>.'
@@ -3233,8 +3395,6 @@
             return;
         }
         const btn = document.getElementById('btnProcess');
-        const progressBar = document.getElementById('progressBar');
-        const progressContainer = document.getElementById('progressContainer');
         const inputNomeSaida = document.getElementById('outputFileName');
         const fileInput = document.getElementById('fileInput');
         const saveMode = document.querySelector('input[name="saveMode"]:checked').value;
@@ -3310,7 +3470,7 @@
         log("🔐 Sal efêmero de 128 bits gerado (vive só na memória deste lote).");
 
         btn.disabled = true;
-        progressContainer.style.display = 'block';
+        processoProgresso(0, fileInput.files.length, 0);
 
         const relatorio = { inicio: inicioLote.toISOString(), arquivos: [], tecnicas: new Set() };
         if (RECORTE_IDX) {
@@ -3320,6 +3480,7 @@
         let arquivosProcessados = 0;
         const totalArquivos = fileInput.files.length;
         const salvos = [];
+        let resultado = null;
 
         try {
             for (let i = 0; i < totalArquivos; i++) {
@@ -3330,7 +3491,7 @@
                 const nomeFinal = nomeSaidaDe(currentFile.name, sufixoNome);
 
                 log(`[${i + 1}/${totalArquivos}] Processando: ${currentFile.name}...`);
-                progressBar.style.width = '0%';
+                processoProgresso(i, totalArquivos, 0);
 
                 // PASSADA 1 (só TXT): coletar pools para swap geo-coerente
                 if (MODO_ATUAL === "TXT") {
@@ -3506,7 +3667,7 @@
                     }
 
                     let percent = Math.round((bytesLidos / currentFile.size) * 100);
-                    progressBar.style.width = percent + "%";
+                    processoProgresso(i, totalArquivos, percent);
                     await new Promise(r => setTimeout(r, 0));
                     if (done) break;
                 }
@@ -3555,15 +3716,45 @@
             relatorio.fim = new Date().toISOString();
             CERTIFICADO = relatorio;
             CERTIFICADO_PASTA = dirHandle;
-            document.getElementById('btnCert').style.display = 'block';
-            salvarMostrarResultado({ salvos: salvos });
+            resultado = { salvos: salvos, linhas: relatorio.arquivos.reduce((s, a) => s + a.linhas, 0) };
 
             log(`🏁 Processo Finalizado. ${arquivosProcessados}/${totalArquivos} arquivos gerados.`);
             log("🔐 Sal efêmero DESTRUÍDO. Nenhuma chave/tabela de reversão foi gravada.");
         } finally {
             destruirSalEfemero(); // sal morre aqui, sempre
             btn.disabled = false;
+            processoFim(!!resultado);
         }
+        // A caixa de pronto aparece so depois do finally: o selo "Sal destruido"
+        // e dito com o sal ja destruido, nao antes.
+        document.getElementById('btnCert').style.display = 'block';
+        salvarMostrarResultado(resultado);
+    }
+
+    // O botao Processar vira a propria barra de progresso: e para ele que a
+    // pessoa esta olhando nessa hora. Antes era uma barrinha separada embaixo.
+    const TEXTO_BTN_PROCESSAR = 'Processar e Salvar Todos';
+    let PROCESSO_TIMER = null;
+
+    function processoProgresso(i, total, percentArquivo) {
+        const btn = document.getElementById('btnProcess');
+        const geral = Math.min(100, Math.round(((i + percentArquivo / 100) / Math.max(total, 1)) * 100));
+        clearTimeout(PROCESSO_TIMER);
+        btn.classList.remove('pronto');
+        btn.classList.add('processando');
+        btn.style.setProperty('--progresso', String(geral / 100));
+        btn.textContent = `Processando${total > 1 ? ` ${i + 1} de ${total}` : ''}… ${geral}%`;
+    }
+
+    function processoFim(ok) {
+        const btn = document.getElementById('btnProcess');
+        btn.classList.remove('processando');
+        btn.style.removeProperty('--progresso');
+        clearTimeout(PROCESSO_TIMER);
+        if (!ok) { btn.textContent = TEXTO_BTN_PROCESSAR; return; }
+        btn.classList.add('pronto');
+        btn.textContent = '✓ Pronto';
+        PROCESSO_TIMER = setTimeout(() => { btn.classList.remove('pronto'); btn.textContent = TEXTO_BTN_PROCESSAR; }, 1600);
     }
 
     // ===========================================================================
