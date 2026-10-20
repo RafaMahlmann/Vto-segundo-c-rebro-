@@ -1440,3 +1440,61 @@ fora e as 5 do repo passaram.
 
 **Versão v4.19 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 36 — Fase 1: rua que vazava, Dublê que juntava texto, tamanhos e "Anterior" (2026-10-20, v4.20)
+
+**Pedido do Rafa:** na edição manual, o "Anterior" ficava cinza com o
+símbolo de proibido; e o chute/Dublê precisa respeitar o formato de cada
+coluna (contar os caracteres e manter, telefone, data, e-mail, ruas de
+verdade embaralhadas...). Medi tudo com os exemplos dele e propus 4
+fases; ele aprovou a fase 1 (correções).
+
+**Achados graves da medição (corrigidos):**
+- **Rua real vazando no Simular.** O `derangement` garante outra CASA,
+  não outra RUA: casas do mesmo bairro na mesma rua recebiam a própria
+  rua de volta. No teste, 56 de 80 linhas. Bairro com uma casa só caía
+  num hash de 32 caracteres. Agora `trocaDiferente` anda no pool até
+  achar um valor diferente; sem rua diferente no bairro, vem uma rua
+  real de outro bairro do arquivo (`POOL.ruasTodas`).
+- **Lote real vazando.** Apartamentos do mesmo prédio repetem o lote: 10
+  de 80 linhas saíam com o lote real. Mesmo `trocaDiferente`; sem outro
+  lote na quadra, lote inventado.
+- **Dublê juntando texto.** `formatarDubleMatricula` só lê dígitos: todo
+  texto virava UM número só (nomes, e-mails, endereços → "30829805").
+  Agora `colunaEhMatricula` (tipo confirmado → detectado → nome)
+  decide: matrícula continua 8 dígitos; o resto usa o gerador do tipo
+  (`fabricaPorTipo`, o mesmo do Simular): nome vira nome, CPF vira CPF
+  válido, número mantém o tamanho, rua vira outra rua real do arquivo
+  (só no TXT — no CSV não há coleta de ruas). Prévia dos cartões igual.
+
+**Tamanhos (geradores `FABRICAS`):**
+- `NUMERO`: mesma quantidade de caracteres, zeros da esquerda ficam,
+  par/ímpar (lado da rua) mantido. "00087" → "00055"; "12345" → "54259".
+- `RG`: mesmo tamanho e máscara ("12.345.678-X" → "54.258.744-X").
+- `TEL`: fixo continua fixo (8 dígitos, começa de 2 a 5), celular
+  continua celular; DDD, 55 e máscara "(41) 3333-4444" ficam.
+
+**"Anterior" cinza:** acontecia com a ficha aberta pela bolinha índigo
+de um cartão sozinho (lote de uma coluna). Agora, com uma edição aberta,
+a bolinha índigo de outro cartão **junta** a coluna na mesma edição
+(`manualJuntarColuna`) e já abre nela; o "Anterior" volta para a de antes
+com o que foi digitado. Lote de uma coluna mostra a frase de como juntar,
+em vez de um botão cinza mudo.
+
+**Textos:** legenda "🆔 Dublê (mesmo tipo e tamanho)" com dica nova;
+aba Auditoria: linha "Rua, lote e Dublê sem vazamento".
+
+**Teste:** `_teste_fase1.py` (fora do repo), 28 verificações, rodado na
+v4.19 (21 falhas: rua 56/80, lote 10/80, Dublê colapsando, tamanhos,
+"Anterior") e na v4.20 (28/28). As outras 11 suítes de fora e as 5 do
+repo passaram.
+
+**Próximas fases propostas:** 2 — Desfazer/Refazer (Ctrl+Z); 3 — chute
+e Dublê inteligentes (biblioteca de ~1.000 nomes e sobrenomes, palavras
+de estrutura em textos, e-mail com domínio reservado, datas sem futuro);
+4 — Raio-X da coluna.
+
+**Versão v4.20 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.

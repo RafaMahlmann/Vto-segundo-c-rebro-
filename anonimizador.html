@@ -543,6 +543,7 @@
         .manual-inline { color: var(--text-primary); font-size: 13px; font-weight: 400; white-space: normal; margin-top: 6px; }
         .manual-nav { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
         .manual-nav-pos { font-size: 12px; font-weight: 700; color: #5856D6; }
+        .manual-nav-dica { font-size: 12px; color: var(--text-secondary); max-width: 60%; line-height: 1.4; }
         .manual-mini {
             width: auto; margin: 0; padding: 7px 12px; font-size: 12px; font-weight: 700; border-radius: 10px;
             box-shadow: none; background: #F2F2F7; color: var(--text-primary);
@@ -838,8 +839,8 @@
                 <div class="legend-item"><span class="dot" style="background:#AF52DE"></span> 👻 Anonimizar (hash irreversível)</div>
                 <div class="legend-item" style="display:flex; align-items:center;">
                     <span class="dot" style="background:#FF9500"></span>
-                    🆔 Dublê (8 Dígitos)
-                    <span class="help-icon" data-tooltip="Dublê v19: cada matrícula vira um número de 8 dígitos derivado do sal efêmero do lote.&#10;Garantias: único no lote, nunca igual ao original, zeros à esquerda preservados.&#10;Irreversível: o sal é destruído ao final — ninguém refaz o caminho.">?</span>
+                    🆔 Dublê (mesmo tipo e tamanho)
+                    <span class="help-icon" data-tooltip="Dublê: troca cada valor por um falso do mesmo tipo e tamanho. Nome vira nome, CPF vira CPF válido, código de 4 dígitos vira outro de 4, rua vira outra rua real do arquivo.&#10;O mesmo valor sempre vira o mesmo dublê, e nunca o original.&#10;Na matrícula: 8 dígitos, único no lote.&#10;Irreversível: o sal é destruído ao final — ninguém refaz o caminho.">?</span>
                 </div>
                 <div class="legend-item" style="display:flex; align-items:center;">
                     <span class="dot" style="background:#34C759"></span>
@@ -868,7 +869,7 @@
                 <span class="selc-barra-n" id="selcBarraN">0 colunas selecionadas</span>
                 <button class="selc-bol-grande" data-estado="1" title="Manter original" onclick="selcAplicarEmMassa(1)"></button>
                 <button class="selc-bol-grande" data-estado="2" title="👻 Anonimizar (hash irreversível)" onclick="selcAplicarEmMassa(2)"></button>
-                <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
+                <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (mesmo tipo e tamanho; matrícula: 8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
                 <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT)" onclick="selcAplicarEmMassa(4)"></button>
                 <button class="selc-bol-grande" data-estado="0" title="Excluir" onclick="selcAplicarEmMassa(0)"></button>
                 <button class="selc-bol-grande" data-estado="5" title="✍️ Manual: editar as colunas selecionadas, de cartão em cartão" onclick="manualIniciarFila()"></button>
@@ -982,6 +983,7 @@
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original e a data e a hora em que foi salvo (a pessoa pode trocar); numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 45 verificações com TXT e CSV.</li>
                 <li><strong>Edição manual com memória (20/10):</strong> o valor de hoje aparece em cinza embaixo de cada campo; o mesmo original recebe sempre o mesmo chute; o destino da coluna muda dentro do cartão. A memória das escolhas guarda só nome de coluna e escolha: o arquivo de memória salvo foi conferido e não tem nenhum valor do arquivo de teste. Valor fixo igual a dado real não entra na memória, e uma memória com nome de coluna malicioso aparece como texto, sem executar. 47 verificações.</li>
+                <li><strong>Rua, lote e Dublê sem vazamento (20/10):</strong> a troca de rua devolvia a rua real quando várias casas do bairro ficam na mesma rua (56 de 80 linhas no teste), e apartamentos com o mesmo lote saíam com o lote real (10 de 80). Agora a troca nunca devolve o mesmo valor: sem outra rua no bairro, vem uma rua real de outro bairro do arquivo. O Dublê juntava todo texto num número só (nomes, e-mails e endereços viravam o mesmo número); agora só a matrícula vira 8 dígitos, e o resto vira um falso do mesmo tipo e tamanho. 28 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
         </div>
@@ -1228,18 +1230,29 @@
             const [d1, d2] = dvCnpj(base);
             return aplicarMascaraDoOriginal(original, base.join("") + d1 + d2);
         },
-        RG: () => (rand) => {
-            let s = "";
-            for (let i = 0; i < 9; i++) s += Math.floor(rand() * 10);
-            return s;
+        // RG com o mesmo tamanho do original (antes saia sempre com 9 digitos).
+        // Digito vira digito; a letra do fim (X) e a pontuacao ficam.
+        RG: (original) => {
+            const o = String(original ?? '');
+            if (!/\d/.test(o)) return fabricarGenericoFormatAware(original);
+            return (rand) => o.split('').map(ch => /\d/.test(ch) ? String(Math.floor(rand() * 10)) : ch).join('');
         },
+        // Telefone com o mesmo tamanho e o mesmo tipo: fixo continua fixo (8
+        // digitos, comeca de 2 a 5), celular continua celular (9, comeca com 9).
+        // DDD e o 55 do pais ficam. Antes todo telefone virava celular com DDD.
         TEL: (original) => {
-            const m = String(original).match(/\b(\d{2})\D*\d{4,5}/);
-            const ddd = m ? m[1] : "47";
+            const o = String(original ?? '');
+            let resto = o.replace(/\D/g, '');
+            if (!resto) return fabricarGenericoFormatAware(original);
+            let prefixo = '';
+            if (resto.length >= 12 && resto.startsWith('55')) { prefixo = '55'; resto = resto.slice(2); }
+            if (resto.length >= 10) { prefixo += resto.slice(0, 2); resto = resto.slice(2); }
+            const tamanho = resto.length;
+            const celular = tamanho === 9;
             return (rand) => {
-                let n = "9";
-                for (let i = 0; i < 8; i++) n += Math.floor(rand() * 10);
-                return ddd + n;
+                let n = celular ? '9' : tamanho === 8 ? String(2 + Math.floor(rand() * 4)) : '';
+                while (n.length < tamanho) n += Math.floor(rand() * 10);
+                return aplicarMascaraDoOriginal(o, prefixo + n);
             };
         },
         NOME: () => (rand) => {
@@ -1255,14 +1268,21 @@
             if (digits.length >= 8 && sufixo === digits.substring(5, 8)) sufixo = String((parseInt(sufixo) + 1) % 1000).padStart(3, '0');
             return prefixo + sufixo;
         },
+        // Mesma quantidade de caracteres do original (antes "00087" virava "3355"
+        // e "12345" virava "181"): zeros da esquerda ficam, o resto e sorteado e o
+        // lado da rua (par/impar) se mantem. Com letra (12A, S/N): mesmo formato.
         NUMERO: (original) => {
-            const orig = parseInt(String(original).replace(/\D/g, ''), 10);
+            const o = String(original ?? '').trim();
+            if (!/^\d+$/.test(o)) return fabricarGenericoFormatAware(original);
+            const zeros = o.match(/^0*/)[0].length;
+            const sig = Math.max(1, o.length - zeros); // digitos que contam
+            const par = Number(o[o.length - 1]) % 2;
             return (rand) => {
-                let n;
-                do { n = 1 + Math.floor(rand() * 9998); } while (n === orig);
-                // preserva paridade (lado da rua) quando o original é numérico
-                if (!isNaN(orig) && (n % 2) !== (orig % 2)) n = n === 9999 ? n - 1 : n + 1;
-                return String(n);
+                let n = '';
+                for (let i = 0; i < sig; i++) n += i === 0 ? String(1 + Math.floor(rand() * 9)) : String(Math.floor(rand() * 10));
+                let ult = Number(n[n.length - 1]);
+                if (ult % 2 !== par) ult = ult === 9 ? 8 : ult + 1;
+                return '0'.repeat(o.length - sig) + n.slice(0, -1) + ult;
             };
         },
         DATA: (original) => {
@@ -1360,7 +1380,14 @@
         if (estado === 0) return null; // excluída: nao sai no arquivo final
         if (!valor) return valor;
         if (estado === 2) return previaHash(valor);
-        if (estado === 3) return previaDuble(valor);
+        if (estado === 3) {
+            // mesma regra do processamento: 8 digitos so na matricula; o resto pelo tipo
+            if (colunaEhMatricula(colId, nome)) return previaDuble(valor);
+            const tipo = tipoGeradorDaColuna(colId, nome);
+            if (tipo === "ENDERECO") return "⏳ depende do arquivo inteiro — ver após processar";
+            const [chave, fab] = fabricaPorTipo(tipo, valor);
+            return previaValorSintetico(chave, valor, fab);
+        }
         if (estado === 4) {
             const tipo = tipoGeradorDaColuna(colId, nome);
             if (tipo === "ENDERECO" || tipo === "LOTE") return "⏳ depende do arquivo inteiro — ver após processar";
@@ -1647,6 +1674,41 @@
         const conf = colId !== undefined ? TIPO_CONFIRMADO.get(colId) : undefined;
         if (conf) return MAPA_TIPO_GERADOR[conf];
         return tipoSimulacao(nome || '');
+    }
+
+    // O dublê de 8 digitos e so para matricula. Vale o tipo confirmado, depois o
+    // detectado (media ou alta) e, sem nenhum dos dois, o nome da coluna.
+    function colunaEhMatricula(colId, nome) {
+        const conf = TIPO_CONFIRMADO.get(colId);
+        if (conf) return conf === 'MATRICULA';
+        const det = TIPO_DETECTADO.get(colId);
+        if (det && det.tipo && det.nivel !== 'baixa') return det.tipo === 'MATRICULA';
+        return String(nome || '').toUpperCase().includes('MATRIC');
+    }
+
+    // Qual gerador e qual chave de consistencia usar para um tipo de coluna.
+    // Mesma escolha no processamento real e na previa.
+    function fabricaPorTipo(tipo, valor) {
+        if (tipo === 'NUMERO') return ['NUM', FABRICAS.NUMERO(valor)];
+        if (tipo === 'DATA') return ['DATA_GEN', FABRICAS.DATA(valor)];
+        if (FABRICAS[tipo] && tipo !== 'GENERICO') return [tipo, FABRICAS[tipo](valor)];
+        if (pareceDataBruta(valor)) return ['DATA_GEN', FABRICAS.DATA(valor)];
+        return ['GENERICO', FABRICAS.GENERICO(valor)];
+    }
+
+    // Troca que nunca devolve o mesmo valor: comeca no sorteado e, se ele for
+    // igual ao original, anda no pool ate achar um diferente. Sem nenhum
+    // diferente, devolve null (quem chama decide o plano B).
+    // Por que: num bairro, varias casas ficam na MESMA rua. Trocar a rua de uma
+    // casa pela de outra casa do bairro devolvia, muitas vezes, a propria rua.
+    function trocaDiferente(pool, inicio, original) {
+        if (!pool || !pool.length) return null;
+        const alvo = normalizar(original);
+        for (let k = 0; k < pool.length; k++) {
+            const v = pool[(inicio + k) % pool.length];
+            if (v && normalizar(v) !== alvo) return v;
+        }
+        return null;
     }
 
     // ===========================================================================
@@ -2507,7 +2569,39 @@
             : (linha.partes[colId] || '').replace(/^["']|["']$/g, '').trim();
     }
 
-    function manualAbrirEditor(colId) { manualIniciarLote([colId]); }
+    // Com uma edicao aberta, a bolinha indigo de outro cartao JUNTA a coluna nela
+    // (antes perguntava se descartava tudo e comecava um lote so com ela - e ai o
+    // "Anterior" ficava cinza, sem ter para onde voltar).
+    function manualAbrirEditor(colId) {
+        if (MANUAL_LOTE) { manualJuntarColuna(colId); return; }
+        manualIniciarLote([colId]);
+    }
+
+    function manualJuntarColuna(colId) {
+        const L = MANUAL_LOTE;
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        if (!L || !col) return;
+        if (!L.todas.includes(colId)) {
+            const ordem = COLUNAS_DETECTADAS.map(c => c.id);
+            L.todas.push(colId);
+            L.todas.sort((a, b) => ordem.indexOf(a) - ordem.indexOf(b));
+        }
+        L.fora.delete(colId);
+        if (L.daSelecao) {
+            SELECIONADAS.add(colId);
+            const card = document.getElementById(`chip-${colId}`);
+            if (card) card.classList.add('selc-on');
+            selcAtualizarBarra();
+        }
+        L.cols = L.todas.filter(id => !L.fora.has(id));
+        if (L.etapa !== 'quantidade') {
+            if (!L.rascunho.has(colId)) manualPrepararRascunho(colId);
+            L.etapa = 'editar';
+            L.pos = L.cols.indexOf(colId); // ja abre nela
+        }
+        log(`✍️ ${col.nome} entrou nesta edição manual (${L.cols.length} coluna(s)).`);
+        manualRenderLote();
+    }
     function manualIniciarFila() {
         manualIniciarLote(Array.from(SELECIONADAS));
         // Veio da selecao: tirar/devolver no trilho desmarca/marca o cartao la embaixo.
@@ -2737,10 +2831,12 @@
         const L = MANUAL_LOTE, total = L.cols.length, ultima = L.pos === total - 1, editando = L.etapa === 'editar' && total > 0;
         const avancar = !editando ? '<span></span>'
             : `<button type="button" class="manual-mini manual-mini-forte" onclick="${ultima ? 'manualIrRevisao()' : `manualIrPara(${L.pos + 1})`}">${ultima ? 'Revisar o lote →' : 'Próxima →'}</button>`;
-        return `<div class="manual-nav">` +
-            `<button type="button" class="manual-mini" onclick="manualIrPara(${L.pos - 1})" ${L.pos === 0 || !editando ? 'disabled' : ''}>← Anterior</button>` +
-            manualHtmlTrilho() + avancar +
-            `</div>`;
+        // Uma coluna so: nao ha para onde voltar. Em vez de um botao cinza mudo,
+        // diz como juntar outras colunas nesta edicao.
+        const voltar = total <= 1
+            ? `<span class="manual-nav-dica">Para ir e voltar entre colunas, clique na bolinha índigo de outro cartão: ele entra nesta edição.</span>`
+            : `<button type="button" class="manual-mini" onclick="manualIrPara(${L.pos - 1})" ${L.pos === 0 || !editando ? 'disabled title="Esta é a primeira coluna desta edição"' : ''}>← Anterior</button>`;
+        return `<div class="manual-nav">` + voltar + manualHtmlTrilho() + avancar + `</div>`;
     }
 
     function manualHtmlQuantidade() {
@@ -3249,7 +3345,8 @@
     async function coletarPools(file, colunasAtivas) {
         POOL.ruasPorBairro.clear();
         POOL.lotesPorQuadra.clear();
-        const usaRua = colunasAtivas.some(c => c.estado === 4 && tipoSimulacao(c.nome) === "ENDERECO");
+        POOL.ruasTodas = []; // ruas reais do arquivo inteiro, sem repetir (plano B da troca e dublê de rua)
+        const usaRua = colunasAtivas.some(c => (c.estado === 4 || c.estado === 3) && tipoSimulacao(c.nome) === "ENDERECO");
         const usaLote = colunasAtivas.some(c => c.estado === 4 && tipoSimulacao(c.nome) === "LOTE");
         if (!usaRua && !usaLote) return;
 
@@ -3289,6 +3386,11 @@
             buffer = lines.pop();
             for (const linha of lines) processar(linha);
         }
+        const vistas = new Set();
+        POOL.ruasPorBairro.forEach(lista => lista.forEach(r => {
+            const k = normalizar(r);
+            if (k && !vistas.has(k)) { vistas.add(k); POOL.ruasTodas.push(r); }
+        }));
         log(`   -> Pools geo: ${POOL.ruasPorBairro.size} bairros, ${POOL.lotesPorQuadra.size} quadras mapeadas.`);
     }
 
@@ -3746,8 +3848,26 @@
                                 valor = await gerarHash(valor);
                                 relatorio.tecnicas.add("Hash SHA-256 + sal efêmero (128 bits)");
                             } else if (item.estado === 3) {
-                                valor = await formatarDubleMatricula(valor);
-                                relatorio.tecnicas.add("Dublê de matrícula (8 dígitos, único, ≠ original)");
+                                if (colunaEhMatricula(item.colId, item.nome)) {
+                                    valor = await formatarDubleMatricula(valor);
+                                    relatorio.tecnicas.add("Dublê de matrícula (8 dígitos, único, ≠ original)");
+                                } else if (valor) {
+                                    // Fora da matricula, o dublê e um falso do mesmo tipo e tamanho.
+                                    // Antes tudo virava 8 digitos - e texto sem digito virava UM
+                                    // numero so, igual para todos (nomes, e-mails, enderecos).
+                                    const tipo = tipoGeradorDaColuna(item.colId, item.nome);
+                                    // so no TXT: no CSV nao ha coleta de ruas, e o pool podia ser de outro arquivo
+                                    if (tipo === 'ENDERECO' && MODO_ATUAL === 'TXT' && POOL.ruasTodas && POOL.ruasTodas.length) {
+                                        const orig = valor;
+                                        valor = await valorSintetico("RUA_DUBLE", orig, rand =>
+                                            trocaDiferente(POOL.ruasTodas, Math.floor(rand() * POOL.ruasTodas.length), orig)
+                                            || fabricarGenericoFormatAware(orig)(rand));
+                                    } else {
+                                        const [chave, fab] = fabricaPorTipo(tipo, valor);
+                                        valor = await valorSintetico(chave, valor, fab);
+                                    }
+                                    relatorio.tecnicas.add("Dublê pelo tipo da coluna (mesmo formato e tamanho, ≠ original)");
+                                }
                             } else if (item.estado === 4) {
                                 const tipo = tipoGeradorDaColuna(item.colId, item.nome);
                                 if (tipo === "NOME") { valor = await gerarNomeSintetico(valor); relatorio.tecnicas.add("Nomes sintéticos"); }
@@ -3762,10 +3882,13 @@
                                     const pos = POOL.posRua.get(numeroLinhaAbsoluto);
                                     if (!valor) {
                                         // rua vazia continua vazia: nao inventa endereco onde nao havia
-                                    } else if (ruas && perm && pos !== undefined) {
-                                        valor = ruas[perm[pos]] || valor; // perm[pos] != pos: nunca a propria rua
                                     } else {
-                                        valor = await gerarHash(valor); // bairro com 1 rua: hash
+                                        // perm[pos] != pos garante outra CASA, nao outra RUA: casas do
+                                        // mesmo bairro na mesma rua devolviam a rua real. Agora nunca igual;
+                                        // sem rua diferente no bairro, vem uma rua real de outro bairro.
+                                        let nova = (ruas && perm && pos !== undefined) ? trocaDiferente(ruas, perm[pos], valor) : null;
+                                        if (!nova) nova = trocaDiferente(POOL.ruasTodas, Math.floor(randCripto() * (POOL.ruasTodas || []).length), valor);
+                                        valor = nova || await valorSintetico("RUA_GEN", valor, FABRICAS.GENERICO(valor));
                                     }
                                     relatorio.tecnicas.add("Swap de ruas dentro do bairro (derangement)");
                                 }
@@ -3793,12 +3916,12 @@
                                     const pos = POOL.posLote.get(numeroLinhaAbsoluto);
                                     if (!valor) {
                                         // lote vazio continua vazio
-                                    } else if (lotes && perm && pos !== undefined) {
-                                        valor = lotes[perm[pos]] || valor; // perm[pos] != pos: nunca o proprio lote
                                     } else {
-                                        // Lote sozinho na quadra: nao tem com quem trocar. Antes o valor
-                                        // REAL passava direto - e setor+quadra+lote identificam o imovel.
-                                        valor = await valorSintetico("LOTE_GEN", valor, FABRICAS.GENERICO(valor));
+                                        // Mesmo cuidado da rua: apartamentos do mesmo predio repetem o
+                                        // lote, e a troca podia devolver o lote real. Nunca igual; sem
+                                        // outro lote na quadra (ou lote sozinho), vira lote inventado.
+                                        const novo = (lotes && perm && pos !== undefined) ? trocaDiferente(lotes, perm[pos], valor) : null;
+                                        valor = novo || await valorSintetico("LOTE_GEN", valor, FABRICAS.GENERICO(valor));
                                     }
                                     relatorio.tecnicas.add("Swap de lotes dentro da quadra");
                                 }
