@@ -1388,3 +1388,55 @@ no Edge.
 
 **Versão v4.18 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 35 — Seleção rápida no trilho: arrastar para tirar (2026-10-20, v4.19)
+
+**Pedido do Rafa:** com o TXT aberto, ele clica "Selecionar visíveis" e
+a bolinha índigo — a ficha abre com as 159 colunas no trilho (160
+pílulas cinza, 684 px de altura, sem fazer nada antes de carregar).
+Quer tirar rápido as que não vai editar: apertar numa pílula e arrastar
+por cima das outras, com o símbolo de proibido, e os cartões de baixo
+acompanhando ("equivalência"). Proposta com demonstração clicável
+aprovada. Referência: o gesto de "Selecionar tudo e arrastar por cima
+das que não quer" do app Fotos do iPhone.
+
+**O que mudou (`anonimizador.html`, embutido no `index.html`):**
+- O lote guarda `todas` (lista e ordem do começo) e `fora` (as tiradas);
+  `cols` é sempre `todas − fora`, então revisão, pendências e
+  "Confirmar" já só enxergam as que ficaram.
+- **Modo ajustar:** ligado sozinho antes de carregar as linhas; depois,
+  pelo botão "✂️ Ajustar a lista" (e "✓ Pronto, voltar a navegar").
+  Ao passar o mouse: 🚫 (tirar) ou ↩ (devolver, nas riscadas).
+- **Pincel** (`manualPincelInicio/Move/Fim`): a primeira pílula decide
+  (começou dentro = tira; começou riscada = devolve). Voltar pelo
+  caminho desfaz a última. Cair de novo numa pílula tocada antes, no
+  mesmo arrasto, não muda nada — sem piscar quando o mouse treme.
+  Usa `elementFromPoint`, então funciona com mouse e com toque. Durante
+  o arrasto só as pílulas e os cartões mudam; a ficha é redesenhada uma
+  vez, ao soltar. Clique simples alterna uma só.
+- **Equivalência:** quando o lote veio da seleção, tirar = desmarcar o
+  cartão lá embaixo, devolver = marcar (lote de um cartão só não mexe
+  na seleção).
+- **Lista grande:** pílulas numa caixa com rolagem (150 px), contador
+  "157 na edição · 2 fora", "Pôr todas de volta" / "Tirar todas".
+  Navegando, as tiradas somem (o contador diz quantas).
+- **Nada se perde:** tirar não muda o destino (a cor) da coluna; o que
+  já foi digitado numa coluna tirada fica guardado e volta se ela
+  voltar. "Quantas linhas?" não volta para 5 ao redesenhar. Sem
+  nenhuma coluna, "Carregar" fica desligado e a ficha diz como devolver.
+
+**Teste:** `_teste_trilho_pincel.py` (fora do repo), 27 verificações
+com o mouse de verdade do Playwright nas 159 colunas: caixa de 150 px,
+arrastar e voltar pelo caminho, a primeira decide, cair de novo numa
+tocada antes, mouse tremendo entre duas, clique simples, tirar/pôr
+todas, Carregar desligado sem colunas, navegar depois de carregar,
+Ajustar a lista tirando a coluna atual, valor digitado preservado,
+revisão e aplicação só com as que ficaram, seleção equivalente, lote de
+um cartão só. `_teste_visual_a.py` ajustado (antes de carregar, as
+pílulas agora tiram em vez de ficar desligadas). As outras 10 suítes de
+fora e as 5 do repo passaram.
+
+**Versão v4.19 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.

@@ -657,8 +657,29 @@
         .manual-ferramentas .manual-chute { font-size: 13px; }
         .manual-rotulo { font-size: 12px; font-weight: 700; color: var(--text-primary); }
         /* trilho de colunas no alto da ficha: onde voce esta, o que ja passou, o que falta */
-        .manual-trilho { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; flex: 1 1 auto; min-width: 0; }
-        .manual-trilho .manual-nav-pos { margin-right: 4px; }
+        /* trilho embaixo da linha Anterior/Proxima: barra (posicao, contador, botoes) + pilulas */
+        .manual-trilho { order: 3; flex: 1 1 100%; min-width: 0; }
+        .manual-trilho-barra { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+        .manual-trilho-conta { font-size: 12px; color: var(--text-secondary); }
+        .manual-trilho-dica { font-size: 12px; color: var(--text-secondary); text-align: center; margin: 0 0 6px; }
+        .manual-trilho-pilulas { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; }
+        /* lista grande (ex.: as 159 do SGCG): caixa com rolagem em vez de uma tela inteira de pilulas */
+        .manual-trilho.grande .manual-trilho-pilulas {
+            max-height: 150px; overflow-y: auto; justify-content: flex-start; padding: 8px;
+            border: 1px solid #ECECF1; border-radius: 12px; background: #FAFAFC;
+        }
+        /* modo ajustar: arrastar por cima tira (ou devolve) colunas da edicao */
+        .manual-trilho.ajustando .manual-trilho-pilulas { cursor: crosshair; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+        .manual-trilho.ajustando button.manual-trilho-pill[data-col] { position: relative; padding-right: 24px; cursor: crosshair; }
+        .manual-trilho.ajustando button.manual-trilho-pill[data-col]:hover::after { content: '🚫'; position: absolute; right: 6px; font-size: 11px; }
+        .manual-trilho.ajustando button.manual-trilho-pill.fora:hover::after { content: '↩'; font-size: 13px; color: #1A7340; }
+        .manual-trilho.ajustando button.manual-trilho-pill:active { transform: none; }
+        button.manual-trilho-pill.fora { background: #FFF1F0; color: #B42318; text-decoration: line-through; border-color: rgba(255, 59, 48, 0.3); }
+        /* navegando, as tiradas somem (o contador diz quantas); "Ajustar a lista" mostra todas */
+        .manual-trilho:not(.ajustando) button.manual-trilho-pill.fora { display: none; }
+        @keyframes manualToque { 50% { transform: scale(.93); } }
+        button.manual-trilho-pill.toque { animation: manualToque .09s ease-out; }
+        @media (prefers-reduced-motion: reduce) { button.manual-trilho-pill.toque { animation: none !important; } }
         button.manual-trilho-pill {
             width: auto; margin: 0; padding: 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
             background: #F2F2F7; color: var(--text-secondary); box-shadow: none; border: 1px solid transparent;
@@ -2487,7 +2508,11 @@
     }
 
     function manualAbrirEditor(colId) { manualIniciarLote([colId]); }
-    function manualIniciarFila() { manualIniciarLote(Array.from(SELECIONADAS)); }
+    function manualIniciarFila() {
+        manualIniciarLote(Array.from(SELECIONADAS));
+        // Veio da selecao: tirar/devolver no trilho desmarca/marca o cartao la embaixo.
+        if (MANUAL_LOTE) MANUAL_LOTE.daSelecao = true;
+    }
 
     function manualIniciarLote(cols) {
         if (!FILE_REF) { alert("Carregue um arquivo primeiro."); return; }
@@ -2502,6 +2527,10 @@
             recorte: cols.length > 1 || !!RECORTE_IDX,
             linhas: [], rascunho: new Map(),
             visitadas: new Set(), // colunas ja abertas: ganham ✓ no trilho
+            // Selecao rapida no trilho: "todas" guarda a lista e a ordem do comeco;
+            // "fora" sao as tiradas (arrastando). "cols" e sempre todas - fora.
+            todas: cols.slice(), fora: new Set(),
+            ajustando: false, daSelecao: false,
         };
         manualRenderLote();
     }
@@ -2526,46 +2555,186 @@
         const entrada = L._chave === chave ? '' : (ordem >= (L._ordem ?? -1) ? 'manual-entra-dir' : 'manual-entra-esq');
         L._chave = chave; L._ordem = ordem;
         if (L.etapa === 'revisar') { manualRenderRevisao(entrada); return; }
-        const colId = L.cols[L.pos];
+        // Sem nenhuma coluna na edicao (tirou todas): a ficha fica no cartao da
+        // primeira da lista, so com o trilho para devolver alguma.
+        const vazio = L.etapa === 'editar' && !L.cols.length;
+        const colId = vazio || !L.cols.length ? L.todas[0] : L.cols[L.pos];
         const chip = document.getElementById(`chip-${colId}`);
         if (!chip) return;
-        if (L.etapa === 'editar') L.visitadas.add(colId);
+        if (L.etapa === 'editar' && !vazio) L.visitadas.add(colId);
         chip.classList.remove('oculto'); // a busca podia ter escondido
         chip.classList.add('manual-aberto');
         const box = document.createElement('div');
         box.className = 'manual-inline';
         box.onclick = (e) => e.stopPropagation();
-        box.innerHTML = L.etapa === 'quantidade' ? manualHtmlQuantidade() : manualHtmlEditar(colId);
+        box.innerHTML = L.etapa === 'quantidade' ? manualHtmlQuantidade()
+            : vazio ? manualHtmlNav() + `<div class="manual-corpo"><p class="manual-ajuda">Nenhuma coluna na edição. Devolva alguma no trilho: comece o arrasto numa coluna riscada. Ou saia sem aplicar.</p>` +
+                `<div class="filtro-val-rodape"><button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button></div></div>`
+            : manualHtmlEditar(colId);
         const corpo = box.querySelector('.manual-corpo');
         if (corpo && entrada) corpo.classList.add(entrada);
         chip.appendChild(box);
-        if (MANUAL_LOTE.etapa === 'editar') MANUAL_LOTE.linhas.forEach((_, i) => manualAtualizarCampo(i));
+        if (MANUAL_LOTE.etapa === 'editar' && !vazio) MANUAL_LOTE.linhas.forEach((_, i) => manualAtualizarCampo(i));
         chip.scrollIntoView({ block: 'nearest' });
     }
 
     // Trilho de colunas: onde voce esta, o que ja passou (✓) e o que falta.
     // Bolinha vermelha = a coluna tem valor igual a dado real ainda sem decidir.
+    // Modo ajustar: arrastar por cima das pilulas tira (ou devolve) colunas da
+    // edicao. Antes de carregar as linhas ja vem ligado (nao ha o que navegar).
+    function manualAjustando() {
+        return !!MANUAL_LOTE && (MANUAL_LOTE.etapa === 'quantidade' || MANUAL_LOTE.ajustando);
+    }
+
     function manualHtmlTrilho() {
-        const L = MANUAL_LOTE, navegavel = L.etapa !== 'quantidade';
-        const pills = L.cols.map((colId, i) => {
+        const L = MANUAL_LOTE, ajustando = manualAjustando(), navegavel = !ajustando && L.etapa !== 'quantidade';
+        const pills = L.todas.map(colId => {
             const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
             const nome = col ? col.nome : String(colId);
-            const atual = L.etapa === 'editar' && i === L.pos;
-            const feita = !atual && L.visitadas.has(colId);
+            const fora = L.fora.has(colId);
+            const i = L.cols.indexOf(colId);
+            const atual = !fora && L.etapa === 'editar' && i === L.pos;
+            const feita = !fora && !atual && L.visitadas.has(colId);
             const r = L.rascunho.get(colId);
-            const pend = !!r && L.linhas.some((_, k) => manualStatus(r, k).tipo === 'igual' && !r.proposital[k]);
-            return `<button type="button" class="manual-trilho-pill${atual ? ' atual' : ''}${feita ? ' feita' : ''}" title="${selcEscAttr(nome)}" ` +
-                (navegavel ? `onclick="manualIrPara(${i})"` : 'disabled') + `>` +
+            const pend = !fora && !!r && L.linhas.some((_, k) => manualStatus(r, k).tipo === 'igual' && !r.proposital[k]);
+            const titulo = ajustando ? (fora ? `Devolver ${nome} para a edição` : `Tirar ${nome} da edição`) : nome;
+            return `<button type="button" class="manual-trilho-pill${atual ? ' atual' : ''}${feita ? ' feita' : ''}${fora ? ' fora' : ''}" ` +
+                `data-col="${colId}" title="${selcEscAttr(titulo)}"` + (navegavel && !fora ? ` onclick="manualIrPara(${i})"` : '') + `>` +
                 (feita ? '✓ ' : '') + selcEsc(nome) + (pend ? ' <span class="manual-trilho-ponto">●</span>' : '') + `</button>`;
         }).join('');
         const rev = `<button type="button" class="manual-trilho-pill${L.etapa === 'revisar' ? ' atual' : ''}" ` +
-            (navegavel ? 'onclick="manualIrRevisao()"' : 'disabled') + `>Revisar</button>`;
-        const pos = L.etapa === 'revisar' ? 'Revisão' : `Coluna ${L.pos + 1} de ${L.cols.length}`;
-        return `<div class="manual-trilho" aria-label="Colunas desta edição"><span class="manual-nav-pos">✍️ ${pos}</span>${pills}${rev}</div>`;
+            (navegavel && L.cols.length ? 'onclick="manualIrRevisao()"' : 'disabled') + `>Revisar</button>`;
+        const pos = L.etapa === 'revisar' ? 'Revisão' : L.cols.length ? `Coluna ${L.pos + 1} de ${L.cols.length}` : 'Nenhuma coluna';
+        const barra = `<div class="manual-trilho-barra"><span class="manual-nav-pos">✍️ ${pos}</span>` +
+            `<span class="manual-trilho-conta" id="manualTrilhoConta">${manualTextoConta()}</span>` +
+            (ajustando
+                ? `<button type="button" class="manual-mini" onclick="manualForaTodas(false)">Pôr todas de volta</button>` +
+                  `<button type="button" class="manual-mini" onclick="manualForaTodas(true)">Tirar todas</button>` : '') +
+            (L.etapa === 'quantidade' ? ''
+                : `<button type="button" class="manual-mini${L.ajustando ? ' manual-mini-forte' : ''}" onclick="manualAlternarAjuste()">` +
+                  (L.ajustando ? '✓ Pronto, voltar a navegar' : '✂️ Ajustar a lista') + `</button>`) +
+            `</div>`;
+        const dica = ajustando
+            ? `<p class="manual-trilho-dica">Aperte numa coluna e arraste por cima das outras para tirar da edição. Começar numa riscada devolve. Voltar pelo caminho desfaz.</p>` : '';
+        const visiveis = ajustando ? L.todas.length : L.cols.length; // navegando, as tiradas nao aparecem
+        return `<div class="manual-trilho${ajustando ? ' ajustando' : ''}${visiveis > 12 ? ' grande' : ''}" aria-label="Colunas desta edição">` +
+            barra + dica +
+            `<div class="manual-trilho-pilulas" onpointerdown="manualPincelInicio(event)" onpointermove="manualPincelMove(event)">${pills}${rev}</div></div>`;
+    }
+
+    function manualTextoConta() {
+        const L = MANUAL_LOTE;
+        return `${L.cols.length} na edição · ${L.fora.size} fora`;
+    }
+
+    function manualAlternarAjuste() {
+        if (!MANUAL_LOTE) return;
+        MANUAL_LOTE.ajustando = !MANUAL_LOTE.ajustando;
+        manualRenderLote();
+    }
+
+    // ----- Pincel: apertar numa pilula e arrastar -----
+    // A primeira pilula decide: comecou numa que esta dentro, o arrasto tira;
+    // comecou numa riscada, devolve. Voltar pelo caminho desfaz a ultima.
+    // Passar de novo numa que ja foi tocada neste arrasto nao muda nada (sem
+    // piscar quando o mouse treme na borda). Durante o arrasto so as pilulas e
+    // os cartoes mudam; a ficha e redesenhada uma vez, ao soltar.
+    let MANUAL_PINCEL = null; // { modo: 'tirar'|'devolver', caminho: [colId], antes: Map(colId -> estavaFora) }
+
+    function manualPincelInicio(e) {
+        if (!manualAjustando() || e.button > 0) return;
+        const pill = e.target.closest('.manual-trilho-pill[data-col]');
+        if (!pill) return;
+        e.preventDefault();
+        if (pill.hasPointerCapture && pill.hasPointerCapture(e.pointerId)) pill.releasePointerCapture(e.pointerId); // toque: segue o dedo
+        const colId = Number(pill.dataset.col);
+        MANUAL_PINCEL = { modo: MANUAL_LOTE.fora.has(colId) ? 'devolver' : 'tirar', caminho: [], antes: new Map() };
+        manualPincelAplicar(colId);
+    }
+
+    function manualPincelMove(e) {
+        if (!MANUAL_PINCEL) return;
+        const el = document.elementFromPoint(e.clientX, e.clientY);
+        const pill = el && el.closest ? el.closest('.manual-trilho-pill[data-col]') : null;
+        if (!pill) return;
+        const colId = Number(pill.dataset.col);
+        const c = MANUAL_PINCEL.caminho;
+        if (c[c.length - 1] === colId) return; // ainda na mesma
+        if (c.length > 1 && c[c.length - 2] === colId) { // voltou pelo caminho: desfaz a ultima
+            const ultima = c.pop();
+            manualForaDefinir(ultima, MANUAL_PINCEL.antes.get(ultima));
+            return;
+        }
+        if (c.includes(colId)) return;
+        manualPincelAplicar(colId);
+    }
+
+    function manualPincelAplicar(colId) {
+        const P = MANUAL_PINCEL;
+        P.antes.set(colId, MANUAL_LOTE.fora.has(colId));
+        P.caminho.push(colId);
+        manualForaDefinir(colId, P.modo === 'tirar');
+    }
+
+    function manualPincelFim() {
+        if (!MANUAL_PINCEL) return;
+        const mexeu = MANUAL_PINCEL.caminho.length > 0;
+        MANUAL_PINCEL = null;
+        if (mexeu) manualForaAplicar();
+    }
+    window.addEventListener('pointerup', manualPincelFim);
+    window.addEventListener('pointercancel', manualPincelFim);
+
+    // Tira ou devolve uma coluna, sem redesenhar a ficha (o arrasto continua).
+    function manualForaDefinir(colId, ficaFora) {
+        const L = MANUAL_LOTE;
+        if (!L) return;
+        if (ficaFora) L.fora.add(colId); else L.fora.delete(colId);
+        document.querySelectorAll(`.manual-trilho-pill[data-col="${colId}"]`).forEach(b => {
+            b.classList.toggle('fora', ficaFora);
+            b.classList.remove('toque'); void b.offsetWidth; b.classList.add('toque');
+        });
+        // Equivalencia: o cartao la embaixo acompanha (tirou = desmarcou).
+        if (L.daSelecao) {
+            const card = document.getElementById(`chip-${colId}`);
+            if (ficaFora) { SELECIONADAS.delete(colId); if (card) card.classList.remove('selc-on'); }
+            else { SELECIONADAS.add(colId); if (card) card.classList.add('selc-on'); }
+            selcAtualizarBarra();
+        }
+        const conta = document.getElementById('manualTrilhoConta');
+        if (conta) conta.textContent = `${L.todas.length - L.fora.size} na edição · ${L.fora.size} fora`;
+    }
+
+    function manualForaTodas(ficaFora) {
+        const L = MANUAL_LOTE;
+        if (!L) return;
+        L.todas.forEach(id => manualForaDefinir(id, ficaFora));
+        manualForaAplicar();
+    }
+
+    // Recalcula a lista da edicao e redesenha uma vez. O que ja foi digitado numa
+    // coluna tirada fica guardado: se ela voltar, volta igual.
+    function manualForaAplicar() {
+        const L = MANUAL_LOTE;
+        if (!L) return;
+        if (L.etapa === 'quantidade') {
+            // guarda o que a pessoa ja escreveu antes de redesenhar a ficha
+            const qtd = document.getElementById('manualQtd');
+            const rec = document.getElementById('manualRecorte');
+            if (qtd) L.n = Math.min(LIMITE_LINHAS_MANUAL, Math.max(1, Number(qtd.value) || L.n));
+            if (rec) L.recorte = rec.checked;
+        }
+        const atual = L.cols[L.pos];
+        L.cols = L.todas.filter(id => !L.fora.has(id));
+        if (L.etapa !== 'quantidade') L.cols.forEach(id => { if (!L.rascunho.has(id)) manualPrepararRascunho(id); });
+        const i = L.cols.indexOf(atual);
+        L.pos = i >= 0 ? i : Math.min(L.pos, Math.max(0, L.cols.length - 1));
+        if (!L.cols.length && L.etapa === 'revisar') L.etapa = 'editar';
+        manualRenderLote();
     }
 
     function manualHtmlNav() {
-        const L = MANUAL_LOTE, total = L.cols.length, ultima = L.pos === total - 1, editando = L.etapa === 'editar';
+        const L = MANUAL_LOTE, total = L.cols.length, ultima = L.pos === total - 1, editando = L.etapa === 'editar' && total > 0;
         const avancar = !editando ? '<span></span>'
             : `<button type="button" class="manual-mini manual-mini-forte" onclick="${ultima ? 'manualIrRevisao()' : `manualIrPara(${L.pos + 1})`}">${ultima ? 'Revisar o lote →' : 'Próxima →'}</button>`;
         return `<div class="manual-nav">` +
@@ -2582,16 +2751,17 @@
             `<label class="manual-qtd-label">Quantas linhas? (1 a ${LIMITE_LINHAS_MANUAL})` +
             `<input type="number" id="manualQtd" min="1" max="${LIMITE_LINHAS_MANUAL}" value="${L.n}"></label>` +
             (L.cols.length > 1 ? `<p class="manual-ajuda">As mesmas linhas valem pras ${L.cols.length} colunas — cada linha vira um registro inteiro.</p>` : '') +
+            (!L.cols.length ? `<p class="manual-pendencias">Nenhuma coluna na edição: devolva alguma no trilho acima.</p>` : '') +
             `<label class="manual-recorte"><input type="checkbox" id="manualRecorte" ${L.recorte ? 'checked' : ''}> Recortar o arquivo final: sai só com essas linhas</label>` +
             `<div class="filtro-val-rodape">` +
             `<button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button>` +
-            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualCarregarLote()">Carregar linhas e chutar valores</button>` +
+            `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualCarregarLote()" ${L.cols.length ? '' : 'disabled'}>Carregar linhas e chutar valores</button>` +
             `</div></div>`;
     }
 
     async function manualCarregarLote() {
         const L = MANUAL_LOTE;
-        if (!L) return;
+        if (!L || !L.cols.length) return;
         L.n = Math.min(LIMITE_LINHAS_MANUAL, Math.max(1, Number(document.getElementById('manualQtd').value) || 5));
         L.recorte = document.getElementById('manualRecorte').checked;
         // Numeracao igual a do laco de processamento (linha substantiva, contando o
@@ -2847,9 +3017,12 @@
         selcDefinirEstado(colId, estado);
         const pos = L.cols.indexOf(colId);
         L.cols.splice(pos, 1);
+        L.todas = L.todas.filter(id => id !== colId); // trocou de destino: sai da lista inteira
+        L.fora.delete(colId);
         L.rascunho.delete(colId);
         log(`✍️ ${col.nome} saiu da edição manual: agora é ${selcNomeEstado(estado)} no arquivo inteiro.`);
-        if (!L.cols.length) { manualFecharLote(); return; }
+        if (!L.todas.length) { manualFecharLote(); return; }
+        if (!L.cols.length) { L.pos = 0; manualRenderLote(); return; } // so sobraram as tiradas: da para devolver
         if (L.pos >= L.cols.length) { L.pos = L.cols.length - 1; manualIrRevisao(); return; }
         manualRenderLote();
     }
