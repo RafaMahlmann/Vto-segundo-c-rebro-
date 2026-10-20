@@ -39,7 +39,7 @@
             --ios-bg: #F5F5F7;
             --ios-card: #FFFFFF;
             --text-primary: #1D1D1F;
-            --text-secondary: #86868B;
+            --text-secondary: #6E6E73; /* era #86868B: 3,6:1 de contraste no branco; agora 5,1:1 (AA) */
             --border-color: #D2D2D7;
             --error-red: #FF3B30;
         }
@@ -103,6 +103,17 @@
             display: flex; align-items: center; gap: 15px;
         }
         .audit-info strong { color: var(--ios-blue); }
+        /* status em selos: cada garantia vira um selo verde (aparece uma vez, ao abrir) */
+        .status-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+        .status-chip {
+            display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px;
+            background: #fff; border: 1px solid rgba(52, 199, 89, 0.4); color: #1A7340; font-size: 12.5px; font-weight: 600;
+            animation: statusChipEntra .22s ease-out both;
+        }
+        .status-chip::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #34C759; }
+        .status-chip.erro { border-color: rgba(255, 59, 48, 0.4); color: #B42318; }
+        .status-chip.erro::before { background: #FF3B30; }
+        @keyframes statusChipEntra { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
         .audit-warning { color: var(--error-red); font-weight: 600; }
 
         .control-group { margin-bottom: 25px; }
@@ -133,7 +144,7 @@
             font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; background: #F2F2F7;
             padding: 2px 6px; border-radius: 6px; white-space: nowrap;
         }
-        .salvar-dica { font-size: 12px; color: #86868B; margin-top: 6px; line-height: 1.5; }
+        .salvar-dica { font-size: 12px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
         .salvar-dica strong { color: var(--text-primary); }
         button.salvar-link {
             width: auto; padding: 0; margin: 0 0 0 4px; background: none; color: var(--ios-blue);
@@ -155,21 +166,24 @@
             margin-top: 10px; box-shadow: 0 4px 12px rgba(0, 122, 255, 0.25);
         }
         button:hover { background-color: var(--ios-blue-hover); transform: translateY(-1px); box-shadow: 0 6px 16px rgba(0, 122, 255, 0.3); }
-        button:active { transform: translateY(0); }
+        /* clique "afunda" o botao (100 ms): retorno fisico barato. Os largos afundam menos. */
+        button:active { transform: scale(0.97); transition-duration: .1s; }
+        #btnProcess:active, .btn-pq:active, .btn-cert:active { transform: scale(0.99); }
         button:disabled { background-color: #E5E5EA; color: #AEAEB2; cursor: not-allowed; box-shadow: none; transform: none; }
 
+        /* cor solida e sombra da mesma cor do botao (antes: degrade com sombra azul) */
         .btn-pq {
-            background: linear-gradient(135deg, #34C759 0%, #30B753 100%);
+            background-color: #34C759; box-shadow: 0 4px 12px rgba(52, 199, 89, 0.28);
             margin-bottom: 20px;
             display: none;
         }
-        .btn-pq:hover { box-shadow: 0 6px 20px rgba(52, 199, 89, 0.4); transform: translateY(-2px); }
+        .btn-pq:hover { background-color: #2DB14F; box-shadow: 0 6px 18px rgba(52, 199, 89, 0.38); }
 
         .btn-cert {
-            background: linear-gradient(135deg, #32ADE6 0%, #2A9BCB 100%);
+            background-color: #32ADE6; box-shadow: 0 4px 12px rgba(50, 173, 230, 0.28);
             display: none;
         }
-        .btn-cert:hover { box-shadow: 0 6px 20px rgba(50, 173, 230, 0.4); transform: translateY(-2px); }
+        .btn-cert:hover { background-color: #2A9BCB; box-shadow: 0 6px 18px rgba(50, 173, 230, 0.38); }
 
         .column-manager {
             margin-bottom: 30px; background: #FFFFFF; border: 1px solid var(--border-color);
@@ -228,11 +242,13 @@
             border-radius: 100px; transition: width 0.4s ease;
         }
 
+        /* registro no mesmo mundo claro do resto (antes: terminal preto com texto verde) */
+        .log-titulo { margin-top: 25px; font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .04em; }
         .log-area {
-            margin-top: 25px; background-color: #1C1C1E; color: #30D158; padding: 20px;
-            border-radius: 16px; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
-            height: 180px; overflow-y: auto; font-size: 13px; line-height: 1.6;
-            border: 1px solid rgba(255,255,255,0.1); box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
+            margin-top: 8px; background-color: #F7F7F9; color: var(--text-primary); padding: 16px 18px;
+            border-radius: 14px; font-family: 'SF Mono', 'Menlo', 'Monaco', 'Courier New', monospace;
+            height: 180px; overflow-y: auto; font-size: 12.5px; line-height: 1.7;
+            border: 1px solid var(--border-color);
         }
 
         /* --- ABA DE AUDITORIA --- */
@@ -542,18 +558,56 @@
         .manual-linha-input {
             display: block !important; width: 100% !important; padding: 10px 12px !important;
             border-radius: 10px !important; font-size: 13px; font-family: 'SF Mono', 'Menlo', monospace;
-            border-color: #5856D6 !important; color: #AEAEB2 !important; transition: color .1s ease;
+            border-color: var(--border-color) !important; background: #fff !important;
+            color: #AEAEB2 !important;
+            /* digitar e a acao mais repetida: nada anima aqui (a regra geral dos inputs animava tudo em 0,2 s) */
+            transition: none !important;
         }
+        .manual-linha-input:focus { border-color: #5856D6 !important; box-shadow: 0 0 0 3px rgba(88, 86, 214, 0.15) !important; }
+        /* tres jeitos de um campo estar: chute (roxo claro), escrito por voce (preto), dado real (vermelho) */
         .manual-linha-input.manual-alterado { color: #1D1D1F !important; font-weight: 700; }
+        .manual-linha-input.manual-alterado.manual-chutado { color: #3F3DB0 !important; font-weight: 500; background: #F7F7FE !important; }
         /* valor original embaixo de cada linha: so o texto, cinza, um clique seleciona tudo */
-        .manual-ref { grid-column: 2 / 4; font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: #8E8E93; margin-top: -3px; padding-left: 2px; }
+        .manual-ref { grid-column: 2 / 4; font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: var(--text-secondary); margin-top: -3px; padding-left: 2px; }
         .manual-ref-valor { user-select: all; -webkit-user-select: all; cursor: text; }
         .manual-ref-vazio { font-style: italic; user-select: none; }
         /* destino da coluna dentro do cartao aberto */
         .manual-destino { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 2px 0 10px; font-size: 12px; color: var(--text-secondary); }
         .manual-destino .selc-bolinhas { gap: 8px; }
         .manual-destino .selc-bol { width: 20px; height: 20px; }
-        .manual-destino-dica { flex-basis: 100%; font-size: 11px; color: #8E8E93; }
+        .manual-destino-dica { font-size: 12px; color: var(--text-secondary); }
+        /* caixa de ferramentas da ficha: destino, chute e atalhos juntos, num fundo so */
+        .manual-ferramentas {
+            background: #F7F7FA; border: 1px solid #ECECF1; border-radius: 12px; padding: 10px 12px; margin: 4px 0 8px;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .manual-ferramentas .manual-destino, .manual-ferramentas .manual-chute, .manual-ferramentas .manual-atalhos { margin: 0; }
+        .manual-ferramentas .manual-chute { font-size: 13px; }
+        .manual-rotulo { font-size: 12px; font-weight: 700; color: var(--text-primary); }
+        /* trilho de colunas no alto da ficha: onde voce esta, o que ja passou, o que falta */
+        .manual-trilho { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center; flex: 1 1 auto; min-width: 0; }
+        .manual-trilho .manual-nav-pos { margin-right: 4px; }
+        button.manual-trilho-pill {
+            width: auto; margin: 0; padding: 4px 11px; border-radius: 999px; font-size: 12px; font-weight: 600;
+            background: #F2F2F7; color: var(--text-secondary); box-shadow: none; border: 1px solid transparent;
+            max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+            transition: background-color .12s ease-out, color .12s ease-out;
+        }
+        button.manual-trilho-pill:hover { background: #E5E5EA; color: var(--text-primary); transform: none; box-shadow: none; }
+        button.manual-trilho-pill.feita { color: #1A7340; }
+        button.manual-trilho-pill.atual { background: #5856D6; color: #fff; }
+        button.manual-trilho-pill:disabled { background: #F2F2F7; color: #AEAEB2; }
+        .manual-trilho-ponto { color: #FF3B30; }
+        /* ao trocar de coluna, o conteudo desliza para o lado da navegacao (uma vez) */
+        @keyframes manualEntraDir { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+        @keyframes manualEntraEsq { from { opacity: 0; transform: translateX(-14px); } to { opacity: 1; transform: none; } }
+        .manual-entra-dir { animation: manualEntraDir .18s ease-out; }
+        .manual-entra-esq { animation: manualEntraEsq .18s ease-out; }
+        @media (prefers-reduced-motion: reduce) {
+            .manual-entra-dir, .manual-entra-esq, .status-chip { animation: none !important; }
+            button, button.manual-trilho-pill { transition: none !important; }
+            button:active, #btnProcess:active, .btn-pq:active, .btn-cert:active { transform: none !important; }
+        }
         /* atalhos para todas as linhas do cartao */
         .manual-atalhos { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; font-size: 12px; color: var(--text-secondary); }
         .manual-atalhos-rotulo { font-weight: 700; color: var(--text-primary); }
@@ -578,9 +632,9 @@
             display: inline-flex; align-items: center; gap: 6px; font-size: 12px; background: #fff;
             border: 1px solid var(--border-color); border-radius: 8px; padding: 3px 4px 3px 8px;
         }
-        .memoria-vazia { font-size: 12px; color: #8E8E93; font-style: italic; }
+        .memoria-vazia { font-size: 12px; color: var(--text-secondary); font-style: italic; }
         button.memoria-x {
-            width: auto; margin: 0; padding: 0 6px; background: none; color: #8E8E93; box-shadow: none;
+            width: auto; margin: 0; padding: 0 6px; background: none; color: var(--text-secondary); box-shadow: none;
             font-size: 12px; border-radius: 6px;
         }
         button.memoria-x:hover { background: #F2F2F7; color: #B42318; transform: none; box-shadow: none; }
@@ -617,16 +671,14 @@
     <!-- ============ ABA 1: PROCESSAMENTO ============ -->
     <div id="abaProcessar">
         <div class="audit-info">
-            <div>
-                <strong>STATUS DO SISTEMA:</strong>
-                <span id="systemStatus" style="opacity: 0.8">Verificando segurança...</span>
-            </div>
+            <strong>Status</strong>
+            <span id="systemStatus" class="status-chips">Verificando segurança…</span>
         </div>
 
         <div class="control-group">
             <label for="fileInput">1. Carregar Arquivos (TXT ou CSV)</label>
             <input type="file" id="fileInput" accept=".txt, .csv" multiple onchange="analisarArquivoInicial()">
-            <div style="font-size: 12px; color: #86868B; margin-top: 5px;">* Dica: Segure Ctrl para selecionar vários arquivos de uma vez.</div>
+            <div style="font-size: 12px; color: var(--text-secondary); margin-top: 5px;">* Dica: Segure Ctrl para selecionar vários arquivos de uma vez.</div>
         </div>
 
         <div class="column-manager" id="columnManager">
@@ -751,6 +803,7 @@
             <div class="progress-bar" id="progressBar"></div>
         </div>
 
+        <div class="log-titulo">📋 Registro do que aconteceu</div>
         <div class="log-area" id="logConsole">
             > Aguardando arquivos...
         </div>
@@ -1559,11 +1612,11 @@
     window.onload = function () {
         const statusEl = document.getElementById('systemStatus');
         if (CRYPTO_DISPONIVEL) {
-            statusEl.innerHTML = "Ambiente Seguro • Criptografia Ativa • Sal Efêmero por Lote • Simulação Ativa";
-            statusEl.style.color = "var(--text-secondary)";
+            // Um selo por garantia, entrando um depois do outro (so na abertura).
+            statusEl.innerHTML = ['Ambiente seguro', 'Criptografia ativa', 'Sal novo a cada lote', 'Tudo roda no seu computador', 'Simulação ativa']
+                .map((t, i) => `<span class="status-chip" style="animation-delay:${i * 60}ms">${t}</span>`).join('');
         } else {
-            statusEl.innerHTML = "⛔ Ambiente SEM criptografia nativa — processamento BLOQUEADO por segurança";
-            statusEl.style.color = "var(--error-red)";
+            statusEl.innerHTML = '<span class="status-chip erro">Sem criptografia nativa: processamento bloqueado por segurança</span>';
             document.getElementById('btnProcess').disabled = true;
             log("BLOQUEADO: este navegador/contexto não oferece Web Crypto API. Abra em Chrome/Edge atualizado (HTTPS ou arquivo local).");
         }
@@ -2335,6 +2388,7 @@
             n: Math.min(LIMITE_LINHAS_MANUAL, (existente && existente.size) || 5),
             recorte: cols.length > 1 || !!RECORTE_IDX,
             linhas: [], rascunho: new Map(),
+            visitadas: new Set(), // colunas ja abertas: ganham ✓ no trilho
         };
         manualRenderLote();
     }
@@ -2351,19 +2405,50 @@
         const grade = document.getElementById('chipsContainer');
         if (!MANUAL_LOTE) { grade.classList.remove('manual-editando'); return; }
         grade.classList.add('manual-editando');
-        if (MANUAL_LOTE.etapa === 'revisar') { manualRenderRevisao(); return; }
-        const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
+        const L = MANUAL_LOTE;
+        // Desliza so quando muda de coluna (ou de etapa), para o lado da navegacao.
+        // Redesenhar a mesma coluna (atalho, chutar de novo) nao anima.
+        const chave = L.etapa === 'editar' ? 'c' + L.cols[L.pos] : L.etapa;
+        const ordem = L.etapa === 'quantidade' ? -1 : L.etapa === 'revisar' ? L.cols.length : L.pos;
+        const entrada = L._chave === chave ? '' : (ordem >= (L._ordem ?? -1) ? 'manual-entra-dir' : 'manual-entra-esq');
+        L._chave = chave; L._ordem = ordem;
+        if (L.etapa === 'revisar') { manualRenderRevisao(entrada); return; }
+        const colId = L.cols[L.pos];
         const chip = document.getElementById(`chip-${colId}`);
         if (!chip) return;
+        if (L.etapa === 'editar') L.visitadas.add(colId);
         chip.classList.remove('oculto'); // a busca podia ter escondido
         chip.classList.add('manual-aberto');
         const box = document.createElement('div');
         box.className = 'manual-inline';
         box.onclick = (e) => e.stopPropagation();
-        box.innerHTML = MANUAL_LOTE.etapa === 'quantidade' ? manualHtmlQuantidade() : manualHtmlEditar(colId);
+        box.innerHTML = L.etapa === 'quantidade' ? manualHtmlQuantidade() : manualHtmlEditar(colId);
+        const corpo = box.querySelector('.manual-corpo');
+        if (corpo && entrada) corpo.classList.add(entrada);
         chip.appendChild(box);
         if (MANUAL_LOTE.etapa === 'editar') MANUAL_LOTE.linhas.forEach((_, i) => manualAtualizarCampo(i));
         chip.scrollIntoView({ block: 'nearest' });
+    }
+
+    // Trilho de colunas: onde voce esta, o que ja passou (✓) e o que falta.
+    // Bolinha vermelha = a coluna tem valor igual a dado real ainda sem decidir.
+    function manualHtmlTrilho() {
+        const L = MANUAL_LOTE, navegavel = L.etapa !== 'quantidade';
+        const pills = L.cols.map((colId, i) => {
+            const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+            const nome = col ? col.nome : String(colId);
+            const atual = L.etapa === 'editar' && i === L.pos;
+            const feita = !atual && L.visitadas.has(colId);
+            const r = L.rascunho.get(colId);
+            const pend = !!r && L.linhas.some((_, k) => manualStatus(r, k).tipo === 'igual' && !r.proposital[k]);
+            return `<button type="button" class="manual-trilho-pill${atual ? ' atual' : ''}${feita ? ' feita' : ''}" title="${selcEscAttr(nome)}" ` +
+                (navegavel ? `onclick="manualIrPara(${i})"` : 'disabled') + `>` +
+                (feita ? '✓ ' : '') + selcEsc(nome) + (pend ? ' <span class="manual-trilho-ponto">●</span>' : '') + `</button>`;
+        }).join('');
+        const rev = `<button type="button" class="manual-trilho-pill${L.etapa === 'revisar' ? ' atual' : ''}" ` +
+            (navegavel ? 'onclick="manualIrRevisao()"' : 'disabled') + `>Revisar</button>`;
+        const pos = L.etapa === 'revisar' ? 'Revisão' : `Coluna ${L.pos + 1} de ${L.cols.length}`;
+        return `<div class="manual-trilho" aria-label="Colunas desta edição"><span class="manual-nav-pos">✍️ ${pos}</span>${pills}${rev}</div>`;
     }
 
     function manualHtmlNav() {
@@ -2372,13 +2457,13 @@
             : `<button type="button" class="manual-mini manual-mini-forte" onclick="${ultima ? 'manualIrRevisao()' : `manualIrPara(${L.pos + 1})`}">${ultima ? 'Revisar o lote →' : 'Próxima →'}</button>`;
         return `<div class="manual-nav">` +
             `<button type="button" class="manual-mini" onclick="manualIrPara(${L.pos - 1})" ${L.pos === 0 || !editando ? 'disabled' : ''}>← Anterior</button>` +
-            `<span class="manual-nav-pos">✍️ Coluna ${L.pos + 1} de ${total}</span>` + avancar +
+            manualHtmlTrilho() + avancar +
             `</div>`;
     }
 
     function manualHtmlQuantidade() {
         const L = MANUAL_LOTE;
-        return manualHtmlNav() +
+        return manualHtmlNav() + `<div class="manual-corpo">` +
             `<div class="manual-aviso">⚠️ <strong>Risco assumido por você.</strong> O que estiver nos campos vai direto pro arquivo final, sem passar pelo anonimizador automático. ` +
             `Cada campo já vem com um valor inventado e conferido. Se você digitar um valor real, o campo fica vermelho.</div>` +
             `<label class="manual-qtd-label">Quantas linhas? (1 a ${LIMITE_LINHAS_MANUAL})` +
@@ -2388,7 +2473,7 @@
             `<div class="filtro-val-rodape">` +
             `<button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button>` +
             `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" onclick="manualCarregarLote()">Carregar linhas e chutar valores</button>` +
-            `</div>`;
+            `</div></div>`;
     }
 
     async function manualCarregarLote() {
@@ -2500,22 +2585,29 @@
         const destinos = [1, 2, 3, 4, 0, 5].map(e =>
             `<button type="button" class="selc-bol${e === 5 ? ' ativa' : ''}" data-estado="${e}" title="${selcNomeEstado(e)}" ` +
             `onclick="manualTrocarDestino(${colId}, ${e})"></button>`).join('');
-        return manualHtmlNav() +
-            `<div class="manual-destino"><span>Destino desta coluna:</span><div class="selc-bolinhas">${destinos}</div>` +
-            `<span class="manual-destino-dica">Índigo = você edita estas linhas. As outras cores tiram a coluna daqui e valem para o arquivo inteiro — azul mantém o original.</span></div>` +
-            `<div class="manual-chute">🎲 Chute como <strong>${selcEsc(t.rotulo)}</strong> <span>(${t.origem})</span>` +
+        // Uma caixa so com as ferramentas (destino, chute, atalhos) e uma linha de
+        // ajuda embaixo: antes eram 7 linhas soltas, com 7 tamanhos de letra.
+        return manualHtmlNav() + `<div class="manual-corpo">` +
+            `<div class="manual-ferramentas">` +
+            `<div class="manual-destino"><span class="manual-rotulo">Destino</span><div class="selc-bolinhas">${destinos}</div>` +
+            `<span class="manual-destino-dica" title="Índigo = você edita estas linhas. As outras cores tiram a coluna daqui e valem para o arquivo inteiro.">azul mantém o original no arquivo inteiro</span></div>` +
+            `<div class="manual-chute"><span class="manual-rotulo">Chute</span> 🎲 <strong>${selcEsc(t.rotulo)}</strong>` +
+            (t.origem !== 'confirmado'
+                ? ` <span title="Não é ${selcEscAttr(t.rotulo)}? Clique no selo do tipo, no alto deste cartão, e escolha o certo — o próximo chute já usa.">(${t.origem} · não é? troque no selo do cartão)</span>`
+                : ` <span>(${t.origem})</span>`) +
             `<button type="button" class="manual-mini" onclick="manualChutarDeNovo()">Chutar de novo</button></div>` +
-            (t.origem !== 'confirmado' ? `<p class="manual-ajuda">Não é ${selcEsc(t.rotulo)}? Clique no selo do tipo, no alto deste cartão, e escolha o certo — o próximo chute já usa.</p>` : '') +
             (memoria && memoria.valorFixo !== undefined
-                ? `<p class="manual-memoria">🧠 Da memória: valor fixo <strong>${selcEsc(memoria.valorFixo)}</strong> em todas as linhas.</p>` : '') +
-            `<div class="manual-atalhos"><span class="manual-atalhos-rotulo">Para as ${L.linhas.length} linhas:</span>` +
+                ? `<div class="manual-memoria">🧠 Da memória: valor fixo <strong>${selcEsc(memoria.valorFixo)}</strong> em todas as linhas.</div>` : '') +
+            `<div class="manual-atalhos"><span class="manual-rotulo">Para as ${L.linhas.length} linhas</span>` +
             `<button type="button" class="manual-mini" onclick="manualChutesEmTodas()">🎲 Chutes em todas</button>` +
             `<button type="button" class="manual-mini" onclick="manualOriginaisEmTodas()">↺ Originais em todas</button>` +
             `<span class="manual-fixo">Mesmo valor em todas <input type="text" id="manualFixo" placeholder="ex.: 10" onkeydown="if (event.key === 'Enter') manualMesmoValor()">` +
             `<button type="button" class="manual-mini" onclick="manualMesmoValor()">Aplicar</button></span></div>` +
-            `<p class="manual-ajuda">Os chutes já valem: se estiver bom, é só ir para a próxima. O cinza embaixo de cada campo é o valor de hoje.</p>` +
+            `</div>` +
+            `<p class="manual-ajuda">Os chutes já valem: se estiver bom, vá para a próxima. Roxo = chute · preto = você escreveu · cinza embaixo = valor de hoje.</p>` +
             `<div class="manual-lista">${campos}</div>` +
-            `<div class="filtro-val-rodape"><button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button></div>`;
+            `<div class="filtro-val-rodape"><button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button></div>` +
+            `</div>`;
     }
 
     function manualRascunhoAtual() {
@@ -2540,6 +2632,7 @@
         if (!input || !alerta) return;
         const s = manualStatus(r, i);
         input.classList.toggle('manual-alterado', s.tipo === 'ok');
+        input.classList.toggle('manual-chutado', s.tipo === 'ok' && r.origem[i] === 'chute'); // roxo claro: ainda e o chute
         input.classList.toggle('manual-colisao', s.tipo === 'igual' && !r.proposital[i]);
         if (s.tipo === 'igual') {
             alerta.innerHTML = `⚠ ${s.mesma ? 'Igual ao valor original desta linha' : `Igual ao valor original da linha ${s.linha}`} — é dado real. ` +
@@ -2666,7 +2759,7 @@
         return n;
     }
 
-    function manualRenderRevisao() {
+    function manualRenderRevisao(entrada) {
         const L = MANUAL_LOTE;
         const blocos = L.cols.map((colId, pos) => {
             const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
@@ -2696,7 +2789,9 @@
         painel.onclick = (e) => e.stopPropagation();
         painel.innerHTML =
             `<div class="manual-nav"><button type="button" class="manual-mini" onclick="manualIrPara(${L.cols.length - 1})">← Voltar</button>` +
-            `<span class="manual-nav-pos">✍️ Revisar: ${L.cols.length} coluna(s) × ${L.linhas.length} linha(s)</span><span></span></div>` +
+            manualHtmlTrilho() + `<span></span></div>` +
+            `<div class="manual-corpo${entrada ? ' ' + entrada : ''}">` +
+            `<p class="manual-rotulo">Revisar: ${L.cols.length} coluna(s) × ${L.linhas.length} linha(s)</p>` +
             `<div class="manual-aviso">⚠️ <strong>Último passo antes de aplicar.</strong> O que está aqui vai pro arquivo final sem passar pelo anonimizador automático.</div>` +
             blocos +
             `<label class="manual-recorte"><input type="checkbox" id="manualRecorteRev" ${L.recorte ? 'checked' : ''} onchange="MANUAL_LOTE.recorte = this.checked"> Recortar o arquivo final: sai só com essas ${L.linhas.length} linha(s)</label>` +
@@ -2705,7 +2800,7 @@
             `<div class="filtro-val-rodape">` +
             `<button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button>` +
             `<button type="button" class="filtro-btn-aplicar manual-btn-aplicar" id="manualBtnAplicar" disabled onclick="manualConfirmarLote()">Confirmar e aplicar</button>` +
-            `</div>`;
+            `</div></div>`;
         document.getElementById('chipsContainer').prepend(painel);
         manualAtualizarBotaoLote();
         painel.scrollIntoView({ block: 'nearest' });

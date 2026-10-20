@@ -1276,3 +1276,65 @@ repo passaram. Aba Auditoria: linha "Edição manual com memória".
 **Versão v4.16 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `DATA_ENTREGA`, `sw.js`, `version.json`, README,
 `package.json`.
+
+---
+
+## PARTE 33 — Visual do Anonimizador, entrega A (2026-10-20, v4.17)
+
+**Pedido do Rafa:** a ficha que abre ao editar e o visual geral da
+"Ferramenta de Auditoria" ainda estavam feios (os cartõezinhos de coluna
+estavam bons). Usar a skill `game-feel-ui` para andar no app, simular,
+medir e propor no mínimo 5 melhorias com efeito satisfatório, dentro
+dos critérios do projeto, e um processo recomendado.
+
+**Medido antes (TXT e CSV pela aba 6):** 7 tamanhos/pesos de letra e 8
+cores de texto dentro da ficha; cinza de texto `#86868B` = 3,6:1 no
+branco (abaixo do AA 4,5:1); 7 linhas soltas de controles antes do
+primeiro campo; todo chute em negrito preto, igual ao que a pessoa
+escreve; botão verde com degradê e sombra **azul**; registro como
+terminal preto com letra verde (única ilha escura num mundo claro);
+status "STATUS DO SISTEMA: ..." em cinza corrido.
+
+**7 propostas, calibradas por frequência de uso (Emil Kowalski):**
+1. Ficha mais calma · 2. Trilho de colunas + deslize ao trocar ·
+3. Revisão em quadradinhos (estilo gráfico do GitHub) · 4. Botão
+Processar vira a barra de progresso + selos de prova no fim ·
+5. Entrada do arquivo em português, com área de soltar · 6. Status em
+selos + botões que afundam no clique · 7. Registro no mundo claro.
+Fora, de propósito: XP, confete, som, partícula, brilho (fundo claro).
+Processo recomendado: **entrega A** (1, 2, 6, 7 — base que tira o
+"feio") e depois **entrega B** (3, 4, 5 — momentos raros). Rafa aprovou A.
+
+**Entrega A (feita):**
+- **6.** Status em 5 selos verdes ("Criptografia ativa", "Sal novo a
+  cada lote", "Tudo roda no seu computador"...), entrando um após o
+  outro só ao abrir (60 ms de intervalo). Clique "afunda" o botão
+  (`scale(.97)`, 100 ms; os largos `.99`). Botão verde e do certificado
+  com cor sólida e sombra da própria cor. `--text-secondary` virou
+  `#6E6E73` (5,1:1).
+- **7.** Registro com fundo `#F7F7F9`, texto escuro e título "📋 Registro
+  do que aconteceu".
+- **1.** Destino, chute e atalhos numa caixa só; ajuda numa linha que
+  também explica as cores. Corpo da ficha com 4 tamanhos de letra e
+  nenhum texto abaixo de 4,5:1. Campo com 3 estados: chute (roxo claro,
+  peso normal), escrito por você (preto, negrito), dado real (vermelho).
+  Campo **não anima** ao digitar (a regra geral dos inputs animava tudo
+  em 0,2 s — achado no teste, peso 660 no meio da transição).
+- **2.** Trilho no alto da ficha e da revisão: "Coluna 1 de 3" + uma
+  pílula por coluna (atual em índigo, ✓ nas já vistas, ● vermelha onde
+  falta decidir dado real) + "Revisar". Clicar pula para a coluna. Ao
+  trocar de coluna o conteúdo desliza 14 px para o lado da navegação
+  (180 ms, `ease-out`); redesenhar a mesma coluna não anima.
+- Tudo desliga com "reduzir movimento" do sistema.
+
+**Teste:** `_teste_visual_a.py` (fora do repo), 26 verificações com
+números (contraste, cores computadas, tamanhos, classes de deslize,
+`prefers-reduced-motion` emulado). As outras 8 suítes de fora e as 5 do
+repo passaram. `_teste_fila_manual.py` e `_teste_edicao_manual.py`
+(antigos) testam a caixa grande que saiu na v4.11 — já falhavam antes,
+cobertos hoje por `_teste_lote_manual.py` e `_teste_manual_v2.py`.
+
+**Falta (entrega B):** propostas 3, 4 e 5.
+
+**Versão v4.17 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
