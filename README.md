@@ -7,7 +7,7 @@
 - **Dominio:** Gestao de Vistorias Tecnicas Operacionais (VTO) da Sanepar
 - **Norma Base:** IT OPE 1580 — Vistorias Tecnicas Operacionais em Ligacoes Prediais de Esgoto
 - **Repositorio:** `RafaMahlmann/Vto-segundo-c-rebro-` (GitHub)
-- **Versao Atual:** 4.15 (6 abas; botao Copiar o VTO assistido - arquivo .html unico ou ZIP com ele dentro; Anonimizador LGPD embutido com filtro de linhas, previa ao vivo, deteccao de tipo por coluna, edicao manual em lote dentro dos cartoes e Simular format-aware em todas as colunas; nenhum registro perdido ou duplicado no export; salvar com nome do original + data e hora, sem gravar por cima, certificado junto; export sem dado pessoal)
+- **Versao Atual:** 4.16 (6 abas; botao Copiar o VTO assistido - arquivo .html unico ou ZIP com ele dentro; Anonimizador LGPD embutido com filtro de linhas, previa ao vivo, deteccao de tipo por coluna, edicao manual em lote dentro dos cartoes (original em cinza, destino no cartao, atalhos, chute coerente, memoria das escolhas em arquivo) e Simular format-aware em todas as colunas; nenhum registro perdido ou duplicado no export; salvar com nome do original + data e hora, sem gravar por cima, certificado junto; export sem dado pessoal)
 
 > **ATENCAO, AGENTE DE IA:** antes de qualquer alteracao, leia o `AGENTS.md` desta pasta.
 > Ele define o protocolo de edicao cirurgica, as proibicoes e o mapa do `index.html`.

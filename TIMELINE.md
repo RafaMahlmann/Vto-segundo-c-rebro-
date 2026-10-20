@@ -1214,3 +1214,65 @@ mudança. Aba Auditoria: linha "Salvar sem apagar nada" atualizada.
 
 **Versão v4.15:** subiram juntos title, badge, 4 rodapés, `VERSAO_LOCAL`,
 `sw.js`, `version.json`, README, `package.json`.
+
+---
+
+## PARTE 32 — Cartão da edição manual: original, destino, atalhos e memória (2026-10-20, v4.16)
+
+**Pedido do Rafa:** no cartão da edição manual (UNIDADE, LOCAL...) faltava
+preservar o original e seguir, mudar tudo de uma vez ("todos viram 10"),
+as bolinhas de destino ali mesmo, ver o original de cada linha para
+comparar e copiar, e um "aprendizado" das escolhas que dê para apagar.
+Pesquisa: Excel (Preencher / Flash Fill), OpenRefine (Extract/Apply do
+histórico em JSON), Power Query (Etapas Aplicadas). Ele aprovou as 5
+propostas, com a memória salva em arquivo.
+
+**1. Original embaixo de cada linha.** Só o texto, em cinza (pedido: sem
+escrever "original"). Um clique ou dois seleciona o valor inteiro
+(`user-select: all`) para copiar e colar. Vazio aparece "(vazio)". Mais
+espaço entre as linhas.
+
+**2. Destino dentro do cartão.** As 6 bolinhas no alto do cartão aberto.
+Índigo = continua manual. Qualquer outra cor tira a coluna da edição e
+vale para o arquivo inteiro (azul = mantém o original). Se a pessoa
+digitou algo na coluna, pergunta antes. Era a última coluna: vai para a
+revisão; era a única: fecha o lote.
+
+**3. Atalhos para as N linhas.** "🎲 Chutes em todas", "↺ Originais em
+todas" (já marcadas "de propósito", mas continuam na revisão como dado
+real) e "Mesmo valor em todas [__] Aplicar" (Enter também aplica). Frase
+nova: "Os chutes já valem: se estiver bom, é só ir para a próxima."
+
+**4. Chute coerente** (`manualChutesCoerentes`). Achado ao fotografar:
+UNIDADE 220 em todas as linhas virava 466, 819, 858... Agora o mesmo
+original recebe o mesmo chute, e originais diferentes recebem chutes
+diferentes. Vale para "Chutar de novo" também.
+
+**5. Memória das escolhas** (`MEMORIA`). Não é aprendizado de máquina:
+é uma lista visível e apagável, como as Etapas Aplicadas do Power Query.
+- Aprende com: bolinhas (cartão fechado, barra preta e cartão aberto),
+  tipo confirmado/desfeito e "Mesmo valor em todas".
+- Guarda só nome da coluna → destino, tipo, valor fixo. Nunca dado do
+  arquivo. Valor fixo igual a dado real não entra (avisa no log).
+- Fica só na aba (AGENTS.md proíbe localStorage). "💾 Salvar memória em
+  arquivo" baixa `memoria_anonimizador_<data>_<hora>.json`; "📂 Abrir
+  memória" carrega e valida (aceita só destino 0–4, tipo conhecido,
+  valor ≤ 200 caracteres; nome de coluna vira texto, nunca HTML).
+- Arquivo novo carregado: **oferece** "Aplicar a memória" / "Agora não";
+  nunca aplica sozinha. Valor fixo entra quando a edição manual da coluna
+  abre ("🧠 Da memória: valor fixo 10").
+- "✕" esquece uma coluna; "🗑 Esquecer tudo" pergunta e apaga. Resumo
+  mostra "● ainda não salva em arquivo" quando mudou.
+
+**Teste:** `_teste_manual_v2.py` (fora do repo), 47 verificações: cinza
+igual ao original e sem a palavra "original", seleção do nome inteiro
+com espaços, colar acende o aviso de dado real, chute coerente (220 e
+001/002), atalhos, troca de destino com e sem pergunta, arquivo final com
+UNIDADE = 10 e COMPLEMENTO excluída, memória salva **sem nenhum valor do
+arquivo de teste**, abrir em aba nova, aplicar, arquivo inválido e nome
+malicioso, CSV sem bolinha verde. As outras 7 suítes de fora e as 5 do
+repo passaram. Aba Auditoria: linha "Edição manual com memória".
+
+**Versão v4.16 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `DATA_ENTREGA`, `sw.js`, `version.json`, README,
+`package.json`.

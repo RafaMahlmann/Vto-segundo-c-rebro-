@@ -538,13 +538,53 @@
             display: inline-block !important; width: 80px !important; padding: 8px 10px !important;
             border-radius: 10px !important; font-size: 13px;
         }
-        .manual-lista { max-height: 44vh; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+        .manual-lista { max-height: 52vh; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin: 14px 0; }
         .manual-linha-input {
             display: block !important; width: 100% !important; padding: 10px 12px !important;
             border-radius: 10px !important; font-size: 13px; font-family: 'SF Mono', 'Menlo', monospace;
             border-color: #5856D6 !important; color: #AEAEB2 !important; transition: color .1s ease;
         }
         .manual-linha-input.manual-alterado { color: #1D1D1F !important; font-weight: 700; }
+        /* valor original embaixo de cada linha: so o texto, cinza, um clique seleciona tudo */
+        .manual-ref { grid-column: 2 / 4; font-family: 'SF Mono', 'Menlo', monospace; font-size: 12px; color: #8E8E93; margin-top: -3px; padding-left: 2px; }
+        .manual-ref-valor { user-select: all; -webkit-user-select: all; cursor: text; }
+        .manual-ref-vazio { font-style: italic; user-select: none; }
+        /* destino da coluna dentro do cartao aberto */
+        .manual-destino { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 2px 0 10px; font-size: 12px; color: var(--text-secondary); }
+        .manual-destino .selc-bolinhas { gap: 8px; }
+        .manual-destino .selc-bol { width: 20px; height: 20px; }
+        .manual-destino-dica { flex-basis: 100%; font-size: 11px; color: #8E8E93; }
+        /* atalhos para todas as linhas do cartao */
+        .manual-atalhos { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0 4px; font-size: 12px; color: var(--text-secondary); }
+        .manual-atalhos-rotulo { font-weight: 700; color: var(--text-primary); }
+        .manual-fixo { display: inline-flex; align-items: center; gap: 6px; }
+        .manual-fixo input {
+            display: inline-block !important; width: 130px !important; padding: 7px 10px !important;
+            border-radius: 10px !important; font-size: 12px; font-family: 'SF Mono', 'Menlo', monospace;
+        }
+        .manual-memoria { font-size: 12px; color: #3F3DB0; margin: 2px 0 4px; }
+        /* memoria das escolhas */
+        .memoria-aviso {
+            display: none; font-size: 13px; line-height: 1.6; background: #F0F0FB; color: #3F3DB0;
+            border-radius: 10px; padding: 8px 12px; margin: 10px 0;
+        }
+        .memoria-aviso.visivel { display: block; }
+        .memoria-painel { margin-top: 12px; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 14px; background: #FAFAFC; }
+        .memoria-painel summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .memoria-painel summary span { font-weight: 400; color: var(--text-secondary); }
+        .memoria-ajuda { font-size: 12px; color: var(--text-secondary); line-height: 1.5; margin: 8px 0; }
+        .memoria-lista { display: flex; flex-wrap: wrap; gap: 6px; max-height: 180px; overflow-y: auto; margin-bottom: 8px; }
+        .memoria-item {
+            display: inline-flex; align-items: center; gap: 6px; font-size: 12px; background: #fff;
+            border: 1px solid var(--border-color); border-radius: 8px; padding: 3px 4px 3px 8px;
+        }
+        .memoria-vazia { font-size: 12px; color: #8E8E93; font-style: italic; }
+        button.memoria-x {
+            width: auto; margin: 0; padding: 0 6px; background: none; color: #8E8E93; box-shadow: none;
+            font-size: 12px; border-radius: 6px;
+        }
+        button.memoria-x:hover { background: #F2F2F7; color: #B42318; transform: none; box-shadow: none; }
+        .memoria-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
         .manual-risco-check {
             display: flex !important; align-items: flex-start; gap: 8px; font-size: 13px; font-weight: 600;
             color: #B42318; margin: 6px 0; cursor: pointer;
@@ -612,6 +652,20 @@
                 <div class="instruction-note" style="display:block;margin-top:10px">
                     ✍️ Edição manual: bolinha índigo de um cartão, ou selecione várias colunas e use a bolinha índigo da barra preta — você passa de cartão em cartão.
                 </div>
+
+                <div class="memoria-aviso" id="memoriaAviso"></div>
+                <details class="memoria-painel" id="memoriaPainel">
+                    <summary>🧠 Memória das suas escolhas <span id="memoriaResumo">(vazia)</span></summary>
+                    <p class="memoria-ajuda">Guarda só o nome da coluna e o que você escolheu nela: o destino (as bolinhas), o tipo confirmado e o valor fixo. Nunca guarda dado do arquivo.
+                        Fica só nesta aba: para usar outro dia, salve em arquivo e abra da próxima vez.</p>
+                    <div class="memoria-lista" id="memoriaLista"></div>
+                    <div class="memoria-botoes">
+                        <button type="button" class="selc-btn-mini" onclick="memoriaSalvarArquivo()">💾 Salvar memória em arquivo</button>
+                        <button type="button" class="selc-btn-mini" onclick="document.getElementById('memoriaArquivo').click()">📂 Abrir memória</button>
+                        <button type="button" class="selc-btn-mini" onclick="memoriaEsquecerTudo()">🗑 Esquecer tudo</button>
+                    </div>
+                    <input type="file" id="memoriaArquivo" accept=".json,application/json" style="display:none" onchange="memoriaAbrirArquivo(this)">
+                </details>
             </div>
 
             <div class="filtro-overlay" id="filtroOverlay">
@@ -774,6 +828,7 @@
                 <li><strong>Detecção de tipo e edição manual em lote (19/10):</strong> num arquivo de teste com CPF, CNPJ, CEP, data, telefone, e-mail e valor, cada coluna foi reconhecida pelo padrão e pela validação (dígito verificador, data que existe no calendário, DDD que existe) — inclusive um CPF guardado numa coluna de nome errado. Na edição manual, todo valor inventado é conferido contra os valores reais carregados e trocado se bater; valor real digitado à mão só passa com confirmação explícita, linha por linha. 27 + 35 verificações, com o arquivo final conferido linha a linha.</li>
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original e a data e a hora em que foi salvo (a pessoa pode trocar); numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 45 verificações com TXT e CSV.</li>
+                <li><strong>Edição manual com memória (20/10):</strong> o valor de hoje aparece em cinza embaixo de cada campo; o mesmo original recebe sempre o mesmo chute; o destino da coluna muda dentro do cartão. A memória das escolhas guarda só nome de coluna e escolha: o arquivo de memória salvo foi conferido e não tem nenhum valor do arquivo de teste. Valor fixo igual a dado real não entra na memória, e uma memória com nome de coluna malicioso aparece como texto, sem executar. 47 verificações.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
         </div>
@@ -1551,6 +1606,7 @@
         salvarMostrarResultado(null);
         salvarAtualizarPrevia();
         sugerirFimDoNome();
+        memoriaDispensarAviso(); // o aviso volta, se couber, quando as colunas do arquivo novo existirem
 
         FILTROS_LINHA = [];
         PRESET_SGCG_APLICADO = false;
@@ -1586,6 +1642,7 @@
         document.body.classList.toggle('selc-modo-csv', MODO_ATUAL === 'CSV');
         carregarAmostras();
         detectarTiposColunas();
+        memoriaOferecer();
     }
 
     function configurarModoTXT() {
@@ -1737,6 +1794,7 @@
         if (!col) return;
         if (estado === 4 && MODO_ATUAL !== 'TXT') return;
         col.estado = estado;
+        if (estado !== 5) memoriaGuardar(col.nome, { destino: estado }); // a memoria aprende com a bolinha
         const chip = document.getElementById(`chip-${id}`);
         if (chip) {
             chip.classList.remove('selc-pop'); void chip.offsetWidth; chip.classList.add('selc-pop');
@@ -1919,11 +1977,14 @@
         TIPO_CONFIRMADO.set(id, tipo);
         const col = COLUNAS_DETECTADAS.find(c => c.id === id);
         log(`Tipo confirmado: ${col ? col.nome : id} = ${TIPOS_INFO[tipo].rotulo}`);
+        if (col) memoriaGuardar(col.nome, { tipo });
         tipoAplicado(id);
     }
 
     function tipoDesconfirmar(id) {
         TIPO_CONFIRMADO.delete(id);
+        const col = COLUNAS_DETECTADAS.find(c => c.id === id);
+        if (col) memoriaGuardar(col.nome, { tipo: null });
         tipoAplicado(id);
     }
 
@@ -1936,7 +1997,12 @@
 
     function tiposConfirmarAltaConfianca() {
         const pendentes = tiposPendentesAlta();
-        pendentes.forEach(c => { TIPO_CONFIRMADO.set(c.id, TIPO_DETECTADO.get(c.id).tipo); tipoAplicado(c.id); });
+        pendentes.forEach(c => {
+            const tipo = TIPO_DETECTADO.get(c.id).tipo;
+            TIPO_CONFIRMADO.set(c.id, tipo);
+            memoriaGuardar(c.nome, { tipo });
+            tipoAplicado(c.id);
+        });
         log(`Tipos confirmados em lote: ${pendentes.length} coluna(s) de confiança alta.`);
     }
 
@@ -2366,38 +2432,88 @@
         manualRenderLote();
     }
 
+    // Mesmo original -> mesmo chute; originais diferentes -> chutes diferentes.
+    // Antes cada linha ganhava um chute solto: UNIDADE 220 em todas as linhas
+    // virava 466, 819, 858... e a coluna perdia o sentido.
+    function manualChutesCoerentes(gerador, originais, proibidos, indices) {
+        const porOriginal = new Map();
+        const usados = new Set(proibidos);
+        const saida = new Map();
+        indices.forEach(i => {
+            const chave = normalizar(originais[i]);
+            if (!porOriginal.has(chave)) {
+                const c = chutarValor(gerador, originais[i], usados);
+                porOriginal.set(chave, c);
+                if (c.valor) usados.add(normalizar(c.valor));
+            }
+            saida.set(i, porOriginal.get(chave));
+        });
+        return saida;
+    }
+
     function manualPrepararRascunho(colId) {
         const L = MANUAL_LOTE;
         const originais = L.linhas.map(l => manualOriginal(l, colId));
         const proibidos = new Set(originais.filter(o => o.trim() !== '').map(normalizar));
         const existente = EDICOES_MANUAIS.get(colId);
         const { gerador } = tipoParaChute(colId);
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        const memoria = col ? MEMORIA.get(col.nome) : null;
+        const fixo = memoria ? memoria.valorFixo : undefined;
         const r = { originais, valores: [], origem: [], proposital: [], chuteFalhou: [] };
+        const paraChutar = [];
         L.linhas.forEach((l, i) => {
             if (existente && existente.has(l.idx)) {
                 r.valores[i] = existente.get(l.idx); r.origem[i] = 'digitado'; r.chuteFalhou[i] = false;
+            } else if (fixo !== undefined) {
+                // valor fixo que a pessoa usou antes nesta coluna (memoria)
+                r.valores[i] = fixo; r.origem[i] = 'memoria'; r.chuteFalhou[i] = false;
             } else {
-                const c = chutarValor(gerador, originais[i], proibidos);
-                r.valores[i] = c.valor; r.origem[i] = 'chute'; r.chuteFalhou[i] = !c.ok;
+                paraChutar.push(i);
             }
             r.proposital[i] = false;
+        });
+        manualChutesCoerentes(gerador, originais, proibidos, paraChutar).forEach((c, i) => {
+            r.valores[i] = c.valor; r.origem[i] = 'chute'; r.chuteFalhou[i] = !c.ok;
         });
         L.rascunho.set(colId, r);
     }
 
     function manualHtmlEditar(colId) {
         const L = MANUAL_LOTE, r = L.rascunho.get(colId), t = tipoParaChute(colId);
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        const memoria = col ? MEMORIA.get(col.nome) : null;
         const campos = L.linhas.map((l, i) =>
             `<div class="manual-campo">` +
             `<span class="manual-n" title="Linha ${l.idx + 1} do arquivo">${i + 1}</span>` +
             `<input type="text" class="manual-linha-input" id="manualInput-${i}" value="${selcEscAttr(r.valores[i])}" placeholder="(vazio — sai em branco)" oninput="manualDigitou(${i}, this.value)">` +
             `<button type="button" class="manual-orig" title="Trazer o valor original pra escrever por cima" onclick="manualTrazerOriginal(${i})">↺</button>` +
+            // So o texto do original, em cinza: referencia do que vai ser trocado.
+            // Um clique (ou dois) seleciona o valor inteiro para copiar e colar.
+            (r.originais[i].trim() === ''
+                ? `<div class="manual-ref"><span class="manual-ref-vazio">(vazio)</span></div>`
+                : `<div class="manual-ref" title="Valor de hoje nesta linha. Clique para selecionar e copiar."><span class="manual-ref-valor" id="manualRef-${i}">${selcEsc(r.originais[i])}</span></div>`) +
             `<div class="manual-alerta" id="manualAlerta-${i}"></div>` +
             `</div>`).join('');
+        // Destino da coluna sem sair do cartao. Manual (indigo) e o de agora;
+        // as outras cores tiram a coluna da edicao e valem para o arquivo inteiro.
+        const destinos = [1, 2, 3, 4, 0, 5].map(e =>
+            `<button type="button" class="selc-bol${e === 5 ? ' ativa' : ''}" data-estado="${e}" title="${selcNomeEstado(e)}" ` +
+            `onclick="manualTrocarDestino(${colId}, ${e})"></button>`).join('');
         return manualHtmlNav() +
+            `<div class="manual-destino"><span>Destino desta coluna:</span><div class="selc-bolinhas">${destinos}</div>` +
+            `<span class="manual-destino-dica">Índigo = você edita estas linhas. As outras cores tiram a coluna daqui e valem para o arquivo inteiro — azul mantém o original.</span></div>` +
             `<div class="manual-chute">🎲 Chute como <strong>${selcEsc(t.rotulo)}</strong> <span>(${t.origem})</span>` +
             `<button type="button" class="manual-mini" onclick="manualChutarDeNovo()">Chutar de novo</button></div>` +
             (t.origem !== 'confirmado' ? `<p class="manual-ajuda">Não é ${selcEsc(t.rotulo)}? Clique no selo do tipo, no alto deste cartão, e escolha o certo — o próximo chute já usa.</p>` : '') +
+            (memoria && memoria.valorFixo !== undefined
+                ? `<p class="manual-memoria">🧠 Da memória: valor fixo <strong>${selcEsc(memoria.valorFixo)}</strong> em todas as linhas.</p>` : '') +
+            `<div class="manual-atalhos"><span class="manual-atalhos-rotulo">Para as ${L.linhas.length} linhas:</span>` +
+            `<button type="button" class="manual-mini" onclick="manualChutesEmTodas()">🎲 Chutes em todas</button>` +
+            `<button type="button" class="manual-mini" onclick="manualOriginaisEmTodas()">↺ Originais em todas</button>` +
+            `<span class="manual-fixo">Mesmo valor em todas <input type="text" id="manualFixo" placeholder="ex.: 10" onkeydown="if (event.key === 'Enter') manualMesmoValor()">` +
+            `<button type="button" class="manual-mini" onclick="manualMesmoValor()">Aplicar</button></span></div>` +
+            `<p class="manual-ajuda">Os chutes já valem: se estiver bom, é só ir para a próxima. O cinza embaixo de cada campo é o valor de hoje.</p>` +
             `<div class="manual-lista">${campos}</div>` +
             `<div class="filtro-val-rodape"><button type="button" class="selc-btn-mini" onclick="manualSairLote()">Sair sem aplicar</button></div>`;
     }
@@ -2460,16 +2576,71 @@
         else manualAtualizarBotaoLote();
     }
 
-    function manualChutarDeNovo() {
+    // Novos chutes nas linhas escolhidas (todas, se nao disser), coerentes entre si.
+    function manualRechutar(filtro) {
         const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
         const r = MANUAL_LOTE.rascunho.get(colId);
         const proibidos = new Set(r.originais.filter(o => o.trim() !== '').map(normalizar));
         const { gerador } = tipoParaChute(colId);
-        r.valores.forEach((_, i) => {
-            if (r.origem[i] === 'digitado') return; // o que a pessoa digitou fica
-            const c = chutarValor(gerador, r.originais[i], proibidos);
+        const indices = r.valores.map((_, i) => i).filter(i => !filtro || filtro(i));
+        manualChutesCoerentes(gerador, r.originais, proibidos, indices).forEach((c, i) => {
             r.valores[i] = c.valor; r.origem[i] = 'chute'; r.proposital[i] = false; r.chuteFalhou[i] = !c.ok;
         });
+        manualRenderLote();
+    }
+
+    function manualChutarDeNovo() {
+        const r = manualRascunhoAtual();
+        manualRechutar(i => r.origem[i] !== 'digitado'); // o que a pessoa digitou fica
+    }
+
+    // Atalhos para todas as linhas do cartao.
+    function manualChutesEmTodas() { manualRechutar(null); }
+
+    function manualOriginaisEmTodas() {
+        const r = manualRascunhoAtual();
+        // A pessoa pediu os originais de proposito: ja vem marcado, mas continua
+        // aparecendo na revisao como dado real.
+        r.valores.forEach((_, i) => {
+            r.valores[i] = r.originais[i]; r.origem[i] = 'original'; r.chuteFalhou[i] = false;
+            r.proposital[i] = r.originais[i].trim() !== '';
+        });
+        manualRenderLote();
+    }
+
+    function manualMesmoValor() {
+        const campo = document.getElementById('manualFixo');
+        if (!campo) return;
+        const v = campo.value;
+        const colId = MANUAL_LOTE.cols[MANUAL_LOTE.pos];
+        const r = MANUAL_LOTE.rascunho.get(colId);
+        r.valores.forEach((_, i) => { r.valores[i] = v; r.origem[i] = 'digitado'; r.proposital[i] = false; r.chuteFalhou[i] = false; });
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        // A memoria guarda o valor fixo so se ele nao for um dado real das linhas.
+        const real = v.trim() !== '' && r.originais.some(o => o.trim() !== '' && normalizar(o) === normalizar(v));
+        if (col && v.trim() !== '' && !real) memoriaGuardar(col.nome, { valorFixo: v });
+        else if (col && real) log(`🧠 Não guardei "${v}" na memória de ${col.nome}: é igual a um dado real.`);
+        manualRenderLote();
+    }
+
+    // Troca o destino da coluna sem sair do cartao. Qualquer cor que nao seja
+    // o indigo tira a coluna desta edicao e passa para a proxima.
+    function manualTrocarDestino(colId, estado) {
+        const L = MANUAL_LOTE;
+        if (!L || estado === 5) return;
+        if (estado === 4 && MODO_ATUAL !== 'TXT') return;
+        const col = COLUNAS_DETECTADAS.find(c => c.id === colId);
+        if (!col) return;
+        const r = L.rascunho.get(colId);
+        if (r && r.origem.some(o => o === 'digitado')
+            && !confirm(`Você digitou valores em ${col.nome}. Trocar o destino descarta o que digitou nesta coluna. Continuar?`)) return;
+        selcDefinirEstado(colId, estado);
+        const pos = L.cols.indexOf(colId);
+        L.cols.splice(pos, 1);
+        L.rascunho.delete(colId);
+        log(`✍️ ${col.nome} saiu da edição manual: agora é ${selcNomeEstado(estado)} no arquivo inteiro.`);
+        if (!L.cols.length) { manualFecharLote(); return; }
+        if (L.pos >= L.cols.length) { L.pos = L.cols.length - 1; manualIrRevisao(); return; }
         manualRenderLote();
     }
 
@@ -2695,6 +2866,159 @@
             for (const linha of lines) processar(linha);
         }
         log(`   -> Pools geo: ${POOL.ruasPorBairro.size} bairros, ${POOL.lotesPorQuadra.size} quadras mapeadas.`);
+    }
+
+    // ===========================================================================
+    // MEMORIA DAS ESCOLHAS — so nome da coluna -> escolha. Nunca dado do arquivo.
+    // ===========================================================================
+    // Nao e aprendizado de maquina: e uma lista visivel e apagavel do que a pessoa
+    // escolheu (como as Etapas Aplicadas do Power Query). Fica so nesta aba - as
+    // regras do projeto proibem localStorage, e isso e bom para a LGPD. Para levar
+    // para outro dia, a pessoa salva em arquivo e abre da proxima vez.
+    const MEMORIA = new Map();   // nome da coluna -> { destino?, tipo?, valorFixo? }
+    let MEMORIA_SUJA = false;    // mudou desde o ultimo "Salvar memoria em arquivo"
+    const MEMORIA_CAMPOS = ['destino', 'tipo', 'valorFixo'];
+
+    function memoriaGuardar(nome, campos) {
+        const atual = MEMORIA.get(nome) || {};
+        const novo = {};
+        MEMORIA_CAMPOS.forEach(k => {
+            const v = k in campos ? campos[k] : atual[k];
+            if (v !== undefined && v !== null) novo[k] = v;
+        });
+        if (MEMORIA_CAMPOS.every(k => novo[k] === atual[k])) return; // nada mudou
+        if (Object.keys(novo).length) MEMORIA.set(nome, novo); else MEMORIA.delete(nome);
+        MEMORIA_SUJA = true;
+        memoriaRender();
+    }
+
+    function memoriaDescrever(m) {
+        const p = [];
+        if (m.destino !== undefined) p.push(selcNomeEstado(m.destino));
+        if (m.tipo) p.push('tipo ' + (TIPOS_INFO[m.tipo] ? TIPOS_INFO[m.tipo].rotulo : m.tipo));
+        if (m.valorFixo !== undefined) p.push('valor fixo ' + m.valorFixo);
+        return p.join(' · ');
+    }
+
+    function memoriaRender() {
+        const resumo = document.getElementById('memoriaResumo');
+        const lista = document.getElementById('memoriaLista');
+        if (!resumo || !lista) return;
+        resumo.textContent = MEMORIA.size
+            ? `(${MEMORIA.size} coluna${MEMORIA.size > 1 ? 's' : ''})${MEMORIA_SUJA ? ' · ● ainda não salva em arquivo' : ''}`
+            : '(vazia)';
+        lista.innerHTML = MEMORIA.size
+            ? [...MEMORIA.keys()].sort().map(nome =>
+                `<span class="memoria-item"><span><strong>${selcEsc(nome)}</strong>: ${selcEsc(memoriaDescrever(MEMORIA.get(nome)))}</span>` +
+                `<button type="button" class="memoria-x" title="Esquecer esta coluna" data-nome="${selcEscAttr(nome)}" onclick="memoriaEsquecer(this.dataset.nome)">✕</button></span>`).join('')
+            : '<span class="memoria-vazia">Ainda vazia. Ela aprende com as bolinhas que você clica, os tipos que confirma e o "Mesmo valor em todas".</span>';
+    }
+
+    function memoriaEsquecer(nome) {
+        if (!MEMORIA.delete(nome)) return;
+        MEMORIA_SUJA = true;
+        memoriaRender();
+        memoriaOferecer();
+    }
+
+    function memoriaEsquecerTudo() {
+        if (!MEMORIA.size) return;
+        if (!confirm(`Esquecer tudo o que a memória aprendeu (${MEMORIA.size} coluna(s))? Um arquivo de memória que você já salvou continua no seu computador.`)) return;
+        MEMORIA.clear();
+        MEMORIA_SUJA = false;
+        memoriaRender();
+        memoriaOferecer();
+        log('🧠 Memória apagada.');
+    }
+
+    function memoriaSalvarArquivo() {
+        if (!MEMORIA.size) { alert('A memória ainda está vazia: não tem o que salvar.'); return; }
+        const dados = {
+            tipo: 'memoria-anonimizador-vto', versao: 1, salvoEm: new Date().toISOString(),
+            aviso: 'So nomes de coluna e escolhas. Nenhum dado de arquivo.',
+            colunas: Object.fromEntries([...MEMORIA.entries()].sort((a, b) => a[0].localeCompare(b[0])))
+        };
+        const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+        const nome = 'memoria_anonimizador_' + carimboAgora() + '.json';
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url; link.download = nome;
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        MEMORIA_SUJA = false;
+        memoriaRender();
+        log(`🧠 Memória salva: ${nome} (pasta Downloads). Da próxima vez, use "Abrir memória".`);
+    }
+
+    async function memoriaAbrirArquivo(input) {
+        const f = input.files && input.files[0];
+        input.value = '';
+        if (!f) return;
+        let dados = null;
+        try { dados = JSON.parse(await f.text()); } catch (e) { dados = null; }
+        const colunas = dados && dados.tipo === 'memoria-anonimizador-vto' && dados.colunas && typeof dados.colunas === 'object'
+            ? dados.colunas : null;
+        if (!colunas) { alert('Este arquivo não é uma memória do Anonimizador.'); return; }
+        if (MEMORIA.size && !confirm(`Abrir esta memória troca a de agora (${MEMORIA.size} coluna(s)). Continuar?`)) return;
+        MEMORIA.clear();
+        // Aceita so o que a memoria sabe guardar; o resto do arquivo e ignorado.
+        Object.keys(colunas).slice(0, 2000).forEach(nome => {
+            const m = colunas[nome] || {};
+            const limpo = {};
+            if ([0, 1, 2, 3, 4].includes(m.destino)) limpo.destino = m.destino;
+            if (typeof m.tipo === 'string' && TIPOS_INFO[m.tipo]) limpo.tipo = m.tipo;
+            if (typeof m.valorFixo === 'string' && m.valorFixo.length <= 200) limpo.valorFixo = m.valorFixo;
+            if (String(nome).length <= 80 && Object.keys(limpo).length) MEMORIA.set(String(nome), limpo);
+        });
+        MEMORIA_SUJA = false;
+        memoriaRender();
+        log(`🧠 Memória aberta: ${MEMORIA.size} coluna(s), do arquivo ${f.name}.`);
+        memoriaOferecer();
+    }
+
+    function memoriaColunasQueBatem() {
+        return COLUNAS_DETECTADAS.filter(c => {
+            const m = MEMORIA.get(c.nome);
+            if (!m) return false;
+            const destinoServe = m.destino !== undefined && !(m.destino === 4 && MODO_ATUAL !== 'TXT') && m.destino !== c.estado;
+            const tipoServe = m.tipo && TIPO_CONFIRMADO.get(c.id) !== m.tipo && !tipoGeoDaColuna(c.nome);
+            return destinoServe || tipoServe || m.valorFixo !== undefined;
+        });
+    }
+
+    // Arquivo novo (ou memoria aberta): oferece aplicar, nunca aplica sozinho.
+    function memoriaOferecer() {
+        memoriaRender();
+        const el = document.getElementById('memoriaAviso');
+        if (!el) return;
+        const batem = COLUNAS_DETECTADAS.length ? memoriaColunasQueBatem() : [];
+        if (!batem.length) { el.classList.remove('visivel'); el.innerHTML = ''; return; }
+        el.innerHTML = `🧠 A memória tem escolhas suas para ${batem.length} coluna(s) deste arquivo. ` +
+            `<button type="button" class="selc-btn-mini" onclick="memoriaAplicar()">Aplicar a memória</button> ` +
+            `<button type="button" class="selc-btn-mini" onclick="memoriaDispensarAviso()">Agora não</button>`;
+        el.classList.add('visivel');
+    }
+
+    function memoriaDispensarAviso() {
+        const el = document.getElementById('memoriaAviso');
+        if (el) { el.classList.remove('visivel'); el.innerHTML = ''; }
+    }
+
+    function memoriaAplicar() {
+        let destinos = 0, tipos = 0, fixos = 0;
+        memoriaColunasQueBatem().forEach(c => {
+            const m = MEMORIA.get(c.nome);
+            if (m.destino !== undefined && !(m.destino === 4 && MODO_ATUAL !== 'TXT') && m.destino !== c.estado) {
+                selcDefinirEstado(c.id, m.destino); destinos++;
+            }
+            if (m.tipo && TIPO_CONFIRMADO.get(c.id) !== m.tipo && !tipoGeoDaColuna(c.nome)) {
+                TIPO_CONFIRMADO.set(c.id, m.tipo); tipoAplicado(c.id); tipos++;
+            }
+            if (m.valorFixo !== undefined) fixos++;
+        });
+        memoriaDispensarAviso();
+        log(`🧠 Memória aplicada: ${destinos} destino(s), ${tipos} tipo(s).` +
+            (fixos ? ` ${fixos} valor(es) fixo(s) entram quando você abrir a edição manual dessas colunas.` : ''));
     }
 
     // ===========================================================================
