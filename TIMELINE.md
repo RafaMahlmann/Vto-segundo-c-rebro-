@@ -1498,3 +1498,36 @@ de estrutura em textos, e-mail com domínio reservado, datas sem futuro);
 
 **Versão v4.20 · 20/10/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+
+---
+
+## PARTE 37 — Tipos "Nome de rua" e "Nome de bairro" no palpite de coluna (2026-11-05, v4.21)
+
+**Pedido do Rafa:** no Dublê, coluna de rua ("Rua João Gomes") era
+chutada como **Nome de pessoa**. Faltava o palpite de rua e de bairro,
+e a opção de escolher os dois na mão.
+
+**O que mudou (só `anonimizador.html`, sistema de tipos):**
+- `TIPOS_INFO` ganhou `RUA` ("Nome de rua") e `BAIRRO` ("Nome de
+  bairro"). Aparecem sozinhos na lista "Não, é:" do selo.
+- `pareceLogradouro()` / `PREFIXO_LOGRADOURO`: valor que começa com
+  Rua, R., Av., Avenida, Travessa, Alameda, Praça, Rodovia, Estrada etc.
+- `ORDEM_TIPOS`: `RUA` antes de `NOME`. O teste de `NOME` recusa valor
+  com prefixo de logradouro.
+- `BAIRRO` não tem formato: só vira palpite se o nome da coluna tiver
+  a palavra BAIRRO (senão todo texto pareceria bairro).
+- `FABRICAS.RUA`: mantém o prefixo do original + nome e sobrenome
+  inventados. `FABRICAS.BAIRRO`: mantém Jardim/Vila/Parque, senão sorteia.
+  Maiúsculas seguem o original. Usados no Dublê, no Simular, na prévia e
+  no chute da edição manual (`MAPA_TIPO_GERADOR`).
+- Coluna `ENDERECO` do TXT continua com a troca real no bairro (selo 🏠).
+
+**Teste (Node, funções extraídas do arquivo):** coluna de ruas saía
+"Nome de pessoa · baixa" na v4.20 e sai "Nome de rua · alta" na v4.21;
+NOME-BAIRRO saía "Texto" e sai "Nome de bairro · media"; nome de
+cliente continua "Nome de pessoa · alta"; colunas de texto comum não
+mudaram.
+
+**Versão v4.21 · 05/11/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
