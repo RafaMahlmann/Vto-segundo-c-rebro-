@@ -983,6 +983,7 @@
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original e a data e a hora em que foi salvo (a pessoa pode trocar); numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 45 verificações com TXT e CSV.</li>
                 <li><strong>Edição manual com memória (20/10):</strong> o valor de hoje aparece em cinza embaixo de cada campo; o mesmo original recebe sempre o mesmo chute; o destino da coluna muda dentro do cartão. A memória das escolhas guarda só nome de coluna e escolha: o arquivo de memória salvo foi conferido e não tem nenhum valor do arquivo de teste. Valor fixo igual a dado real não entra na memória, e uma memória com nome de coluna malicioso aparece como texto, sem executar. 47 verificações.</li>
+                <li><strong>Rua e bairro não viram nome de pessoa (05/11):</strong> coluna com "Rua João Gomes", "Av. Brasil" ou "Travessa Pedro" era chutada como <strong>Nome de pessoa</strong>. Agora o selo reconhece o tipo do logradouro e diz <strong>Nome de rua</strong>. Coluna com "BAIRRO" no nome ganha o palpite <strong>Nome de bairro</strong>. Os dois também aparecem na lista "Não, é:" para escolher na mão. No Simular e no Dublê, rua vira rua falsa com o mesmo tipo (Rua continua Rua, Av. continua Av.) e bairro vira bairro falso (Jardim continua Jardim).</li>
                 <li><strong>Rua, lote e Dublê sem vazamento (20/10):</strong> a troca de rua devolvia a rua real quando várias casas do bairro ficam na mesma rua (56 de 80 linhas no teste), e apartamentos com o mesmo lote saíam com o lote real (10 de 80). Agora a troca nunca devolve o mesmo valor: sem outra rua no bairro, vem uma rua real de outro bairro do arquivo. O Dublê juntava todo texto num número só (nomes, e-mails e endereços viravam o mesmo número); agora só a matrícula vira 8 dígitos, e o resto vira um falso do mesmo tipo e tamanho. 28 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
             </ul>
@@ -1260,6 +1261,25 @@
             const s1 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
             const s2 = SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
             return `${n} ${s1} ${s2}`.toUpperCase();
+        },
+        // Rua falsa: mantem o tipo do logradouro do original (Rua, Av., Travessa...)
+        // e troca o nome por nome + sobrenome inventados. Maiusculas seguem o original.
+        RUA: (original) => (rand) => {
+            const o = String(original ?? '').trim();
+            const m = selcNorm(o).match(PREFIXO_LOGRADOURO);
+            const prefixo = m ? o.slice(0, m[0].length) : 'Rua ';
+            const nome = `${NOMES[Math.floor(rand() * NOMES.length)]} ${SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)]}`;
+            const v = prefixo + nome;
+            return o && o === o.toUpperCase() ? v.toUpperCase() : v;
+        },
+        // Bairro falso: mantem Jardim/Vila/Parque do original quando existe.
+        BAIRRO: (original) => (rand) => {
+            const o = String(original ?? '').trim();
+            const m = selcNorm(o).match(/^(JARDIM|JD|VILA|VL|PARQUE|PQ|CONJUNTO|CONJ|RESIDENCIAL|RES|LOTEAMENTO|LOT|NUCLEO|SITIO|CHACARA|BAIRRO)(\.\s*|\s+)(?=\S)/);
+            const tipos = ['Jardim ', 'Vila ', 'Parque ', 'Residencial '];
+            const prefixo = m ? o.slice(0, m[0].length) : tipos[Math.floor(rand() * tipos.length)];
+            const v = prefixo + SOBRENOMES[Math.floor(rand() * SOBRENOMES.length)];
+            return o && o === o.toUpperCase() ? v.toUpperCase() : v;
         },
         CEP: (original) => (rand) => {
             const digits = String(original).replace(/\D/g, '');
@@ -1572,14 +1592,23 @@
         RG:        { rotulo: 'RG', forca: 'fraca', palavras: ['RG'], prova: 'têm de 7 a 9 dígitos (RG não tem regra nacional)' },
         VALOR:     { rotulo: 'Valor (R$)', forca: 'media', palavras: ['VALOR', 'VLR', 'VL'], prova: 'têm valor com centavos' },
         NOME:      { rotulo: 'Nome de pessoa', forca: 'media', palavras: ['NOME'], prova: 'têm 2 ou mais palavras, só com letras' },
+        RUA:       { rotulo: 'Nome de rua', forca: 'media', palavras: ['RUA', 'LOGRADOURO', 'ENDERECO', 'END', 'AV', 'AVENIDA'], prova: 'começam com Rua, Av., Travessa ou outro tipo de logradouro' },
+        BAIRRO:    { rotulo: 'Nome de bairro', forca: 'fraca', palavras: ['BAIRRO'], prova: 'são texto sem número (bairro não tem regra fixa)' },
         CODIGO:    { rotulo: 'Código / categoria', forca: 'media', palavras: ['COD', 'CODIGO', 'CATEG', 'UNIDADE', 'LOCAL', 'CLASSE', 'CODOPE', 'SIT', 'TIPO'], prova: '' },
         NUMERO:    { rotulo: 'Número de imóvel', forca: 'fraca', palavras: ['NUMERO', 'NUM', 'NRO'], prova: 'têm de 1 a 5 dígitos' },
         TEXTO:     { rotulo: 'Texto / genérico', forca: 'fraca', palavras: [], prova: 'nenhum padrão conhecido bateu' },
     };
     // do mais especifico pro mais generico - desempata quando dois tipos servem
-    const ORDEM_TIPOS = ['CPF', 'CNPJ', 'EMAIL', 'DATA', 'TEL', 'CEP', 'MATRICULA', 'RG', 'VALOR', 'NOME', 'CODIGO', 'NUMERO'];
+    // RUA antes de NOME: "RUA JOAO GOMES" tem cara de nome de pessoa, mas e rua.
+    const ORDEM_TIPOS = ['CPF', 'CNPJ', 'EMAIL', 'DATA', 'TEL', 'CEP', 'MATRICULA', 'RG', 'VALOR', 'RUA', 'NOME', 'BAIRRO', 'CODIGO', 'NUMERO'];
 
     function soDigitos(v) { return String(v).replace(/\D/g, ''); }
+
+    // Comeca com tipo de logradouro (Rua, R., Av., Travessa, Alameda...)?
+    const PREFIXO_LOGRADOURO = /^(RUA|R|AVENIDA|AV|AVN|TRAVESSA|TRAV|TV|ALAMEDA|AL|PRACA|PC|PCA|RODOVIA|ROD|ESTRADA|EST|VIELA|LARGO|LGO|BECO|SERVIDAO|VIA|MARGINAL|PASSAGEM)(\.\s*|\s+)(?=\S)/;
+    function pareceLogradouro(v) {
+        return PREFIXO_LOGRADOURO.test(selcNorm(String(v).trim()));
+    }
 
     const TESTES_VALOR = {
         CPF: v => cpfValido(v),
@@ -1598,7 +1627,9 @@
         MATRICULA: v => /^\d{8}$/.test(v),
         RG: v => /^[\d.\-]+[Xx]?$/.test(v) && soDigitos(v).length >= 7 && soDigitos(v).length <= 9,
         VALOR: v => /^-?\d{1,3}(\.\d{3})*,\d{2}$/.test(v) || /^-?\d+[.,]\d{2}$/.test(v),
-        NOME: v => /^[A-Za-zÀ-ÿ']+(?: [A-Za-zÀ-ÿ']+)+$/.test(v),
+        NOME: v => /^[A-Za-zÀ-ÿ']+(?: [A-Za-zÀ-ÿ']+)+$/.test(v) && !pareceLogradouro(v),
+        RUA: v => pareceLogradouro(v),
+        BAIRRO: v => /^[A-Za-zÀ-ÿ'.\- ]+$/.test(v) && /[A-Za-zÀ-ÿ]{2}/.test(v) && !pareceLogradouro(v),
         NUMERO: v => /^\d{1,5}$/.test(v),
     };
 
@@ -1624,6 +1655,9 @@
                 taxa = ok ? 1 : 0;
                 prova = `só ${distintos.size} valor(es) diferente(s), todos com ${vals[0].length} caractere(s)`;
             } else {
+                // bairro nao tem formato proprio: sem a palavra BAIRRO no nome
+                // da coluna, qualquer texto pareceria bairro
+                if (tipo === 'BAIRRO' && !palavraNaColuna(tipo, nomeColuna)) continue;
                 taxa = vals.filter(TESTES_VALOR[tipo]).length / vals.length;
             }
             if (taxa < 0.6) continue;
@@ -1657,6 +1691,7 @@
     // Tipo confirmado -> gerador usado no Simular e no chute da edicao manual.
     const MAPA_TIPO_GERADOR = {
         CPF: 'CPF', CNPJ: 'CNPJ', RG: 'RG', TEL: 'TEL', NOME: 'NOME', CEP: 'CEP', NUMERO: 'NUMERO', DATA: 'DATA',
+        RUA: 'RUA', BAIRRO: 'BAIRRO',
         MATRICULA: 'GENERICO', EMAIL: 'GENERICO', VALOR: 'GENERICO', CODIGO: 'GENERICO', TEXTO: 'GENERICO',
     };
 
@@ -3891,6 +3926,10 @@
                                         valor = nova || await valorSintetico("RUA_GEN", valor, FABRICAS.GENERICO(valor));
                                     }
                                     relatorio.tecnicas.add("Swap de ruas dentro do bairro (derangement)");
+                                }
+                                else if ((tipo === "RUA" || tipo === "BAIRRO") && valor) {
+                                    valor = await valorSintetico(tipo, valor, FABRICAS[tipo](valor));
+                                    relatorio.tecnicas.add(tipo === "RUA" ? "Rua sintética (tipo do logradouro mantido)" : "Bairro sintético");
                                 }
                                 else if (tipo === "NUMERO") {
                                     valor = await valorSintetico("NUM", valor + "|" + matriculaLinha, FABRICAS.NUMERO(valor));
