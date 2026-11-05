@@ -230,6 +230,8 @@
         .chip-anon { background-color: #FBF5FF; color: var(--ios-purple); border-color: rgba(175, 82, 222, 0.15); }
         .chip-duble { background-color: #FFF5E0; color: #FF9500; border-color: rgba(255, 149, 0, 0.15); }
         .chip-simular { background-color: #E8F9F0; color: #1F9D55; border-color: rgba(52, 199, 89, 0.2); }
+        /* carimbo "em desenvolvimento" (pedido do Rafa, 05/11) */
+        .selo-dev { display: inline-block; margin-left: 8px; padding: 1px 7px; border: 2px dashed #D9480F; border-radius: 6px; color: #D9480F; background: #FFF4E6; font-size: 10px; font-weight: 800; letter-spacing: .5px; text-transform: uppercase; transform: rotate(-4deg); white-space: nowrap; }
         .chip-exclude { background-color: #F2F2F7; color: #C7C7CC; border-color: transparent; text-decoration: line-through; }
         .chip:hover { transform: scale(1.02); }
 
@@ -845,6 +847,7 @@
                 <div class="legend-item" style="display:flex; align-items:center;">
                     <span class="dot" style="background:#34C759"></span>
                     🌍 Simular (mundo fictício)
+                    <span class="selo-dev" title="Esta função ainda está sendo ajustada. Confira o resultado antes de usar.">em desenvolvimento</span>
                     <span class="help-icon" data-tooltip="Simulação realista: ruas reais trocadas entre matrículas do mesmo bairro, números randomizados (nunca iguais ao original), CPF/RG/telefone sintéticos válidos, datas deslocadas mantendo a cronologia.&#10;O mapa funciona, a estatística é real, mas nada aponta para pessoas ou endereços verdadeiros.">?</span>
                 </div>
                 <div class="legend-item"><span class="dot" style="background:#C7C7CC"></span> Excluir</div>
@@ -870,7 +873,7 @@
                 <button class="selc-bol-grande" data-estado="1" title="Manter original" onclick="selcAplicarEmMassa(1)"></button>
                 <button class="selc-bol-grande" data-estado="2" title="👻 Anonimizar (hash irreversível)" onclick="selcAplicarEmMassa(2)"></button>
                 <button class="selc-bol-grande" data-estado="3" title="🆔 Dublê (mesmo tipo e tamanho; matrícula: 8 dígitos)" onclick="selcAplicarEmMassa(3)"></button>
-                <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT)" onclick="selcAplicarEmMassa(4)"></button>
+                <button class="selc-bol-grande" data-estado="4" title="🌍 Simular (só TXT) — em desenvolvimento" onclick="selcAplicarEmMassa(4)"></button>
                 <button class="selc-bol-grande" data-estado="0" title="Excluir" onclick="selcAplicarEmMassa(0)"></button>
                 <button class="selc-bol-grande" data-estado="5" title="✍️ Manual: editar as colunas selecionadas, de cartão em cartão" onclick="manualIniciarFila()"></button>
                 <button class="selc-limpar" onclick="selcLimparSelecao()">Limpar</button>

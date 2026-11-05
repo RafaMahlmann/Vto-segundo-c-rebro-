@@ -1531,3 +1531,23 @@ mudaram.
 
 **Versão v4.21 · 05/11/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+
+---
+
+## PARTE 38 — Carimbo "em desenvolvimento" no Simular (2026-11-05, v4.22)
+
+**Pedido do Rafa:** marcar a função Simular (mundo fictício) com um
+carimbo "em desenvolvimento".
+
+**O que mudou (só `anonimizador.html`):**
+- Classe `.selo-dev`: selo laranja tracejado, levemente torto.
+- Legenda das cores: o selo fica ao lado de "🌍 Simular (mundo fictício)",
+  com dica "Esta função ainda está sendo ajustada. Confira o resultado
+  antes de usar."
+- Botão verde de aplicar em massa: dica "Simular (só TXT) — em
+  desenvolvimento".
+- O Simular funciona igual; é só aviso visual.
+
+**Versão v4.22 · 05/11/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
