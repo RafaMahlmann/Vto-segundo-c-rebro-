@@ -779,6 +779,24 @@
         .ver-grade tbody tr:hover td { background: #EEF5FF; }
         .ver-grade td.ver-sel { outline: 2px solid var(--ios-blue); outline-offset: -2px; }
         .ver-grade td.ver-vazio::after { content: "vazio"; color: #C7C7CC; font-size: 12px; }
+        .ver-meio { flex: 1; display: flex; min-height: 0; }
+        .ver-raiox { display: none; width: 340px; flex-shrink: 0; overflow: auto; border-left: 1px solid #E5E5EA; background: #F9F9FB; padding: 10px; box-sizing: border-box; }
+        .ver-raiox.aberto { display: block; }
+        .ver-btn-sec.ligado { background: #EEF5FF; border-color: var(--ios-blue); color: var(--ios-blue); }
+        .rx-intro { font-size: 12px; color: #6E6E73; margin: 0 2px 8px; line-height: 1.4; }
+        .rx-card { background: #fff; border: 1px solid #E5E5EA; border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; }
+        .rx-nome { font-weight: 700; font-size: 14px; margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .rx-linha { font-size: 12px; color: #3A3A3C; margin: 2px 0; }
+        .rx-cheio { height: 6px; border-radius: 3px; background: #E5E5EA; overflow: hidden; margin: 4px 0 6px; }
+        .rx-cheio span { display: block; height: 100%; background: #34C759; }
+        .rx-alerta { font-size: 12px; background: #FFF5E0; color: #8A4B00; border-radius: 8px; padding: 4px 8px; margin: 4px 0; }
+        .rx-info { font-size: 12px; background: #EEF5FF; color: #0A4FA3; border-radius: 8px; padding: 4px 8px; margin: 4px 0; }
+        .rx-top { display: grid; grid-template-columns: 1fr auto; gap: 1px 8px; margin-top: 6px; font-size: 12px; }
+        .rx-top-val { position: relative; padding: 2px 6px; border-radius: 6px; cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+        .rx-top-val:hover { outline: 1px solid var(--ios-blue); }
+        .rx-top-val i { position: absolute; inset: 0 auto 0 0; background: rgba(0, 122, 255, 0.14); z-index: 0; }
+        .rx-top-val b { position: relative; z-index: 1; font-weight: 500; }
+        .rx-top-n { color: #6E6E73; text-align: right; padding: 2px 0; font-variant-numeric: tabular-nums; }
         .ver-rodape { padding: 8px 14px; border-top: 1px solid #E5E5EA; background: #F9F9FB; color: #3A3A3C; min-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .ver-rodape strong { color: #1C1C1E; }
     </style>
@@ -1026,6 +1044,7 @@
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original e a data e a hora em que foi salvo (a pessoa pode trocar); numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 45 verificações com TXT e CSV.</li>
                 <li><strong>Edição manual com memória (20/10):</strong> o valor de hoje aparece em cinza embaixo de cada campo; o mesmo original recebe sempre o mesmo chute; o destino da coluna muda dentro do cartão. A memória das escolhas guarda só nome de coluna e escolha: o arquivo de memória salvo foi conferido e não tem nenhum valor do arquivo de teste. Valor fixo igual a dado real não entra na memória, e uma memória com nome de coluna malicioso aparece como texto, sem executar. 47 verificações.</li>
+                <li><strong>Raio-X da coluna (06/11):</strong> na tabela "Como ficou", o botão <strong>📊 Raio-X</strong> abre um resumo de cada coluna: preenchidas e vazias, valores diferentes, tamanho (de quantos a quantos caracteres) e os 5 valores que mais aparecem, com barrinhas. Avisa quando a coluna está toda igual, toda vazia, mais da metade vazia ou com um valor só dominando. Segue a busca e os filtros; clicar num valor filtra a tabela por ele.</li>
                 <li><strong>Ver antes de salvar (06/11):</strong> o botão <strong>👁️ Processar e ver antes de salvar</strong> abre o arquivo final numa tabela em tela cheia, feita aqui dentro, sem biblioteca de fora. Dá para ordenar (clique no nome da coluna), buscar em tudo, filtrar cada coluna, esconder colunas e clicar numa célula para ler o valor inteiro. Só aparece o resultado já anonimizado. Nada é gravado até o <strong>Salvar</strong>, e o que sai é exatamente o que estava na tabela. Descartar apaga da memória. Testado com 20.000 linhas.</li>
                 <li><strong>Rua e bairro não viram nome de pessoa (05/11):</strong> coluna com "Rua João Gomes", "Av. Brasil" ou "Travessa Pedro" era chutada como <strong>Nome de pessoa</strong>. Agora o selo reconhece o tipo do logradouro e diz <strong>Nome de rua</strong>. Coluna com "BAIRRO" no nome ganha o palpite <strong>Nome de bairro</strong>. Os dois também aparecem na lista "Não, é:" para escolher na mão. No Simular e no Dublê, rua vira rua falsa com o mesmo tipo (Rua continua Rua, Av. continua Av.) e bairro vira bairro falso (Jardim continua Jardim).</li>
                 <li><strong>Rua, lote e Dublê sem vazamento (20/10):</strong> a troca de rua devolvia a rua real quando várias casas do bairro ficam na mesma rua (56 de 80 linhas no teste), e apartamentos com o mesmo lote saíam com o lote real (10 de 80). Agora a troca nunca devolve o mesmo valor: sem outra rua no bairro, vem uma rua real de outro bairro do arquivo. O Dublê juntava todo texto num número só (nomes, e-mails e endereços viravam o mesmo número); agora só a matrícula vira 8 dígitos, e o resto vira um falso do mesmo tipo e tamanho. 28 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
@@ -1080,12 +1099,16 @@
             <input type="text" id="verBusca" placeholder="🔍 Buscar em todas as colunas..." oninput="verAgendarFiltro()">
             <button type="button" class="ver-btn-sec" onclick="verAlternarColunas()">Colunas ▾</button>
             <button type="button" class="ver-btn-sec" onclick="verLimparFiltros()">Limpar filtros</button>
+            <button type="button" class="ver-btn-sec" id="verBtnRaiox" onclick="verAlternarRaiox()" title="Resumo de cada coluna: vazios, valores diferentes e os que mais aparecem">📊 Raio-X</button>
             <button type="button" class="ver-btn-salvar" onclick="verSalvar()">💾 Salvar</button>
             <button type="button" class="ver-btn-descartar" onclick="verDescartar()">Descartar</button>
             <button type="button" class="ver-btn-sec" onclick="verFechar()" title="Fecha a tabela. O resultado continua guardado até você salvar ou descartar.">✕ Fechar</button>
         </div>
         <div class="ver-colunas" id="verColunas"></div>
-        <div class="ver-grade" id="verGrade" onscroll="verDesenhar()"></div>
+        <div class="ver-meio">
+            <div class="ver-grade" id="verGrade" onscroll="verDesenhar()"></div>
+            <div class="ver-raiox" id="verRaiox"></div>
+        </div>
         <div class="ver-rodape" id="verRodape"></div>
     </div>
 
@@ -4308,6 +4331,7 @@
         document.getElementById('verGrade').innerHTML =
             `<table style="width:${largura}px">${colgroup}<thead>${cab1}${cab2}</thead><tbody id="verCorpo"></tbody></table>`;
         verDesenhar();
+        verRaioxAtualizar();
     }
 
     function verDesenhar() {
@@ -4378,7 +4402,7 @@
 
     function verAgendarFiltro() {
         clearTimeout(VER_FILTRO_TIMER);
-        VER_FILTRO_TIMER = setTimeout(() => { verAplicarFiltros(); verVoltarAoTopo(); verDesenhar(); }, 200);
+        VER_FILTRO_TIMER = setTimeout(() => { verAplicarFiltros(); verVoltarAoTopo(); verDesenhar(); verRaioxAtualizar(); }, 200);
     }
 
     function verVoltarAoTopo() { const g = document.getElementById('verGrade'); if (g) g.scrollTop = 0; }
@@ -4452,6 +4476,83 @@
         verLimparPendentes();
         document.getElementById('btnCert').style.display = 'block';
         salvarMostrarResultado({ salvos, linhas });
+    }
+
+    // ----- RAIO-X DA COLUNA: resumo de cada coluna, como o perfil de coluna do Power BI -----
+    // Conta so as linhas que a tabela mostra agora (segue a busca e os filtros).
+    let VER_RAIOX = false; // painel aberto? Fica lembrado entre aberturas da tabela
+
+    function verAlternarRaiox() {
+        VER_RAIOX = !VER_RAIOX;
+        verRaioxAtualizar();
+    }
+
+    function verRaioxColuna(c) {
+        const linhas = VER.visiveis;
+        const cont = new Map();
+        let vazias = 0, menor = Infinity, maior = 0;
+        for (const r of linhas) {
+            const v = VER.dados[r][c] || '';
+            if (v === '') { vazias++; continue; }
+            cont.set(v, (cont.get(v) || 0) + 1);
+            if (v.length < menor) menor = v.length;
+            if (v.length > maior) maior = v.length;
+        }
+        const top = [...cont.entries()].sort((a, b) => b[1] - a[1] || VER_COLADOR.compare(a[0], b[0])).slice(0, 5);
+        return { total: linhas.length, vazias, cheias: linhas.length - vazias, distintos: cont.size, top, menor, maior };
+    }
+
+    function verRaioxAtualizar() {
+        const painel = document.getElementById('verRaiox');
+        const btn = document.getElementById('verBtnRaiox');
+        if (!painel) return;
+        painel.classList.toggle('aberto', VER_RAIOX);
+        if (btn) btn.classList.toggle('ligado', VER_RAIOX);
+        if (!VER_RAIOX || !VER) { painel.innerHTML = ''; return; }
+        VER_RAIOX_VALORES = [];
+        const fmt = n => n.toLocaleString('pt-BR');
+        const pct = (a, b) => b ? (a / b * 100).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + '%' : '0%';
+        const filtrado = VER.visiveis.length !== VER.dados.length;
+        let html = `<p class="rx-intro">Resumo de cada coluna${filtrado ? `, só das <strong>${fmt(VER.visiveis.length)}</strong> linhas do filtro` : ''}. ` +
+            'Clique num valor para filtrar a tabela por ele.</p>';
+        if (!VER.visiveis.length) { painel.innerHTML = html + '<div class="rx-info">Nenhuma linha passa no filtro. Clique em Limpar filtros.</div>'; return; }
+        for (const c of verColunasVisiveis()) {
+            const x = verRaioxColuna(c);
+            const avisos = [];
+            // coluna filtrada: "tudo igual" e efeito do proprio filtro, nao aviso
+            if (VER.filtros.has(c)) avisos.push(['info', `Filtrada por “${selcEsc(VER.filtros.get(c))}”.`]);
+            else if (x.total > 1 && x.distintos === 1 && x.vazias === 0) avisos.push(['alerta', 'Todas as linhas têm o mesmo valor.']);
+            else if (x.total > 1 && x.distintos === 1) avisos.push(['alerta', 'Só existe um valor (fora os vazios).']);
+            if (x.total && x.cheias === 0) avisos.push(['alerta', 'A coluna está toda vazia.']);
+            else if (x.total && x.vazias / x.total > 0.5) avisos.push(['alerta', `Mais da metade está vazia (${pct(x.vazias, x.total)}).`]);
+            if (!VER.filtros.has(c) && x.distintos > 1 && x.top.length && x.top[0][1] / x.cheias > 0.5) avisos.push(['alerta', `Um valor só aparece em ${pct(x.top[0][1], x.cheias)} das linhas preenchidas.`]);
+            if (x.cheias > 1 && x.distintos === x.cheias) avisos.push(['info', 'Cada linha tem um valor diferente.']);
+            const maxTop = x.top.length ? x.top[0][1] : 1;
+            html += `<div class="rx-card"><div class="rx-nome" title="${selcEscAttr(VER.cab[c])}">${selcEsc(VER.cab[c])}</div>` +
+                `<div class="rx-linha">Preenchidas <strong>${fmt(x.cheias)}</strong> · Vazias <strong>${fmt(x.vazias)}</strong> (${pct(x.vazias, x.total)})</div>` +
+                `<div class="rx-cheio" title="Parte verde: preenchidas"><span style="width:${x.total ? x.cheias / x.total * 100 : 0}%"></span></div>` +
+                `<div class="rx-linha">Valores diferentes: <strong>${fmt(x.distintos)}</strong>` +
+                (x.cheias ? ` · Tamanho: ${x.menor === x.maior ? `${x.menor} caractere(s)` : `de ${x.menor} a ${x.maior} caracteres`}` : '') + '</div>' +
+                avisos.map(([t, m]) => `<div class="rx-${t}">${t === 'alerta' ? '⚠️ ' : 'ℹ️ '}${m}</div>`).join('') +
+                (x.top.length && x.distintos < x.cheias ? '<div class="rx-top">' + x.top.map(([v, n]) =>
+                    `<div class="rx-top-val" title="Filtrar por: ${selcEscAttr(v)}" onclick="verRaioxFiltrar(${c}, ${verRaioxIndice(c, v)})"><i style="width:${n / maxTop * 100}%"></i><b>${selcEsc(v)}</b></div>` +
+                    `<div class="rx-top-n">${fmt(n)} · ${pct(n, x.cheias)}</div>`).join('') + '</div>' : '') +
+                '</div>';
+        }
+        painel.innerHTML = html;
+    }
+
+    // O valor vai por indice (nao dentro do onclick), para aspas e acentos nao quebrarem nada.
+    let VER_RAIOX_VALORES = [];
+    function verRaioxIndice(c, v) { VER_RAIOX_VALORES.push(v); return VER_RAIOX_VALORES.length - 1; }
+
+    function verRaioxFiltrar(c, i) {
+        const v = VER_RAIOX_VALORES[i];
+        if (v === undefined) return;
+        VER.filtros.set(c, v);
+        verAplicarFiltros();
+        verVoltarAoTopo();
+        verMontarTabela();
     }
 
     document.addEventListener('keydown', e => {
