@@ -1597,3 +1597,33 @@ top 5 com barrinhas).
 **Versão v4.23 · 06/11/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `DATA_ENTREGA`, `sw.js`, `version.json`, README,
 `package.json`.
+
+
+---
+
+## PARTE 40 — Raio-X da coluna na tabela "Como ficou" (2026-11-06, v4.24)
+
+**Pedido do Rafa:** a etapa 2 proposta na PARTE 39.
+
+**O que mudou (só `anonimizador.html`, seção `VER ANTES DE SALVAR`):**
+- Botão `#verBtnRaiox` "📊 Raio-X" abre o painel `#verRaiox` à direita
+  da tabela (`.ver-meio` junta tabela + painel). Fica lembrado
+  (`VER_RAIOX`) entre aberturas da tabela.
+- `verRaioxColuna(c)`: conta só as linhas que a tabela mostra
+  (`VER.visiveis`) — segue busca e filtros, como no Power BI.
+- Cartão por coluna visível: preenchidas/vazias (barra), valores
+  diferentes, tamanho mínimo e máximo, top 5 com barrinhas e %.
+- Avisos: tudo igual, toda vazia, mais da metade vazia, um valor com
+  mais de 50%; info "cada linha tem um valor diferente" (top 5 some,
+  porque não diria nada). Coluna com filtro mostra "Filtrada por…" no
+  lugar dos avisos. Filtro sem linhas: aviso único.
+- Clicar num valor do top 5 filtra a tabela por ele
+  (`verRaioxFiltrar`; valor passa por índice, não dentro do onclick).
+
+**Teste (Playwright, 20.000 linhas × 6 colunas):** painel calcula em
+~0,15 s; clique em valor filtra (5.039 linhas) e o cartão mostra
+"Filtrada por"; busca sem resultado mostra o aviso; painel lembrado ao
+reabrir; zero erros. App, 6 abas e cópia ZIP conferidos.
+
+**Versão v4.24 · 06/11/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
