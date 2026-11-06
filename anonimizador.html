@@ -743,6 +743,44 @@
         .manual-btn-aplicar { background: linear-gradient(135deg, #5856D6 0%, #4644b8 100%); }
         .manual-btn-aplicar:not(:disabled):hover { box-shadow: 0 4px 14px rgba(88,86,214,.35); }
         .manual-btn-aplicar:active:not(:disabled) { transform: scale(.97); }
+        /* --- VER ANTES DE SALVAR: tabela do arquivo final (feita aqui, sem biblioteca) --- */
+        .btn-ver { background-color: #fff; color: var(--ios-blue); border: 2px solid var(--ios-blue); box-shadow: none; padding: 14px; }
+        .btn-ver:hover { background-color: #EEF5FF; color: var(--ios-blue); box-shadow: none; }
+        .btn-ver:disabled { border-color: #E5E5EA; }
+        .ver-overlay { position: fixed; inset: 0; z-index: 1000; background: #fff; display: none; flex-direction: column; font-size: 14px; }
+        .ver-overlay.aberto { display: flex; }
+        .ver-overlay button { width: auto; margin: 0; padding: 8px 14px; font-size: 14px; border-radius: 10px; box-shadow: none; }
+        .ver-overlay button:hover { transform: none; box-shadow: none; }
+        .ver-topo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #E5E5EA; background: #F9F9FB; }
+        .ver-titulo { font-weight: 700; font-size: 15px; margin-right: auto; }
+        .ver-titulo small { font-weight: 400; color: #6E6E73; margin-left: 6px; }
+        .ver-topo input[type="text"], .ver-topo select { width: auto; min-width: 200px; margin: 0; padding: 8px 10px; font-size: 14px; border-radius: 10px; }
+        .ver-btn-sec { background: #fff; color: #1C1C1E; border: 1px solid #C7C7CC; }
+        .ver-btn-sec:hover { background: #F2F2F7; color: #1C1C1E; }
+        .ver-btn-salvar { background: #34C759; }
+        .ver-btn-salvar:hover { background: #2DB24F; }
+        .ver-btn-descartar { background: #fff; color: #D70015; border: 1px solid #FFB3B8; }
+        .ver-btn-descartar:hover { background: #FFF0F1; color: #D70015; }
+        .ver-colunas { display: none; flex-wrap: wrap; gap: 6px; padding: 8px 14px; border-bottom: 1px solid #E5E5EA; max-height: 30vh; overflow: auto; }
+        .ver-colunas.aberto { display: flex; }
+        .ver-colunas label { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; border: 1px solid #E5E5EA; border-radius: 8px; font-size: 13px; font-weight: 400; margin: 0; cursor: pointer; }
+        .ver-colunas input { width: auto; margin: 0; }
+        .ver-grade { flex: 1; overflow: auto; position: relative; }
+        .ver-grade table { border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+        .ver-grade th, .ver-grade td { height: 30px; padding: 0 8px; border-right: 1px solid #EFEFF4; border-bottom: 1px solid #EFEFF4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; box-sizing: border-box; }
+        .ver-grade thead th { position: sticky; top: 0; z-index: 3; background: #F2F2F7; font-weight: 700; cursor: pointer; user-select: none; }
+        .ver-grade thead tr.ver-filtros th { top: 30px; cursor: default; padding: 2px 4px; }
+        .ver-grade thead tr.ver-filtros input { width: 100%; margin: 0; padding: 3px 6px; font-size: 12px; border-radius: 6px; min-width: 0; }
+        .ver-grade .ver-fixa { position: sticky; left: 0; z-index: 2; background: #FAFAFC; }
+        .ver-grade .ver-fixa2 { position: sticky; left: 72px; z-index: 2; background: #FAFAFC; box-shadow: 2px 0 0 #E5E5EA; }
+        .ver-grade thead .ver-fixa, .ver-grade thead .ver-fixa2 { z-index: 4; background: #ECECF1; }
+        .ver-grade thead th.ver-ordenada { color: var(--ios-blue); }
+        .ver-grade td.ver-num, .ver-grade th.ver-num { color: #8E8E93; text-align: right; font-variant-numeric: tabular-nums; }
+        .ver-grade tbody tr:hover td { background: #EEF5FF; }
+        .ver-grade td.ver-sel { outline: 2px solid var(--ios-blue); outline-offset: -2px; }
+        .ver-grade td.ver-vazio::after { content: "vazio"; color: #C7C7CC; font-size: 12px; }
+        .ver-rodape { padding: 8px 14px; border-top: 1px solid #E5E5EA; background: #F9F9FB; color: #3A3A3C; min-height: 20px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .ver-rodape strong { color: #1C1C1E; }
     </style>
 </head>
 <body>
@@ -904,6 +942,8 @@
         </div>
 
         <button id="btnProcess" disabled onclick="iniciarProcessamento()">Processar e Salvar Todos</button>
+        <button id="btnVer" class="btn-ver" disabled onclick="iniciarProcessamento({ ver: true })">👁️ Processar e ver antes de salvar</button>
+        <div class="salvar-dica">Mostra o arquivo final numa tabela. Você confere e só depois salva.</div>
         <div class="salvar-resultado" id="salvarResultado" role="status"></div>
         <button id="btnCert" class="btn-cert" onclick="baixarCertificado()">📜 Salvar o certificado do lote</button>
 
@@ -986,6 +1026,7 @@
                 <li><strong>Nada some, nada sobra, nada cruza (19/10):</strong> a última linha do arquivo sai mesmo sem quebra de linha no fim; o cabeçalho do CSV não vira registro; dois lotes seguidos na mesma aba não repetem o deslocamento de data — o vínculo continua só dentro do mesmo lote. Na troca de rua e de lote, nenhuma linha recebe o próprio valor, nem com recorte; lote sozinho na quadra não sai mais com o número real. 17 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Salvar sem apagar nada (19/10):</strong> o arquivo final sai sempre com o nome do original e a data e a hora em que foi salvo (a pessoa pode trocar); numa pasta escolhida, um lote nunca grava por cima de outro (vira "nome (2).csv"), nem o certificado; pasta recusada pelo navegador não processa nada e explica o que fazer; erro ao gravar cai em Downloads sem duplicar arquivo. 45 verificações com TXT e CSV.</li>
                 <li><strong>Edição manual com memória (20/10):</strong> o valor de hoje aparece em cinza embaixo de cada campo; o mesmo original recebe sempre o mesmo chute; o destino da coluna muda dentro do cartão. A memória das escolhas guarda só nome de coluna e escolha: o arquivo de memória salvo foi conferido e não tem nenhum valor do arquivo de teste. Valor fixo igual a dado real não entra na memória, e uma memória com nome de coluna malicioso aparece como texto, sem executar. 47 verificações.</li>
+                <li><strong>Ver antes de salvar (06/11):</strong> o botão <strong>👁️ Processar e ver antes de salvar</strong> abre o arquivo final numa tabela em tela cheia, feita aqui dentro, sem biblioteca de fora. Dá para ordenar (clique no nome da coluna), buscar em tudo, filtrar cada coluna, esconder colunas e clicar numa célula para ler o valor inteiro. Só aparece o resultado já anonimizado. Nada é gravado até o <strong>Salvar</strong>, e o que sai é exatamente o que estava na tabela. Descartar apaga da memória. Testado com 20.000 linhas.</li>
                 <li><strong>Rua e bairro não viram nome de pessoa (05/11):</strong> coluna com "Rua João Gomes", "Av. Brasil" ou "Travessa Pedro" era chutada como <strong>Nome de pessoa</strong>. Agora o selo reconhece o tipo do logradouro e diz <strong>Nome de rua</strong>. Coluna com "BAIRRO" no nome ganha o palpite <strong>Nome de bairro</strong>. Os dois também aparecem na lista "Não, é:" para escolher na mão. No Simular e no Dublê, rua vira rua falsa com o mesmo tipo (Rua continua Rua, Av. continua Av.) e bairro vira bairro falso (Jardim continua Jardim).</li>
                 <li><strong>Rua, lote e Dublê sem vazamento (20/10):</strong> a troca de rua devolvia a rua real quando várias casas do bairro ficam na mesma rua (56 de 80 linhas no teste), e apartamentos com o mesmo lote saíam com o lote real (10 de 80). Agora a troca nunca devolve o mesmo valor: sem outra rua no bairro, vem uma rua real de outro bairro do arquivo. O Dublê juntava todo texto num número só (nomes, e-mails e endereços viravam o mesmo número); agora só a matrícula vira 8 dígitos, e o resto vira um falso do mesmo tipo e tamanho. 28 verificações, rodadas também na versão anterior para provar que pegavam o defeito.</li>
                 <li><strong>Regressão geral do app, a cada entrega:</strong> <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_test_regressao_completa.py</span> (21) e <span style="font-family:'SF Mono','Menlo',monospace;font-size:13px">_testa_seletor.py</span> (24) — as 6 abas do VTO, undo/redo, export/import, ciclo completo do ZIP, zero erros de console.</li>
@@ -1030,6 +1071,23 @@
         Desenvolvido e Auditado por <strong>Rafael Reis Mahlmann</strong> · Reconstrução de segurança v19.0.0 · Pentest 01/09/2026
     </div>
 </div>
+
+    <!-- VER ANTES DE SALVAR: tabela do arquivo final, em tela cheia -->
+    <div class="ver-overlay" id="verOverlay" role="dialog" aria-label="Arquivo final antes de salvar">
+        <div class="ver-topo">
+            <div class="ver-titulo" id="verTitulo"></div>
+            <select id="verArquivo" onchange="verTrocarArquivo(this.value)"></select>
+            <input type="text" id="verBusca" placeholder="🔍 Buscar em todas as colunas..." oninput="verAgendarFiltro()">
+            <button type="button" class="ver-btn-sec" onclick="verAlternarColunas()">Colunas ▾</button>
+            <button type="button" class="ver-btn-sec" onclick="verLimparFiltros()">Limpar filtros</button>
+            <button type="button" class="ver-btn-salvar" onclick="verSalvar()">💾 Salvar</button>
+            <button type="button" class="ver-btn-descartar" onclick="verDescartar()">Descartar</button>
+            <button type="button" class="ver-btn-sec" onclick="verFechar()" title="Fecha a tabela. O resultado continua guardado até você salvar ou descartar.">✕ Fechar</button>
+        </div>
+        <div class="ver-colunas" id="verColunas"></div>
+        <div class="ver-grade" id="verGrade" onscroll="verDesenhar()"></div>
+        <div class="ver-rodape" id="verRodape"></div>
+    </div>
 
 <script>
     // ===========================================================================
@@ -1818,6 +1876,7 @@
         } else {
             statusEl.innerHTML = '<span class="status-chip erro">Sem criptografia nativa: processamento bloqueado por segurança</span>';
             document.getElementById('btnProcess').disabled = true;
+            document.getElementById('btnVer').disabled = true;
             log("BLOQUEADO: este navegador/contexto não oferece Web Crypto API. Abra em Chrome/Edge atualizado (HTTPS ou arquivo local).");
         }
     };
@@ -1889,8 +1948,10 @@
         document.getElementById('logConsole').innerHTML = `> ${qtdArquivos} arquivo(s) detectado(s).<br>> Analisando estrutura baseada em: ${nomeArquivo}...<br>`;
         document.getElementById('columnManager').style.display = 'block';
         document.getElementById('btnProcess').disabled = !CRYPTO_DISPONIVEL;
+        document.getElementById('btnVer').disabled = !CRYPTO_DISPONIVEL;
         document.getElementById('btnCert').style.display = 'none';
         salvarMostrarResultado(null);
+        verLimparPendentes(); // arquivo novo: o resultado guardado do anterior some
         salvarAtualizarPrevia();
         sugerirFimDoNome();
         memoriaDispensarAviso(); // o aviso volta, se couber, quando as colunas do arquivo novo existirem
@@ -3702,7 +3763,102 @@
         caixa.classList.add('visivel');
     }
 
-    async function iniciarProcessamento() {
+    // Pasta de destino (ou Downloads). Usada pelo Processar e Salvar e pelo
+    // Salvar do visualizador. Devolve null se a pessoa fechou a janela da pasta.
+    async function escolherPastaDestino(saveMode, nArquivos) {
+        // --- PASTA: escolhida ANTES do sal. Antes o sal nascia primeiro e, se a
+        // pessoa fechasse a janela da pasta, o log parava em "sal gerado" e nada
+        // mais acontecia, sem explicar por que.
+        let dirHandle = null;
+        let usarMetodoDownloadManual = false;
+        if (saveMode === 'picker') {
+            if (window.showDirectoryPicker) {
+                let pasta = PASTA_DESTINO;
+                if (pasta) {
+                    // Reusa a pasta do lote anterior, se o navegador ainda deixa gravar nela.
+                    try {
+                        if ((await pasta.queryPermission({ mode: 'readwrite' })) !== 'granted'
+                            && (await pasta.requestPermission({ mode: 'readwrite' })) !== 'granted') pasta = null;
+                    } catch (e) { pasta = null; }
+                    if (!pasta) { PASTA_DESTINO = null; salvarAtualizarPrevia(); }
+                }
+                if (!pasta) {
+                    try {
+                        pasta = await window.showDirectoryPicker({ id: 'anonimizadorSaida', mode: 'readwrite', startIn: 'documents' });
+                    } catch (err) {
+                        if (err.name === 'AbortError') {
+                            // Fechou a janela - ou o navegador recusou a pasta (Downloads,
+                            // Documentos e Area de Trabalho nao podem ser usadas direto).
+                            log("📁 Nenhuma pasta escolhida: nada foi salvo.");
+                            salvarMostrarResultado({ aviso: true });
+                            return null;
+                        }
+                        log(`Aviso: não deu para usar a pasta (${err.message}). Vai para Downloads.`);
+                        usarMetodoDownloadManual = true;
+                    }
+                }
+                if (pasta) {
+                    dirHandle = pasta;
+                    PASTA_DESTINO = pasta;
+                    log(`📁 Pasta de destino: ${pasta.name}`);
+                    salvarAtualizarPrevia();
+                }
+            } else {
+                log("Este navegador não deixa escolher pasta. Vai para Downloads.");
+                usarMetodoDownloadManual = true;
+            }
+        } else {
+            usarMetodoDownloadManual = true;
+        }
+        if (usarMetodoDownloadManual && nArquivos > 1) {
+            log("⬇️ Vários arquivos: se o navegador perguntar se pode baixar todos, clique em Permitir.");
+        }
+        return { dirHandle, usarMetodoDownloadManual };
+    }
+
+    // Grava um CSV pronto na pasta (nunca por cima) ou manda para Downloads.
+    // "destino" e { dirHandle, usarMetodoDownloadManual }: se a pasta falhar, ele
+    // muda para Downloads e os proximos arquivos vao para la tambem.
+    async function gravarCsv(nomeFinal, blob, destino, salvos) {
+        let dirHandle = destino.dirHandle;
+        let usarMetodoDownloadManual = destino.usarMetodoDownloadManual;
+        let nomeGravado = nomeFinal;
+        if (dirHandle) {
+            try {
+                // Nunca grava por cima: se o nome ja existe na pasta, vira "nome (2).csv".
+                nomeGravado = await nomeLivreNaPasta(dirHandle, nomeFinal);
+                const fileHandle = await dirHandle.getFileHandle(nomeGravado, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(blob);
+                await writable.close();
+                if (nomeGravado !== nomeFinal) log(`   -> Já existia ${nomeFinal} na pasta: salvei como ${nomeGravado}, sem apagar o outro.`);
+                log(`   -> ✅ Salvo na pasta ${dirHandle.name}: ${nomeGravado}`);
+                salvos.push({ nome: nomeGravado, pasta: dirHandle.name });
+            } catch (e) {
+                // Os proximos arquivos tambem vao para Downloads: senao um iria
+                // para a pasta e para Downloads ao mesmo tempo.
+                log(`   -> Não deu para salvar na pasta (${e.message}). Vai para Downloads.`);
+                dirHandle = null;
+                PASTA_DESTINO = null;
+                usarMetodoDownloadManual = true;
+                nomeGravado = nomeFinal;
+            }
+        }
+        if (usarMetodoDownloadManual) {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url; link.download = nomeFinal;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            log(`   -> ✅ Download iniciado: ${nomeFinal}`);
+            salvos.push({ nome: nomeFinal, pasta: null });
+            await new Promise(r => setTimeout(r, 500));
+        }
+        destino.dirHandle = dirHandle;
+        destino.usarMetodoDownloadManual = usarMetodoDownloadManual;
+        return nomeGravado;
+    }
+    async function iniciarProcessamento(opcoes) {
+        const VER = !!(opcoes && opcoes.ver); // processar e mostrar, sem salvar ainda
         if (!CRYPTO_DISPONIVEL) {
             alert("⛔ Processamento bloqueado: ambiente sem criptografia nativa (Web Crypto API).");
             return;
@@ -3728,53 +3884,17 @@
         // Lote novo: a caixa e o certificado do lote anterior saem da tela.
         salvarMostrarResultado(null);
         document.getElementById('btnCert').style.display = 'none';
+        verLimparPendentes(); // resultado guardado de um "ver antes" anterior some
 
-        // --- PASTA: escolhida ANTES do sal. Antes o sal nascia primeiro e, se a
-        // pessoa fechasse a janela da pasta, o log parava em "sal gerado" e nada
-        // mais acontecia, sem explicar por que.
+        // --- PASTA: escolhida ANTES do sal (ver escolherPastaDestino). No modo
+        // "ver antes de salvar", a pasta so e pedida no botao Salvar do visualizador.
         let dirHandle = null;
-        let usarMetodoDownloadManual = false;
-        if (saveMode === 'picker') {
-            if (window.showDirectoryPicker) {
-                let pasta = PASTA_DESTINO;
-                if (pasta) {
-                    // Reusa a pasta do lote anterior, se o navegador ainda deixa gravar nela.
-                    try {
-                        if ((await pasta.queryPermission({ mode: 'readwrite' })) !== 'granted'
-                            && (await pasta.requestPermission({ mode: 'readwrite' })) !== 'granted') pasta = null;
-                    } catch (e) { pasta = null; }
-                    if (!pasta) { PASTA_DESTINO = null; salvarAtualizarPrevia(); }
-                }
-                if (!pasta) {
-                    try {
-                        pasta = await window.showDirectoryPicker({ id: 'anonimizadorSaida', mode: 'readwrite', startIn: 'documents' });
-                    } catch (err) {
-                        if (err.name === 'AbortError') {
-                            // Fechou a janela - ou o navegador recusou a pasta (Downloads,
-                            // Documentos e Area de Trabalho nao podem ser usadas direto).
-                            log("📁 Nenhuma pasta escolhida: nada foi processado nem salvo.");
-                            salvarMostrarResultado({ aviso: true });
-                            return;
-                        }
-                        log(`Aviso: não deu para usar a pasta (${err.message}). Vai para Downloads.`);
-                        usarMetodoDownloadManual = true;
-                    }
-                }
-                if (pasta) {
-                    dirHandle = pasta;
-                    PASTA_DESTINO = pasta;
-                    log(`📁 Pasta de destino: ${pasta.name}`);
-                    salvarAtualizarPrevia();
-                }
-            } else {
-                log("Este navegador não deixa escolher pasta. Vai para Downloads.");
-                usarMetodoDownloadManual = true;
-            }
-        } else {
-            usarMetodoDownloadManual = true;
-        }
-        if (usarMetodoDownloadManual && fileInput.files.length > 1) {
-            log("⬇️ Vários arquivos: se o navegador perguntar se pode baixar todos, clique em Permitir.");
+        let usarMetodoDownloadManual = true;
+        if (!VER) {
+            const destino = await escolherPastaDestino(saveMode, fileInput.files.length);
+            if (!destino) return;
+            dirHandle = destino.dirHandle;
+            usarMetodoDownloadManual = destino.usarMetodoDownloadManual;
         }
 
         // --- SAL EFÊMERO: nasce aqui, morre no final do lote ---
@@ -3783,6 +3903,7 @@
         log("🔐 Sal efêmero de 128 bits gerado (vive só na memória deste lote).");
 
         btn.disabled = true;
+        document.getElementById('btnVer').disabled = true;
         processoProgresso(0, fileInput.files.length, 0);
 
         const relatorio = { inicio: inicioLote.toISOString(), arquivos: [], tecnicas: new Set() };
@@ -4012,38 +4133,18 @@
 
                 log(`   -> Concluído: ${linhasProcessadas} linhas (Ignoradas: ${linhasIgnoradas}).`);
 
+                if (VER) {
+                    // Ver antes de salvar: guarda o resultado (ja anonimizado) so na memoria.
+                    VER_PENDENTES.push({ nome: nomeFinal, linhas: csvContent });
+                    relatorio.arquivos.push({ nome: nomeFinal, linhas: linhasProcessadas, ignoradas: linhasIgnoradas });
+                    arquivosProcessados++;
+                    continue;
+                }
                 const blob = new Blob([csvContent.join("\n")], { type: "text/csv;charset=utf-8;" });
-                let nomeGravado = nomeFinal;
-                if (dirHandle) {
-                    try {
-                        // Nunca grava por cima: se o nome ja existe na pasta, vira "nome (2).csv".
-                        nomeGravado = await nomeLivreNaPasta(dirHandle, nomeFinal);
-                        const fileHandle = await dirHandle.getFileHandle(nomeGravado, { create: true });
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
-                        if (nomeGravado !== nomeFinal) log(`   -> Já existia ${nomeFinal} na pasta: salvei como ${nomeGravado}, sem apagar o outro.`);
-                        log(`   -> ✅ Salvo na pasta ${dirHandle.name}: ${nomeGravado}`);
-                        salvos.push({ nome: nomeGravado, pasta: dirHandle.name });
-                    } catch (e) {
-                        // Os proximos arquivos tambem vao para Downloads: senao um iria
-                        // para a pasta e para Downloads ao mesmo tempo.
-                        log(`   -> Não deu para salvar na pasta (${e.message}). Vai para Downloads.`);
-                        dirHandle = null;
-                        PASTA_DESTINO = null;
-                        usarMetodoDownloadManual = true;
-                        nomeGravado = nomeFinal;
-                    }
-                }
-                if (usarMetodoDownloadManual) {
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement("a");
-                    link.href = url; link.download = nomeFinal;
-                    document.body.appendChild(link); link.click(); document.body.removeChild(link);
-                    log(`   -> ✅ Download iniciado: ${nomeFinal}`);
-                    salvos.push({ nome: nomeFinal, pasta: null });
-                    await new Promise(r => setTimeout(r, 500));
-                }
+                const destino = { dirHandle, usarMetodoDownloadManual };
+                const nomeGravado = await gravarCsv(nomeFinal, blob, destino, salvos);
+                dirHandle = destino.dirHandle;
+                usarMetodoDownloadManual = destino.usarMetodoDownloadManual;
                 relatorio.arquivos.push({ nome: nomeGravado, linhas: linhasProcessadas, ignoradas: linhasIgnoradas });
                 arquivosProcessados++;
             }
@@ -4061,7 +4162,13 @@
         } finally {
             destruirSalEfemero(); // sal morre aqui, sempre
             btn.disabled = false;
+            document.getElementById('btnVer').disabled = false;
             processoFim(!!resultado);
+        }
+        if (VER) {
+            // Nada foi gravado ainda: o certificado so aparece depois do Salvar.
+            if (resultado) verAbrir();
+            return;
         }
         // A caixa de pronto aparece so depois do finally: o selo "Sal destruido"
         // e dito com o sal ja destruido, nao antes.
@@ -4094,6 +4201,262 @@
         btn.textContent = '✓ Pronto';
         PROCESSO_TIMER = setTimeout(() => { btn.classList.remove('pronto'); btn.textContent = TEXTO_BTN_PROCESSAR; }, 1600);
     }
+
+    // ===========================================================================
+    // VER ANTES DE SALVAR — tabela do arquivo final, estilo Power BI
+    // ===========================================================================
+    // Feita aqui, sem biblioteca (regra do projeto: nada de fora). So mostra o
+    // resultado JA anonimizado; o original nunca entra aqui. O resultado fica so
+    // na memoria ate a pessoa salvar, descartar ou abrir outro arquivo.
+    // Rolagem virtual: desenha so as linhas que aparecem na tela, por isso
+    // aguenta arquivo grande sem travar.
+    let VER_PENDENTES = [];  // [{ nome, linhas: [cabecalho, ...linhas CSV] }]
+    let VER = null;          // estado da tabela aberta
+    let VER_FILTRO_TIMER = null;
+    const VER_ALTURA = 30;   // altura de cada linha, em px (igual ao CSS)
+    const VER_COLADOR = new Intl.Collator('pt-BR', { numeric: true, sensitivity: 'base' });
+
+    // Le uma linha do CSV que o proprio app gerou (separador ; e aspas com "").
+    function verDividirLinha(l) {
+        const out = [];
+        let cur = '', aspas = false;
+        for (let i = 0; i < l.length; i++) {
+            const ch = l[i];
+            if (aspas) {
+                if (ch === '"') { if (l[i + 1] === '"') { cur += '"'; i++; } else aspas = false; }
+                else cur += ch;
+            } else if (ch === '"' && cur === '') aspas = true;
+            else if (ch === ';') { out.push(cur); cur = ''; }
+            else cur += ch;
+        }
+        out.push(cur);
+        return out;
+    }
+
+    function verLimparPendentes() {
+        VER_PENDENTES = [];
+        VER = null;
+        const ov = document.getElementById('verOverlay');
+        if (ov) ov.classList.remove('aberto');
+        const g = document.getElementById('verGrade');
+        if (g) g.innerHTML = '';
+    }
+
+    function verAbrir() {
+        if (!VER_PENDENTES.length) return;
+        const sel = document.getElementById('verArquivo');
+        sel.innerHTML = VER_PENDENTES.map((p, i) => `<option value="${i}">${selcEsc(p.nome)}</option>`).join('');
+        sel.style.display = VER_PENDENTES.length > 1 ? '' : 'none';
+        document.getElementById('verOverlay').classList.add('aberto');
+        verTrocarArquivo(0);
+        log('👁️ Arquivo final aberto na tabela. Nada foi salvo ainda.');
+    }
+
+    function verTrocarArquivo(i) {
+        i = Number(i) || 0;
+        const p = VER_PENDENTES[i];
+        if (!p) return;
+        const cab = verDividirLinha(p.linhas[0].replace(/^﻿/, ''));
+        const dados = [];
+        for (let k = 1; k < p.linhas.length; k++) dados.push(verDividirLinha(p.linhas[k]));
+        // largura de cada coluna pelo maior texto (cabecalho e primeiras 300 linhas)
+        const medida = document.createElement('canvas').getContext('2d');
+        const fonte = getComputedStyle(document.body).fontFamily;
+        const larguras = cab.map((nome, c) => {
+            // mede o texto de verdade: o maior valor das primeiras 300 linhas e o
+            // cabecalho em negrito, com folga para a seta de ordenacao
+            medida.font = `400 14px ${fonte}`;
+            let max = 0;
+            for (let k = 0; k < Math.min(dados.length, 300); k++) max = Math.max(max, medida.measureText(dados[k][c] || '').width);
+            medida.font = `700 14px ${fonte}`;
+            const cabec = medida.measureText(nome + ' ▲').width;
+            return Math.max(70, Math.min(320, Math.ceil(Math.max(max, cabec)) + 24));
+        });
+        VER = { arq: i, cab, dados, larguras, visiveis: dados.map((_, k) => k), ordem: null,
+            sortCol: -1, sortDir: 0, ocultas: new Set(), filtros: new Map(), busca: '', sel: null };
+        document.getElementById('verBusca').value = '';
+        document.getElementById('verArquivo').value = String(i);
+        verMontarColunas();
+        verMontarTabela();
+    }
+
+    function verColunasVisiveis() {
+        return VER.cab.map((_, c) => c).filter(c => !VER.ocultas.has(c));
+    }
+
+    function verMontarColunas() {
+        const box = document.getElementById('verColunas');
+        box.innerHTML = '<button type="button" class="ver-btn-sec" onclick="verMostrarTodas()">Mostrar todas</button>' +
+            VER.cab.map((n, c) => `<label><input type="checkbox" ${VER.ocultas.has(c) ? '' : 'checked'} onchange="verOcultar(${c}, !this.checked)">${selcEsc(n)}</label>`).join('');
+    }
+
+    function verAlternarColunas() { document.getElementById('verColunas').classList.toggle('aberto'); }
+    function verOcultar(c, ocultar) { if (ocultar) VER.ocultas.add(c); else VER.ocultas.delete(c); verMontarTabela(); }
+    function verMostrarTodas() { VER.ocultas.clear(); verMontarColunas(); verMontarTabela(); }
+
+    // Cabecalho (clique ordena) + linha de filtros por coluna. O corpo e desenhado em verDesenhar.
+    function verMontarTabela() {
+        const cols = verColunasVisiveis();
+        const seta = c => VER.sortCol === c ? (VER.sortDir > 0 ? ' ▲' : ' ▼') : '';
+        const fixa = (j) => j === 0 ? ' ver-fixa2' : '';
+        const largura = 72 + cols.reduce((s, c) => s + VER.larguras[c], 0);
+        const colgroup = '<colgroup><col style="width:72px">' + cols.map(c => `<col style="width:${VER.larguras[c]}px">`).join('') + '</colgroup>';
+        const cab1 = '<tr><th class="ver-fixa ver-num" title="Número da linha no arquivo final">#</th>' +
+            cols.map((c, j) => `<th class="${(fixa(j) + (VER.sortCol === c ? ' ver-ordenada' : '')).trim()}" title="Clique para ordenar: ${selcEscAttr(VER.cab[c])}" onclick="verOrdenar(${c})">${selcEsc(VER.cab[c])}${seta(c)}</th>`).join('') + '</tr>';
+        const cab2 = '<tr class="ver-filtros"><th class="ver-fixa"></th>' +
+            cols.map((c, j) => `<th class="${fixa(j).trim()}"><input type="text" placeholder="filtrar…" value="${selcEscAttr(VER.filtros.get(c) || '')}" oninput="verFiltroColuna(${c}, this.value)"></th>`).join('') + '</tr>';
+        document.getElementById('verGrade').innerHTML =
+            `<table style="width:${largura}px">${colgroup}<thead>${cab1}${cab2}</thead><tbody id="verCorpo"></tbody></table>`;
+        verDesenhar();
+    }
+
+    function verDesenhar() {
+        if (!VER) return;
+        const grade = document.getElementById('verGrade');
+        const corpo = document.getElementById('verCorpo');
+        if (!grade || !corpo) return;
+        const cols = verColunasVisiveis();
+        const total = VER.visiveis.length;
+        const inicio = Math.max(0, Math.floor(grade.scrollTop / VER_ALTURA) - 10);
+        const fim = Math.min(total, inicio + Math.ceil(grade.clientHeight / VER_ALTURA) + 25);
+        const span = cols.length + 1;
+        let html = inicio > 0 ? `<tr style="height:${inicio * VER_ALTURA}px"><td colspan="${span}" style="border:0;padding:0"></td></tr>` : '';
+        for (let k = inicio; k < fim; k++) {
+            const r = VER.visiveis[k];
+            const linha = VER.dados[r];
+            html += `<tr><td class="ver-fixa ver-num">${(r + 1).toLocaleString('pt-BR')}</td>` + cols.map((c, j) => {
+                const v = linha[c] || '';
+                const cls = (j === 0 ? 'ver-fixa2 ' : '') + (v === '' ? 'ver-vazio ' : '') +
+                    (VER.sel && VER.sel[0] === r && VER.sel[1] === c ? 'ver-sel' : '');
+                return `<td class="${cls.trim()}" onclick="verCelula(${r}, ${c})">${selcEsc(v)}</td>`;
+            }).join('') + '</tr>';
+        }
+        if (fim < total) html += `<tr style="height:${(total - fim) * VER_ALTURA}px"><td colspan="${span}" style="border:0;padding:0"></td></tr>`;
+        corpo.innerHTML = html;
+        verAtualizarTextos();
+    }
+
+    function verAtualizarTextos() {
+        const p = VER_PENDENTES[VER.arq];
+        const n = VER.dados.length, m = VER.cab.length, vis = VER.visiveis.length;
+        document.getElementById('verTitulo').innerHTML = `👁️ Como ficou<small>${n.toLocaleString('pt-BR')} linha(s) · ${m} coluna(s) · ainda não salvo</small>`;
+        const rod = document.getElementById('verRodape');
+        if (VER.sel) {
+            const [r, c] = VER.sel;
+            const v = VER.dados[r][c] || '';
+            rod.innerHTML = `Linha <strong>${(r + 1).toLocaleString('pt-BR')}</strong> · <strong>${selcEsc(VER.cab[c])}</strong>: ${v === '' ? '<em>vazio</em>' : selcEsc(v)}`;
+        } else {
+            rod.innerHTML = (vis === n ? `Mostrando as <strong>${n.toLocaleString('pt-BR')}</strong> linhas.` :
+                `Mostrando <strong>${vis.toLocaleString('pt-BR')}</strong> de ${n.toLocaleString('pt-BR')} linhas (filtro ligado).`) +
+                (VER.ocultas.size ? ` ${VER.ocultas.size} coluna(s) escondida(s) só na tabela — o arquivo sai com todas.` : '') +
+                ` Clique numa célula para ler o valor inteiro. Arquivo: ${selcEsc(p ? p.nome : '')}`;
+        }
+    }
+
+    function verCelula(r, c) {
+        VER.sel = (VER.sel && VER.sel[0] === r && VER.sel[1] === c) ? null : [r, c];
+        verDesenhar();
+    }
+
+    // Clique: crescente -> decrescente -> ordem do arquivo.
+    function verOrdenar(c) {
+        if (VER.sortCol !== c) { VER.sortCol = c; VER.sortDir = 1; }
+        else if (VER.sortDir === 1) VER.sortDir = -1;
+        else { VER.sortCol = -1; VER.sortDir = 0; }
+        if (VER.sortCol >= 0) {
+            const d = VER.dados, dir = VER.sortDir;
+            VER.ordem = d.map((_, k) => k).sort((a, b) => dir * VER_COLADOR.compare(d[a][c] || '', d[b][c] || '') || a - b);
+        } else VER.ordem = null;
+        verAplicarFiltros();
+        verMontarTabela();
+    }
+
+    function verFiltroColuna(c, texto) {
+        if (texto.trim()) VER.filtros.set(c, texto); else VER.filtros.delete(c);
+        verAgendarFiltro();
+    }
+
+    function verAgendarFiltro() {
+        clearTimeout(VER_FILTRO_TIMER);
+        VER_FILTRO_TIMER = setTimeout(() => { verAplicarFiltros(); verVoltarAoTopo(); verDesenhar(); }, 200);
+    }
+
+    function verVoltarAoTopo() { const g = document.getElementById('verGrade'); if (g) g.scrollTop = 0; }
+
+    // Busca e filtros sem acento e sem diferenca de maiuscula; todos juntos (E).
+    function verAplicarFiltros() {
+        if (!VER) return;
+        VER.busca = selcNorm(document.getElementById('verBusca').value.trim());
+        const filtros = [...VER.filtros.entries()].map(([c, t]) => [c, selcNorm(t.trim())]);
+        const base = VER.ordem || VER.dados.map((_, k) => k);
+        if (!VER.busca && !filtros.length) { VER.visiveis = base; return; }
+        VER.visiveis = base.filter(r => {
+            const linha = VER.dados[r];
+            for (const [c, t] of filtros) if (!selcNorm(linha[c] || '').includes(t)) return false;
+            if (VER.busca && !linha.some(v => selcNorm(v).includes(VER.busca))) return false;
+            return true;
+        });
+    }
+
+    function verLimparFiltros() {
+        document.getElementById('verBusca').value = '';
+        VER.filtros.clear();
+        verAplicarFiltros();
+        verMontarTabela();
+    }
+
+    // Fecha so a tabela: o resultado continua guardado, com os botoes na caixa de baixo.
+    function verFechar() {
+        document.getElementById('verOverlay').classList.remove('aberto');
+        if (!VER_PENDENTES.length) return;
+        const caixa = document.getElementById('salvarResultado');
+        caixa.classList.remove('aviso');
+        caixa.innerHTML = '<h4>👁️ O arquivo final está pronto, mas ainda não foi salvo</h4>' +
+            '<div class="salvar-selos">' +
+            '<button type="button" class="ver-btn-sec selc-btn-mini" onclick="verAbrir()">👁️ Ver de novo</button> ' +
+            '<button type="button" class="selc-btn-mini" onclick="verSalvar()">💾 Salvar</button> ' +
+            '<button type="button" class="selc-btn-mini" onclick="verDescartar()">Descartar</button></div>';
+        caixa.classList.add('visivel');
+    }
+
+    function verDescartar() {
+        if (!VER_PENDENTES.length) return;
+        if (!confirm('Descartar o resultado? Nada foi salvo. Para ter o arquivo, processe de novo.')) return;
+        verLimparPendentes();
+        CERTIFICADO = null; // nada foi salvo: nao tem lote para certificar
+        salvarMostrarResultado(null);
+        log('🗑️ Resultado descartado. Nada foi salvo.');
+    }
+
+    // Salva exatamente o que esta na tabela. A pasta e pedida agora (clique da pessoa).
+    async function verSalvar() {
+        if (!VER_PENDENTES.length) return;
+        const saveMode = document.querySelector('input[name="saveMode"]:checked').value;
+        const destino = await escolherPastaDestino(saveMode, VER_PENDENTES.length);
+        if (!destino) {
+            document.getElementById('verRodape').innerHTML = '📁 <strong>Nenhuma pasta escolhida.</strong> O resultado continua aqui: clique em Salvar de novo ou marque Pasta Downloads.';
+            return;
+        }
+        const salvos = [];
+        let linhas = 0;
+        for (let i = 0; i < VER_PENDENTES.length; i++) {
+            const p = VER_PENDENTES[i];
+            const blob = new Blob([p.linhas.join("\n")], { type: "text/csv;charset=utf-8;" });
+            const nomeGravado = await gravarCsv(p.nome, blob, destino, salvos);
+            if (CERTIFICADO && CERTIFICADO.arquivos[i]) {
+                CERTIFICADO.arquivos[i].nome = nomeGravado;
+                linhas += CERTIFICADO.arquivos[i].linhas;
+            }
+        }
+        CERTIFICADO_PASTA = destino.dirHandle;
+        verLimparPendentes();
+        document.getElementById('btnCert').style.display = 'block';
+        salvarMostrarResultado({ salvos, linhas });
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && document.getElementById('verOverlay')?.classList.contains('aberto')) verFechar();
+    });
 
     // ===========================================================================
     // CERTIFICADO DE ANONIMIZAÇÃO
