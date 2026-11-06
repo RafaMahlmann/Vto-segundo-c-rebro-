@@ -1551,3 +1551,49 @@ carimbo "em desenvolvimento".
 
 **Versão v4.22 · 05/11/2026:** subiram juntos title, badge, 4 rodapés,
 `VERSAO_LOCAL`, `sw.js`, `version.json`, README, `package.json`.
+
+
+---
+
+## PARTE 39 — Ver antes de salvar: tabela do arquivo final (2026-11-06, v4.23)
+
+**Pedido do Rafa:** um visualizador estilo Power BI para conferir colunas
+e linhas do resultado antes de salvar ("pente fino").
+
+**Pesquisa:** Tabulator, Grid.js, AG Grid Community (MIT), Perspective
+(FINOS, WebAssembly, vários MB), Handsontable (licença paga para uso no
+trabalho). Todos esbarram na regra "nenhuma biblioteca". Decisão com o
+Rafa: fazer o nosso, leve, dentro do `anonimizador.html`.
+
+**O que mudou (só `anonimizador.html`):**
+- Botão novo `#btnVer` "👁️ Processar e ver antes de salvar". O
+  "Processar e Salvar Todos" continua igual.
+- `iniciarProcessamento({ ver: true })`: processa igual, mas guarda o CSV
+  pronto em `VER_PENDENTES` (só memória) em vez de gravar. A pasta é
+  pedida só no Salvar. O sal morre no fim do processamento, como sempre.
+- Refatoração sem mudar comportamento: a escolha da pasta virou
+  `escolherPastaDestino()` e a gravação virou `gravarCsv()` (mesmo
+  código, agora usado pelos dois caminhos).
+- Tabela `#verOverlay` (seção `VER ANTES DE SALVAR`): cabeçalho, linha nº
+  e primeira coluna fixos; rolagem virtual (desenha ~50 linhas por vez);
+  ordenar no clique (▲ ▼ volta); busca geral e filtro por coluna, sem
+  acento e sem maiúscula; esconder colunas (só na tela); clique na
+  célula mostra o valor inteiro no rodapé; Esc fecha.
+- Fechar deixa o resultado guardado com "Ver de novo / Salvar /
+  Descartar" na caixa de resultado. Descartar apaga e anula o
+  certificado. Salvar grava exatamente o que está na tabela, e o
+  certificado sai com os nomes gravados.
+- Arquivo novo ou lote novo apagam o resultado guardado (`verLimparPendentes`).
+
+**Teste (Playwright, 20.000 linhas):** processa em ~0,3 s; 51 linhas no
+DOM mesmo rolando; ordenar, buscar, filtrar, esconder; fechar/reabrir;
+Salvar baixa 20.001 linhas (cabeçalho + dados) idênticas à tabela;
+Descartar zera tudo; botão antigo continua salvando. As 6 abas abrem sem
+erro e a tabela funciona dentro do iframe da aba 6.
+
+**Próxima etapa proposta:** Raio-X da coluna (valores distintos, vazios,
+top 5 com barrinhas).
+
+**Versão v4.23 · 06/11/2026:** subiram juntos title, badge, 4 rodapés,
+`VERSAO_LOCAL`, `DATA_ENTREGA`, `sw.js`, `version.json`, README,
+`package.json`.
